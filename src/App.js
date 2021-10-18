@@ -1,24 +1,37 @@
-import logo from './logo.svg';
 import './App.css';
+import Login from "./components/Login";
+import React, {useEffect, useMemo, useState} from "react";
+import {UserContext} from "./contexts/UserContext";
+import { BrowserRouter as Router, Route } from "react-router-dom";
+import Home from "./components/Home";
 
 function App() {
+
+  const [user, setUser] = useState(null);
+  const userProvider = useMemo(() => ({ user, setUser }), [user, setUser]);
+
+    useEffect(() => {
+        setUser(JSON.parse(window.localStorage.getItem("user")));
+    }, []);
+
+    useEffect(() => {
+        window.localStorage.setItem("user", JSON.stringify(user));
+    }, [user]);
+
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div>
+        <UserContext.Provider value={userProvider}>
+            { user == null ?
+                <Route path="/" exact component={Login} />
+            :
+                <Route path="/" exact component={Home} />
+            }
+        </UserContext.Provider>
+      </div>
+    </Router>
   );
 }
 
