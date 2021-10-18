@@ -1,4 +1,4 @@
-import './App.css';
+import './index.css';
 import Login from "./components/Login";
 import React, {useEffect, useMemo, useState} from "react";
 import {UserContext} from "./contexts/UserContext";
