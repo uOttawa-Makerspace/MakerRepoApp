@@ -2,7 +2,7 @@
   "name": "makerepo-react-app",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://uottawa-makerspace.github.io/makerepo-react-app",
+  "homepage": "https://uottawa-makerspace.github.io",
   "dependencies": {
     "@craco/craco": "^6.3.0",
     "@testing-library/jest-dom": "^5.11.4",
