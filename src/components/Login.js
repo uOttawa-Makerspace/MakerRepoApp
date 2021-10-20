@@ -10,7 +10,7 @@ const Login = () => {
 
     const handleLogin = (e) => {
         e.preventDefault();
-        fetch('http://localhost:3000/login_authentication', {
+        fetch('https://staging.makerepo.com/login_authentication', {
             method: 'post',
             credentials: 'include',
             headers: {

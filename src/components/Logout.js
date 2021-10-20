@@ -6,7 +6,7 @@ const Logout = () => {
     const { user, setUser } = useContext(UserContext);
 
     const handleLogout = (e) => {
-        fetch('http://localhost:3000/logout', {
+        fetch('https://staging.makerepo.com/logout', {
             method: 'GET',
             credentials: 'include',
             headers: {

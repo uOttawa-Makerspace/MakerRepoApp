@@ -8,7 +8,7 @@ const Home = () => {
     const [ badge, setBadge ] = useState(null);
 
     const getBadges = () => {
-        fetch('http://localhost:3000/badges/populate_badge_list?user_id=1', {
+        fetch('https://staging.makerepo.com/badges/populate_badge_list?user_id=1', {
             method: 'GET',
             credentials: 'include',
             headers: {
