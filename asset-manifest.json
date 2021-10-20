@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/makerepo-react-app/static/css/main.b9200794.chunk.css",
-    "main.js": "/makerepo-react-app/static/js/main.31f0887e.chunk.js",
-    "main.js.map": "/makerepo-react-app/static/js/main.31f0887e.chunk.js.map",
+    "main.js": "/makerepo-react-app/static/js/main.d7964d59.chunk.js",
+    "main.js.map": "/makerepo-react-app/static/js/main.d7964d59.chunk.js.map",
     "runtime-main.js": "/makerepo-react-app/static/js/runtime-main.7247acc6.js",
     "runtime-main.js.map": "/makerepo-react-app/static/js/runtime-main.7247acc6.js.map",
     "static/js/2.67def462.chunk.js": "/makerepo-react-app/static/js/2.67def462.chunk.js",
@@ -15,6 +15,6 @@
     "static/js/runtime-main.7247acc6.js",
     "static/js/2.67def462.chunk.js",
     "static/css/main.b9200794.chunk.css",
-    "static/js/main.31f0887e.chunk.js"
+    "static/js/main.d7964d59.chunk.js"
   ]
 }
