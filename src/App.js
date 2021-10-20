@@ -2,7 +2,7 @@ import './index.css';
 import Login from "./components/Login";
 import React, {useEffect, useMemo, useState} from "react";
 import {UserContext} from "./contexts/UserContext";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { HashRouter as Router, Route } from "react-router-dom";
 import Home from "./components/Home";
 
 function App() {
@@ -21,7 +21,7 @@ function App() {
 
 
   return (
-    <Router>
+    <Router basename ="/makerepo-react-app">
       <div>
         <UserContext.Provider value={userProvider}>
             { user == null ?
