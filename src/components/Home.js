@@ -1,6 +1,9 @@
 import React, {useContext, useState} from "react";
 import {UserContext} from "../contexts/UserContext";
 import Logout from "./Logout";
+import '../env_variables'
+import env_variables from "../env_variables";
+import SpaceDashboard from "./SpaceDashboard";
 
 const Home = () => {
 
@@ -8,7 +11,7 @@ const Home = () => {
     const [ badge, setBadge ] = useState(null);
 
     const getBadges = () => {
-        fetch('https://staging.makerepo.com/badges/populate_badge_list?user_id=1', {
+        fetch(`${env_variables.config.api_url}/badges/populate_badge_list?user_id=1`, {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -29,6 +32,7 @@ const Home = () => {
             { badge !== null &&
                 <p>{ badge }</p>
             }
+            <SpaceDashboard />
             <Logout/>
         </div>
     )

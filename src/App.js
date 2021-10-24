@@ -4,6 +4,7 @@ import React, {useEffect, useMemo, useState} from "react";
 import {UserContext} from "./contexts/UserContext";
 import { HashRouter as Router, Route } from "react-router-dom";
 import Home from "./components/Home";
+import Header from "./components/Header";
 
 function App() {
 
@@ -18,16 +19,18 @@ function App() {
         window.localStorage.setItem("user", JSON.stringify(user));
     }, [user]);
 
-
-
   return (
-    <Router basename ="/makerepo-react-app">
+    <Router>
       <div>
         <UserContext.Provider value={userProvider}>
+            <Header />
             { user == null ?
                 <Route path="/" exact component={Login} />
             :
-                <Route path="/" exact component={Home} />
+                <>
+                    <Route path="/" exact component={Home} />
+                </>
+
             }
         </UserContext.Provider>
       </div>

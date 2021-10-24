@@ -1,5 +1,6 @@
 import React, {useContext, useState} from "react";
 import {UserContext} from "../contexts/UserContext";
+import env_variables from "../env_variables";
 
 const Login = () => {
 
@@ -10,7 +11,7 @@ const Login = () => {
 
     const handleLogin = (e) => {
         e.preventDefault();
-        fetch('https://staging.makerepo.com/login_authentication', {
+        fetch(`${env_variables.config.api_url}/login_authentication`, {
             method: 'post',
             credentials: 'include',
             headers: {

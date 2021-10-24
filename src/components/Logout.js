@@ -1,12 +1,13 @@
 import React, {useContext} from "react";
 import {UserContext} from "../contexts/UserContext";
+import env_variables from "../env_variables";
 
 const Logout = () => {
 
     const { user, setUser } = useContext(UserContext);
 
     const handleLogout = (e) => {
-        fetch('https://staging.makerepo.com/logout', {
+        fetch(`${env_variables.config.api_url}/logout`, {
             method: 'GET',
             credentials: 'include',
             headers: {
