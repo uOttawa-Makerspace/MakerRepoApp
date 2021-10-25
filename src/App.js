@@ -13,15 +13,14 @@ function App() {
   const userProvider = useMemo(() => ({ user, setUser }), [user, setUser]);
 
     const check_signed_in = () => {
-        fetch(`${env_variables.config.api_url}/check_signed_in`, {
+        return fetch(`${env_variables.config.api_url}/check_signed_in`, {
             method: 'GET',
             credentials: 'include',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             }}).then(response => response.json().then((data => {
-                console.log(data);
-                return data === {"signed_in": "true"};
+                return data["signed_in"] === "true";
             })
         )).catch((error) => {
             console.error(error);
@@ -29,15 +28,22 @@ function App() {
     }
 
     useEffect(() => {
-        if (check_signed_in) {
-            setUser(JSON.parse(window.localStorage.getItem("user")));
-        } else {
-            setUser(null);
-        }
+        check_signed_in().then((signed_in) => {
+                if (signed_in === true) {
+                    setUser(JSON.parse(window.localStorage.getItem("user")));
+                    console.log("signed in");
+                } else {
+                    setUser(null);
+                }
+            }
+        );
+        console.log(user);
     }, []);
 
     useEffect(() => {
-        window.localStorage.setItem("user", JSON.stringify(user));
+        if (user !== null) {
+            window.localStorage.setItem("user", JSON.stringify(user));
+        }
     }, [user]);
 
   return (
