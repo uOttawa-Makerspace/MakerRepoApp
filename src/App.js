@@ -10,6 +10,7 @@ import env_variables from "./env_variables";
 function App() {
 
   const [user, setUser] = useState(null);
+  const [userLoading, setUserLoading] = useState(false);
   const userProvider = useMemo(() => ({ user, setUser }), [user, setUser]);
 
     const check_signed_in = () => {
@@ -37,7 +38,7 @@ function App() {
                 }
             }
         );
-        console.log(user);
+        setUserLoading(true);
     }, []);
 
     useEffect(() => {
@@ -50,14 +51,20 @@ function App() {
     <Router>
       <div>
         <UserContext.Provider value={userProvider}>
-            <Header />
-            { user == null ?
-                <Route path="/" exact component={Login} />
-            :
-                <>
-                    <Route path="/" exact component={Home} />
-                </>
+            { userLoading === false ?
+                <div>Loading...</div>
+                :
+                <div>
+                    <Header />
+                    { user == null ?
+                    <Route path="/" exact component={Login} />
+                    :
+                    <>
+                        <Route path="/" exact component={Home} />
+                    </>
 
+                    }
+                </div>
             }
         </UserContext.Provider>
       </div>
