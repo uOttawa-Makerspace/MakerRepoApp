@@ -3,7 +3,7 @@ const dev = {
 }
 
 const production = {
-    api_url: "https://staging.makerepo.com"
+    api_url: "https://makerepo.com"
 }
 
 const config = process.env.NODE_ENV === 'production'
