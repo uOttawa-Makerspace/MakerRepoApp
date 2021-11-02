@@ -1,10 +1,12 @@
 import {UserContext} from "../contexts/UserContext";
 import {useContext, useEffect, useState} from "react";
 import env_variables from "../env_variables";
+import {useHistory} from "react-router-dom/cjs/react-router-dom";
 
 const SpaceDashboard = () => {
 
     const {user, setUser} = useContext(UserContext);
+    const history = useHistory();
     const [inSpaceUsers, setInSpaceUsers] = useState(null);
     const [searchedUsers, setSearchedUsers] = useState(null);
     const [value, setValue] = useState(null);
@@ -96,12 +98,16 @@ const SpaceDashboard = () => {
         });
     };
 
+    const sendToUserProfile = (username) => {
+        history.push(`/profile/${username}`);
+    }
+
     return (
         <div>
             <div>
-                <select onChange={e => changeSpace(e.target.value)} className="block w-52 text-gray-700 py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500">
-                    { inSpaceUsers !== null &&  JSON.parse(inSpaceUsers)['space_list'].map((space) => {
-                        return (<option value={space[1]} selected={space[1] === JSON.parse(inSpaceUsers)['space']['id']}>{space[0]}</option>)
+                <select value={inSpaceUsers !== null && JSON.parse(inSpaceUsers)['space']['id']} onChange={e => changeSpace(e.target.value)} className="block w-52 text-gray-700 py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500">
+                    { inSpaceUsers !== null && JSON.parse(inSpaceUsers)['space_list'].map((space) => {
+                        return (<option value={space[1]}>{space[0]}</option>)
                     })}
                 </select>
             </div>
@@ -143,7 +149,7 @@ const SpaceDashboard = () => {
                                     <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                         <div className="flex items-center">
                                             <div className="ml-3">
-                                                <p className="text-gray-900 whitespace-no-wrap">
+                                                <p onClick={() => sendToUserProfile(dashboard_user.username)} className="text-gray-900 whitespace-no-wrap">
                                                     {dashboard_user.name}
                                                 </p>
                                             </div>

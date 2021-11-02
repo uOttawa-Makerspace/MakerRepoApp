@@ -6,6 +6,7 @@ import { HashRouter as Router, Route } from "react-router-dom";
 import Home from "./components/Home";
 import Header from "./components/Header";
 import env_variables from "./env_variables";
+import Profile from "./components/Profile";
 
 function App() {
 
@@ -61,6 +62,9 @@ function App() {
                     :
                     <>
                         <Route path="/" exact component={Home} />
+                        <Route path="/profile/:username">
+                            <Profile />
+                        </Route>
                     </>
 
                     }
