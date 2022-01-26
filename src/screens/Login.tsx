@@ -1,47 +1,45 @@
-import React, {useContext, useState} from "react";
-import {UserContext} from "../contexts/UserContext";
-import env_variables from "../env_variables";
+import React, {useState} from "react";
+import env_variables from "../utils/env_variables";
+import axios from "axios";
+import {setUserSession} from "../utils/Common";
 
-const Login = () => {
-
-    const {user, setUser} = useContext(UserContext);
+function Login(props: { history: string[]; }) {
 
     const [usernameEmail, setUsernameEmail] = useState('')
     const [password, setPassword] = useState('')
 
-    const handleLogin = (e) => {
-        e.preventDefault();
-        fetch(`${env_variables.config.api_url}/login_authentication`, {
-            method: 'post',
-            credentials: 'include',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
+    const handleLogin = () => {
+        axios.post(`${env_variables.config.api_url}/login_authentication`, {
                 username_email: usernameEmail,
-                password: password,
-            })
-        }).then(response => response.json().then(data => {
-            setUser(data['user']);
-        })).catch((error) => {
-            console.error(error);
+                password: password
+            },
+            {
+                withCredentials: true,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            }).then(response => {
+                setUserSession(response.data.token, response.data.user);
+                props.history.push('/');
+        }).catch(error => {
+            console.log("Something went wrong. Please try again later.")
         });
     }
 
     return (
         <div>
             <div
-                className="flex flex-col w-full px-4 py-8 bg-white rounded-lg shadow dark:bg-gray-800 sm:px-6 md:px-8 lg:px-10">
-                <div className="self-center mb-6 text-xl font-light text-gray-600 sm:text-2xl dark:text-white">
+                className="flex flex-col w-full px-4 py-8 bg-white rounded-lg">
+                <h5 className="mb-1">
                     Login To Your MakerRepo Account
-                </div>
-                <div className="mt-8">
-                    <form onSubmit={handleLogin}>
+                </h5>
+                <div>
+                    <div>
                         <div className="flex flex-col mb-2">
                             <div className="flex relative">
                     <span
-                        className="rounded-l-md inline-flex  items-center px-3 border-t bg-white border-l border-b  border-gray-300 text-gray-500 shadow-sm text-sm">
+                        className="rounded-l-md inline-flex items-center px-3 border-t bg-white border-l border-b border-gray-300 text-gray-500 shadow-sm text-sm">
                         <svg width="15" height="15" fill="currentColor" viewBox="0 0 1792 1792"
                              xmlns="http://www.w3.org/2000/svg">
                             <path
@@ -80,13 +78,12 @@ const Login = () => {
                         {/*        </a>*/}
                         {/*    </div>*/}
                         {/*</div>*/}
-                        <div className="flex w-full">
-                            <button type="submit"
-                                    className="py-2 px-4 bg-primary hover:bg-primary focus:ring-primary focus:ring-offset-primary-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg ">
+                        <div className="d-grid gap-2">
+                            <button type={"button"} onClick={handleLogin} className="btn btn-primary">
                                 Login
                             </button>
                         </div>
-                    </form>
+                    </div>
                 </div>
                 {/*<div className="flex items-center justify-center mt-6">*/}
                 {/*    <a href="#" target="_blank"*/}

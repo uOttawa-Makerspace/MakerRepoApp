@@ -1,79 +1,67 @@
 import './index.css';
-import Login from "./components/Login";
-import React, {useEffect, useMemo, useState} from "react";
-import {UserContext} from "./contexts/UserContext";
-import { HashRouter as Router, Route } from "react-router-dom";
-import Home from "./components/Home";
-import Header from "./components/Header";
-import env_variables from "./env_variables";
-import Profile from "./components/Profile";
+import Login from "./screens/Login";
+import axios from 'axios';
+import React, {useEffect, useState} from "react";
+import {HashRouter as Router, Switch} from "react-router-dom";
+import Home from "./screens/Home";
+import Navbar from "./components/Navbar";
+import env_variables from "./utils/env_variables";
+import Profile from "./screens/Profile";
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap/dist/js/bootstrap';
+import PublicRoute from "./utils/PublicRoute";
+import PrivateRoute from "./utils/PrivateRoute";
+import {getToken, removeUserSession, setUserSession} from "./utils/Common";
+import Help from "./screens/Help";
 
 function App() {
 
-  const [user, setUser] = useState(null);
-  const [userLoading, setUserLoading] = useState(false);
-  const userProvider = useMemo(() => ({ user, setUser }), [user, setUser]);
+    const [authLoading, setAuthLoading] = useState(true);
 
-    const check_signed_in = () => {
-        return fetch(`${env_variables.config.api_url}/check_signed_in`, {
-            method: 'GET',
-            credentials: 'include',
+    useEffect(() => {
+        const token = getToken();
+        if (!token) {
+            return;
+        }
+
+        axios.get(`${env_variables.config.api_url}/check_signed_in`, {
+            withCredentials: true,
             headers: {
+                'Authorization': `Bearer ${window.localStorage.getItem('token')}`,
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-            }}).then(response => response.json().then((data => {
-                return data["signed_in"] === "true";
-            })
-        )).catch((error) => {
-            console.error(error);
-        });
-    }
-
-    useEffect(() => {
-        check_signed_in().then((signed_in) => {
-                if (signed_in === true) {
-                    setUser(JSON.parse(window.localStorage.getItem("user")));
-                    console.log("signed in");
-                } else {
-                    setUser(null);
-                }
             }
-        );
-        setUserLoading(true);
+        }).then(response => {
+            setUserSession(response.data.token, response.data.user);
+            setAuthLoading(false);
+        }).catch(error => {
+            console.log(error)
+            removeUserSession();
+            setAuthLoading(false);
+        });
     }, []);
 
-    useEffect(() => {
-        if (user !== null) {
-            window.localStorage.setItem("user", JSON.stringify(user));
-        }
-    }, [user]);
+    if (authLoading && getToken()) {
+        return <div className="content">Checking Authentication...</div>
+    }
 
-  return (
-    <Router>
-      <div>
-        <UserContext.Provider value={userProvider}>
-            { userLoading === false ?
-                <div>Loading...</div>
-                :
-                <div>
-                    <Header />
-                    { user == null ?
-                    <Route path="/" exact component={Login} />
-                    :
-                    <>
-                        <Route path="/" exact component={Home} />
-                        <Route path="/profile/:username">
-                            <Profile />
-                        </Route>
-                    </>
-
-                    }
+    return (
+        <Router>
+            <div className="main">
+                <div className="content">
+                    <Switch>
+                        <PublicRoute path="/login" component={Login}/>
+                        <PublicRoute path="/help" component={Help} />
+                        <PrivateRoute path="/profile/:username">
+                            <Profile/>
+                        </PrivateRoute>
+                        <PrivateRoute path="/" component={Home}/>
+                    </Switch>
                 </div>
-            }
-        </UserContext.Provider>
-      </div>
-    </Router>
-  );
+                <Navbar/>
+            </div>
+        </Router>
+    );
 }
 
 export default App;
