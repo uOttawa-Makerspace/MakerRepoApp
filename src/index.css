@@ -7,7 +7,6 @@ body {
   display: flex;
   min-height: 100vh;
   width: 100vw;
-  background-color: #311740;
   margin: 0;
   padding-bottom: 110px;
 }
