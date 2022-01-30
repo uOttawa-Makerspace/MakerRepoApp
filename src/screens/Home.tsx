@@ -35,7 +35,7 @@ function Home(props: { history: string[]; }) {
             {user &&
                 <>
                     <h1>Hello {user.name}</h1>
-                    {user.role === 'admin1'
+                    {user.role === 'admin'
                         ? <SpaceDashboard/>
                         : <SpaceHours/>
                     }

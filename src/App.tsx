@@ -28,9 +28,11 @@ function App() {
         HTTPRequest.get('check_signed_in').then(
             response => {
                 setUserSession(response.token, response.user);
+                setLoggedIn(true);
             }
         ).catch((error) => {
             console.error(error);
+            setLoggedIn(false);
             removeUserSession();
         });
 

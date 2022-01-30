@@ -42,7 +42,6 @@
     "build": "craco build",
     "test": "craco test",
     "eject": "craco eject",
-    "prepare": "husky install"
   },
   "eslintConfig": {
     "extends": [
@@ -63,7 +62,6 @@
     ]
   },
   "devDependencies": {
-    "husky": "^7.0.0",
     "pretty-quick": "^3.1.3"
   }
 }

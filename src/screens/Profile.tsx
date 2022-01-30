@@ -15,23 +15,17 @@ const Profile = () => {
     const [user, setUser] = useState<any>(null);
     const [profileUser, setProfileUser] = useState<any>(null);
     const [programs, setPrograms] = useState(null);
-    const [certifications, setCertifications] = useState(null);
+    const [certifications, setCertifications] = useState<any[] | null>(null);
     const [remainingTrainings, setRemainingTraings] = useState(null);
     const [role, setRole] = useState('')
     const [devProgram, setDevProgram] = useState(false);
     const [volunteerProgram, setVolunteerProgram] = useState(false);
 
-    const handleRoleChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
-        setRole(event.target.value)
-    }
+    const handleRoleChange = (event: { target: { value: React.SetStateAction<string>; }; }) => { setRole(event.target.value) }
 
-    const handleDevProgramChange = () => {
-        setDevProgram(!devProgram);
-    }
+    const handleDevProgramChange = () => { setDevProgram(!devProgram); }
 
-    const handleVolunteerProgramChange = () => {
-        setVolunteerProgram(!volunteerProgram);
-    }
+    const handleVolunteerProgramChange = () => { setVolunteerProgram(!volunteerProgram); }
 
     const onSubmit = (e: any) => {
         e.preventDefault();
@@ -152,12 +146,24 @@ const Profile = () => {
                                 </label>
                             </div>
                             {user.role === "admin" &&
-                                <button type="submit" className="btn btn-primary">Update Programs</button>
+                               <>
+                                   <br/>
+                                   <button type="submit" className="btn btn-primary">Update Programs</button>
+                               </>
                             }
                         </form>
                     </TabPanel>
                     <TabPanel value={value} index={2}>
                         Certifications
+                        <ul className="list-group">
+                            {certifications.map((certification: any, index: number) => (
+                                <li className="list-group-item" key={index}>
+                                    Name: {certification.training.name}
+                                    <br/>
+                                    On: {new Date(Date.parse(certification.updated_at)).toDateString()}
+                                </li>
+                            ))}
+                        </ul>
                     </TabPanel>
                     <TabPanel value={value} index={3}>
                         {user.role === "admin" &&
@@ -186,6 +192,7 @@ const Profile = () => {
                                             Regular User
                                         </label>
                                     </div>
+                                    <br/>
                                     <button className="btn btn-primary">Update role</button>
                                 </form>
                             </>
