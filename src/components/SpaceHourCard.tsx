@@ -3,7 +3,7 @@ import {Skeleton} from "@mui/material";
 
 export function SpaceHourCard(props: { hour: any; }) {
 
-    const valueOrSkeleton = (value: string, variant: string = 'text', width?: number, height?: number, applyFunc?: ((arg0: any) => any) | undefined) => {
+    const valueOrSkeleton = (value: string, variant: string = 'text', width?: number | string, height?: number | string, applyFunc?: ((arg0: any) => any) | undefined) => {
         let items = props.hour
 
         try {

@@ -33,7 +33,7 @@ export const patch = (route: string, body: any ) => {
 }
 
 export const put = (route: string, body: any) => {
-    return axios.patch(`${env_variables.config.api_url}/${route}`, body,{
+    return axios.put(`${env_variables.config.api_url}/${route}`, body,{
         withCredentials: true,
         headers: {
             'Accept': 'application/json',

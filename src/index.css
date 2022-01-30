@@ -70,3 +70,9 @@ code {
   padding-left: 7%;
   padding-right: 7%;
 }
+
+.v-center {
+  display: flex;
+  align-items: center;
+  height: 100vh;
+}

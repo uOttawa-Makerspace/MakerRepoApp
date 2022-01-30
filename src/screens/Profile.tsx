@@ -134,6 +134,7 @@ const Profile = () => {
                             <div className="list-group mx-0">
                                 <label className="list-group-item d-flex gap-2">
                                     <input className="form-check-input flex-shrink-0" type="checkbox"
+                                           disabled={user.role !== "admin"}
                                            checked={devProgram} value={String(devProgram)}
                                            onChange={handleDevProgramChange}/>
                                     <span>
@@ -142,6 +143,7 @@ const Profile = () => {
                                 </label>
                                 <label className="list-group-item d-flex gap-2">
                                     <input className="form-check-input flex-shrink-0" type="checkbox"
+                                           disabled={user.role !== "admin"}
                                            checked={volunteerProgram} value={String(volunteerProgram)}
                                            onChange={handleVolunteerProgramChange}/>
                                     <span>
@@ -149,7 +151,9 @@ const Profile = () => {
                                   </span>
                                 </label>
                             </div>
-                            <button type="submit" className="btn btn-primary">Update Programs</button>
+                            {user.role === "admin" &&
+                                <button type="submit" className="btn btn-primary">Update Programs</button>
+                            }
                         </form>
                     </TabPanel>
                     <TabPanel value={value} index={2}>

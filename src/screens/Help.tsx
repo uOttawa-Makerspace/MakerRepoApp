@@ -1,10 +1,11 @@
-import React, {useState} from "react";
+import React, {useContext, useState} from "react";
 import env_variables from "../utils/env_variables";
 import * as HTTPRequest from "../utils/HTTPRequests";
 import LogoutIcon from '@mui/icons-material/Logout';
 import {Button} from "@mui/material";
 import axios from "axios";
 import {removeUserSession} from "../utils/Common";
+import {LoggedInContext} from "../utils/Contexts";
 
 const Help = (props: { history: string[]; }) => {
     const [errors, setErrors] = useState(false);
@@ -14,6 +15,7 @@ const Help = (props: { history: string[]; }) => {
     const [email, setEmail] = useState("");
     const [subject, setSubject] = useState("");
     const [comments, setComments] = useState("");
+    const {loggedIn, setLoggedIn} = useContext(LoggedInContext);
 
     const handleLogout = () => {
         axios.get(`${env_variables.config.api_url}/logout`, {
@@ -24,6 +26,7 @@ const Help = (props: { history: string[]; }) => {
                 'Authorization': `Bearer ${window.localStorage.getItem('token')}`,
             }
         }).then(() => {
+            setLoggedIn(false);
             removeUserSession();
             props.history.push('/login');
         }).catch((error) => {
@@ -54,6 +57,7 @@ const Help = (props: { history: string[]; }) => {
                 email: email,
                 subject: subject,
                 comments: comments,
+                app_version: `${env_variables.config.app_version} ${env_variables.config.app_release_type}`,
             }).then(() => {
                 setEmailSent(true);
                 setErrors(false);
@@ -69,7 +73,7 @@ const Help = (props: { history: string[]; }) => {
         <div className="p-5p">
             <div className="py-4 text-center">
                 <h2>MakerRepo App</h2>
-                <p>Version {env_variables.config.app_version}</p>
+                <p>Version {env_variables.config.app_version} {env_variables.config.app_release_type}</p>
             </div>
             <div>
                 <h3 className="text-center py-1">You need help? Contact Us through this form!</h3>
