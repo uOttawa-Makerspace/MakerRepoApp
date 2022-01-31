@@ -1,23 +1,24 @@
 {
   "files": {
-    "main.css": "/static/css/main.265805da.chunk.css",
-    "main.js": "/static/js/main.d0d4922e.chunk.js",
-    "main.js.map": "/static/js/main.d0d4922e.chunk.js.map",
+    "main.css": "/static/css/main.348c9721.chunk.css",
+    "main.js": "/static/js/main.0fcc3e75.chunk.js",
+    "main.js.map": "/static/js/main.0fcc3e75.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.9e102e72.js",
     "runtime-main.js.map": "/static/js/runtime-main.9e102e72.js.map",
     "static/css/2.1e3798b8.chunk.css": "/static/css/2.1e3798b8.chunk.css",
-    "static/js/2.ab838685.chunk.js": "/static/js/2.ab838685.chunk.js",
-    "static/js/2.ab838685.chunk.js.map": "/static/js/2.ab838685.chunk.js.map",
+    "static/js/2.08fddfae.chunk.js": "/static/js/2.08fddfae.chunk.js",
+    "static/js/2.08fddfae.chunk.js.map": "/static/js/2.08fddfae.chunk.js.map",
     "index.html": "/index.html",
     "static/css/2.1e3798b8.chunk.css.map": "/static/css/2.1e3798b8.chunk.css.map",
-    "static/css/main.265805da.chunk.css.map": "/static/css/main.265805da.chunk.css.map",
-    "static/js/2.ab838685.chunk.js.LICENSE.txt": "/static/js/2.ab838685.chunk.js.LICENSE.txt"
+    "static/css/main.348c9721.chunk.css.map": "/static/css/main.348c9721.chunk.css.map",
+    "static/js/2.08fddfae.chunk.js.LICENSE.txt": "/static/js/2.08fddfae.chunk.js.LICENSE.txt",
+    "static/media/makerepo-logo.ccabe80b.jpg": "/static/media/makerepo-logo.ccabe80b.jpg"
   },
   "entrypoints": [
     "static/js/runtime-main.9e102e72.js",
     "static/css/2.1e3798b8.chunk.css",
-    "static/js/2.ab838685.chunk.js",
-    "static/css/main.265805da.chunk.css",
-    "static/js/main.d0d4922e.chunk.js"
+    "static/js/2.08fddfae.chunk.js",
+    "static/css/main.348c9721.chunk.css",
+    "static/js/main.0fcc3e75.chunk.js"
   ]
 }
