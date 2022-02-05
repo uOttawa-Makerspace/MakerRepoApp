@@ -2,9 +2,10 @@ import React, {useEffect, useState} from "react";
 import '../utils/env_variables'
 import env_variables from "../utils/env_variables";
 import SpaceDashboard from "./SpaceDashboard";
-import {getUser, removeUserSession} from "../utils/Common";
+import {getUser, removeUserSession, setUserSession} from "../utils/Common";
 import SpaceHours from "./SpaceHours";
 import axios from "axios";
+import * as HTTPRequest from "../utils/HTTPRequests";
 
 function Home(props: { history: string[]; }) {
 
@@ -15,17 +16,12 @@ function Home(props: { history: string[]; }) {
     }, [])
 
     const handleLogout = () => {
-        axios.get(`${env_variables.config.api_url}/logout`, {
-            withCredentials: true,
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${window.localStorage.getItem('token')}`,
+        HTTPRequest.get('logout').then(
+            () => {
+                removeUserSession();
+                props.history.push('/login');
             }
-        }).then(() => {
-            removeUserSession();
-            props.history.push('/login');
-        }).catch((error) => {
+        ).catch((error) => {
             console.error(error);
         });
     }

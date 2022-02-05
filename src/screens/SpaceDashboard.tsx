@@ -1,6 +1,8 @@
 import {useEffect, useState} from "react";
 import env_variables from "../utils/env_variables";
 import {useHistory} from "react-router-dom";
+import * as HTTPRequest from "../utils/HTTPRequests";
+import {removeUserSession, setUserSession} from "../utils/Common";
 
 const SpaceDashboard = () => {
 
@@ -14,17 +16,11 @@ const SpaceDashboard = () => {
     }, []);
 
     const getCurrentUsers = () => {
-        fetch(`${env_variables.config.api_url}/staff_dashboard`, {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
+        HTTPRequest.get('staff_dashboard').then(
+            response => {
+                setInSpaceUsers(JSON.stringify(response))
             }
-        }).then(response => response.json().then((data => {
-                setInSpaceUsers(JSON.stringify(data))
-            })
-        )).catch((error) => {
+        ).catch((error) => {
             console.error(error);
         });
     };

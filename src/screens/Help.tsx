@@ -113,7 +113,7 @@ const Help = (props: { history: string[]; }) => {
             </div>
             <br />
             { emailSent && !errors &&
-                <div className="alert alert-success">The help request has successfully been sent. You can expect an answer within 48 business hours</div>
+                <div className="alert alert-success">The help request has successfully been sent. You can expect an answer within 2 business days</div>
             }
             { emailSent && errors &&
             <div className="alert alert-danger">An error occurred while sending the email. Please try again later or contact uottawa.makerepo@gmail.com</div>
