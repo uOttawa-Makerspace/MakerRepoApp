@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import {SpaceHourCard} from "../components/SpaceHourCard";
 import axios from "axios";
 import env_variables from "../utils/env_variables";
+import * as HTTPRequest from "../utils/HTTPRequests";
 
 const SpaceHours = () => {
 
@@ -9,15 +10,12 @@ const SpaceHours = () => {
     const [errors, setErrors] = useState(false);
 
     const getHours = () => {
-        axios.get(`${env_variables.config.api_url}/hours`, {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
+        HTTPRequest.get('hours').then(
+            response => {
+                setHours(response);
             }
-        }).then(response => {
-            setHours(response.data);
-        }).catch(error => {
-            console.log(error);
+        ).catch((error) => {
+            console.error(error);
         });
     }
 

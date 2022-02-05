@@ -1,9 +1,8 @@
 import React, {useContext, useState} from "react";
-import env_variables from "../utils/env_variables";
-import axios from "axios";
 import {setUserSession} from "../utils/Common";
 import logo from '../assets/makerepo-logo.jpg';
 import {LoggedInContext} from "../utils/Contexts";
+import * as HTTPRequest from "../utils/HTTPRequests";
 
 function Login(props: { history: string[]; }) {
 
@@ -12,18 +11,11 @@ function Login(props: { history: string[]; }) {
     const {loggedIn, setLoggedIn} = useContext(LoggedInContext);
 
     const handleLogin = () => {
-        axios.post(`${env_variables.config.api_url}/login_authentication`, {
-                username_email: usernameEmail,
-                password: password
-            },
-            {
-                withCredentials: true,
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                }
-            }).then(response => {
-            setUserSession(response.data.token, response.data.user);
+        HTTPRequest.post('login_authentication', {
+            username_email: usernameEmail,
+            password: password
+        }).then((response) => {
+            setUserSession(response.token, response.user);
             setLoggedIn(true);
             props.history.push('/');
         }).catch(error => {

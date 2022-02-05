@@ -3,8 +3,7 @@ import env_variables from "../utils/env_variables";
 import * as HTTPRequest from "../utils/HTTPRequests";
 import LogoutIcon from '@mui/icons-material/Logout';
 import {Button} from "@mui/material";
-import axios from "axios";
-import {removeUserSession} from "../utils/Common";
+import {removeUserSession, setUserSession} from "../utils/Common";
 import {LoggedInContext} from "../utils/Contexts";
 
 const Help = (props: { history: string[]; }) => {
@@ -18,18 +17,13 @@ const Help = (props: { history: string[]; }) => {
     const {loggedIn, setLoggedIn} = useContext(LoggedInContext);
 
     const handleLogout = () => {
-        axios.get(`${env_variables.config.api_url}/logout`, {
-            withCredentials: true,
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${window.localStorage.getItem('token')}`,
+        HTTPRequest.get('logout').then(
+            () => {
+                setLoggedIn(false);
+                removeUserSession();
+                props.history.push('/login');
             }
-        }).then(() => {
-            setLoggedIn(false);
-            removeUserSession();
-            props.history.push('/login');
-        }).catch((error) => {
+        ).catch((error) => {
             console.error(error);
         });
     }

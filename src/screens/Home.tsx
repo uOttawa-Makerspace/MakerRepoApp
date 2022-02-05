@@ -1,10 +1,8 @@
 import React, {useEffect, useState} from "react";
 import '../utils/env_variables'
-import env_variables from "../utils/env_variables";
 import SpaceDashboard from "./SpaceDashboard";
 import {getUser, removeUserSession, setUserSession} from "../utils/Common";
 import SpaceHours from "./SpaceHours";
-import axios from "axios";
 import * as HTTPRequest from "../utils/HTTPRequests";
 
 function Home(props: { history: string[]; }) {

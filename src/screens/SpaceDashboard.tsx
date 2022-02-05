@@ -1,8 +1,6 @@
 import {useEffect, useState} from "react";
-import env_variables from "../utils/env_variables";
 import {useHistory} from "react-router-dom";
 import * as HTTPRequest from "../utils/HTTPRequests";
-import {removeUserSession, setUserSession} from "../utils/Common";
 
 const SpaceDashboard = () => {
 
@@ -26,69 +24,37 @@ const SpaceDashboard = () => {
     };
 
     const changeSpace = (space_id: number | string) => {
-        fetch(`${env_variables.config.api_url}/staff_dashboard/change_space?space_id=${space_id}`, {
-            method: 'PUT',
-            credentials: 'include',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            }
-        }).then(response => response.json().then((data => {
-                getCurrentUsers()
-            })
-        )).catch((error) => {
-            console.error(error);
+        HTTPRequest.put(`staff_dashboard/change_space?space_id=${space_id}`, {}).then(() => {
+            getCurrentUsers()
+        }).catch(error => {
+            console.log(error);
         });
     };
 
     const getSearchedUsers = () => {
-        fetch(`${env_variables.config.api_url}/staff_dashboard/search?query=${value}`, {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
+        HTTPRequest.get(`staff_dashboard/search?query=${value}`).then(
+            response => {
+                setSearchedUsers(JSON.stringify(response))
             }
-        }).then(response => response.json().then((data => {
-                setSearchedUsers(JSON.stringify(data))
-            })
-        )).catch((error) => {
+        ).catch((error) => {
             console.error(error);
         });
     };
 
     const signOutUser = (username: string) => {
-        fetch(`${env_variables.config.api_url}/staff_dashboard/remove_users?dropped_users[]=${username}`, {
-            method: 'PUT',
-            credentials: 'include',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            }
-        }).then(response => response.json()).then(
-            (data) => {
-                getCurrentUsers()
-            }
-        ).catch((error) => {
-            console.error(error);
+        HTTPRequest.put(`staff_dashboard/remove_users?dropped_users[]=${username}`, {}).then(() => {
+            getCurrentUsers()
+        }).catch(error => {
+            console.log(error);
         });
     };
 
     const signInUser = (username: string) => {
-        fetch(`${env_variables.config.api_url}/staff_dashboard/add_users?added_users[]=${username}`, {
-            method: 'PUT',
-            credentials: 'include',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            }
-        }).then(response => response.json()).then(
-            (data) => {
-                getCurrentUsers();
-                getSearchedUsers();
-            }
-        ).catch((error) => {
-            console.error(error);
+        HTTPRequest.put(`staff_dashboard/remove_users?add_users[]=${username}`, {}).then(() => {
+            getCurrentUsers();
+            getSearchedUsers();
+        }).catch(error => {
+            console.log(error);
         });
     };
 
