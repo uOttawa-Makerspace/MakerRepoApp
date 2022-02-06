@@ -76,3 +76,7 @@ code {
   align-items: center;
   height: 100vh;
 }
+
+.w-100vh {
+  width: 100vw;
+}

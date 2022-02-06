@@ -1,6 +1,6 @@
 import './index.css';
 import Login from "./screens/Login";
-import React, {useCallback, useContext, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {HashRouter as Router, Switch} from "react-router-dom";
 import Home from "./screens/Home";
 import Navbar from "./components/Navbar";

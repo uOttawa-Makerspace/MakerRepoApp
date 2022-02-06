@@ -28,11 +28,12 @@ function Home(props: { history: string[]; }) {
         <div>
             {user &&
                 <>
-                    <h1>Hello {user.name}</h1>
+                    <h1 className="text-center">Hello {user.name}</h1>
                     {user.role === 'admin'
                         ? <SpaceDashboard/>
                         : <SpaceHours/>
                     }
+                    <br/>
                     <button className="btn btn-primary" onClick={handleLogout}>Logout</button>
                 </>
             }

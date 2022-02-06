@@ -48,14 +48,13 @@ export const put = (route: string, body: any) => {
 }
 
 export const post = (route: string, body: any) => {
-    return axios.post(`${env_variables.config.api_url}/${route}`, {
+    return axios.post(`${env_variables.config.api_url}/${route}`, body, {
         withCredentials: true,
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${window.localStorage.getItem('token')}`,
         },
-        body: JSON.stringify(body)
     }).then((response) => {
         return response.data;
     }).catch((error) => {

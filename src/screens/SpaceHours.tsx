@@ -1,7 +1,5 @@
 import React, {useEffect, useState} from "react";
 import {SpaceHourCard} from "../components/SpaceHourCard";
-import axios from "axios";
-import env_variables from "../utils/env_variables";
 import * as HTTPRequest from "../utils/HTTPRequests";
 
 const SpaceHours = () => {
