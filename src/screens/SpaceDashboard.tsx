@@ -63,7 +63,7 @@ const SpaceDashboard = () => {
     }
 
     return (
-        <div className="w-100vh">
+        <div className="w-100vh px-2">
             <select value={inSpaceUsers !== null && JSON.parse(inSpaceUsers)['space']['id']}
                     onChange={e => changeSpace(e.target.value)} className="form-select mb-2">
                 {inSpaceUsers !== null && JSON.parse(inSpaceUsers)['space_list'].map((space: any) => {

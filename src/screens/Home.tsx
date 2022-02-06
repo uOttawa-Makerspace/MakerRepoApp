@@ -27,15 +27,14 @@ function Home(props: { history: string[]; }) {
     return (
         <div>
             {user &&
-                <div className="px-2">
+                <>
                     <h1 className="text-center">Hello {user.name}</h1>
                     {user.role === 'admin'
                         ? <SpaceDashboard/>
                         : <SpaceHours/>
                     }
                     <br/>
-                    <button className="btn btn-primary" onClick={handleLogout}>Logout</button>
-                </div>
+                </>
             }
         </div>
     )
