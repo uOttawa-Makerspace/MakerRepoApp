@@ -1,5 +1,5 @@
 import React, {useContext, useState} from "react";
-import {setUserSession} from "../utils/Common";
+import {getToken, setUserSession} from "../utils/Common";
 import logo from '../assets/makerepo-logo.jpg';
 import {LoggedInContext} from "../utils/Contexts";
 import * as HTTPRequest from "../utils/HTTPRequests";
@@ -17,6 +17,7 @@ function Login(props: { history: string[]; }) {
         }).then((response) => {
             setUserSession(response.token, response.user);
             setLoggedIn(true);
+            console.log(getToken())
             props.history.push('/');
         }).catch(error => {
             setLoggedIn(false);

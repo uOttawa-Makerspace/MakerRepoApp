@@ -22,6 +22,7 @@ function App() {
     useEffect(() => {
         const token = getToken();
         if (!token) {
+            setAuthLoading(false);
             return;
         }
 
@@ -40,12 +41,8 @@ function App() {
 
     }, []);
 
-    if (authLoading && getToken()) {
+    if (authLoading) {
         return <div className="content">Checking Authentication...</div>
-    }
-
-    if (!authLoading && !getToken()) {
-        return <div className="content">Missing token...</div>
     }
 
     return (
