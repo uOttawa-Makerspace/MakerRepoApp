@@ -29,18 +29,23 @@ function App() {
             response => {
                 setUserSession(response.token, response.user);
                 setLoggedIn(true);
+                setAuthLoading(false);
             }
         ).catch((error) => {
             console.error(error);
             setLoggedIn(false);
+            setAuthLoading(false);
             removeUserSession();
         });
 
-        setAuthLoading(false);
     }, []);
 
     if (authLoading && getToken()) {
         return <div className="content">Checking Authentication...</div>
+    }
+
+    if (!authLoading && !getToken()) {
+        return <div className="content">Missing token...</div>
     }
 
     return (
