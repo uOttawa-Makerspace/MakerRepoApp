@@ -8,7 +8,7 @@ const dev = {
 }
 
 const production = {
-    api_url: "https://dev.makerepo.com",
+    api_url: "https://staging.makerepo.com",
     app_release_type: APP_RELEASE_TYPE,
     app_version: APP_VERSION,
 }
