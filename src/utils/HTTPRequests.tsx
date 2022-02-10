@@ -56,7 +56,7 @@ export const post = (route: string, body: any) => {
             'Authorization': `Bearer ${window.localStorage.getItem('token')}`,
         },
     }).then((response) => {
-        return response.data;
+        return response;
     }).catch((error) => {
         return error;
     });

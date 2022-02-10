@@ -1,6 +1,6 @@
 import React, {useContext, useState} from "react";
-import {getToken, setUserSession} from "../utils/Common";
-import logo from '../assets/makerepo-logo.jpg';
+import {setUserSession} from "../utils/Common";
+import logo from '../assets/logo192.png';
 import {LoggedInContext} from "../utils/Contexts";
 import * as HTTPRequest from "../utils/HTTPRequests";
 
@@ -8,6 +8,7 @@ function Login(props: { history: string[]; }) {
 
     const [usernameEmail, setUsernameEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [loginError, setLoginError] = useState(false)
     const {loggedIn, setLoggedIn} = useContext(LoggedInContext);
 
     const handleLogin = () => {
@@ -15,13 +16,19 @@ function Login(props: { history: string[]; }) {
             username_email: usernameEmail,
             password: password
         }).then((response) => {
-            setUserSession(response.token, response.user);
-            setLoggedIn(true);
-            console.log(getToken())
-            props.history.push('/');
+            if(response.status === 200) {
+                setUserSession(response.data.token, response.data.user);
+                setLoggedIn(true);
+                setLoginError(false);
+                props.history.push('/');
+            } else {
+                setLoggedIn(false);
+                setLoginError(true);
+            }
         }).catch(error => {
             setLoggedIn(false);
-            console.log("Something went wrong. Please try again later.")
+            setLoginError(true);
+            console.log("Something went wrong. Please try again later.", error);
         });
     }
 
@@ -29,11 +36,16 @@ function Login(props: { history: string[]; }) {
         <div className="v-center">
             <div className="d-block">
                 <div className="text-center">
-                    <img src={logo} alt="MakeRepo Logo"/>
+                    <img src={logo} width={55} height={55} alt="MakeRepo Logo"/>
                     <h5 className="m-2">
                         Login
                     </h5>
                 </div>
+                {loginError &&
+                    <div className="alert alert-danger">
+                        Invalid username or password.
+                    </div>
+                }
                 <div className="mb-3">
                     <input type="text" value={usernameEmail}
                            onChange={e => setUsernameEmail(e.target.value)} name="username_email"
