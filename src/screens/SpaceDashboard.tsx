@@ -309,6 +309,7 @@ function SpaceDashboard() {
         <input
           type="text"
           id="rounded-email"
+          autoComplete="off"
           onChange={(e) => setValue(e.target.value)}
           placeholder="Username, Name"
           className="form-control mb-2"
