@@ -7,18 +7,18 @@ module.exports = {
     defaultLocale: "en-US",
   },
   purge: {
-    content: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
+    content: ["./src/**/*.{js,jsx,ts,tsx}", "./public/index.html"],
   },
   theme: {
     extend: {
       colors: {
         primary: {
-          light: '#64aaaa',
-          DEFAULT: '#497979',
-          dark: '#395e5e'
-        }
-      }
-    }
+          light: "#64aaaa",
+          DEFAULT: "#497979",
+          dark: "#395e5e",
+        },
+      },
+    },
   },
   variants: {
     extend: {

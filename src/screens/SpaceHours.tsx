@@ -1,43 +1,43 @@
-import React, {useEffect, useState} from "react";
-import {SpaceHourCard} from "../components/SpaceHourCard";
+import React, { useEffect, useState } from "react";
+import { SpaceHourCard } from "../components/SpaceHourCard";
 import * as HTTPRequest from "../utils/HTTPRequests";
 
 const SpaceHours = () => {
+  const [hours, setHours] = useState<any>(null);
+  const [errors, setErrors] = useState(false);
 
-    const [hours, setHours] = useState<any>(null);
-    const [errors, setErrors] = useState(false);
+  const getHours = () => {
+    HTTPRequest.get("hours")
+      .then((response) => {
+        setHours(response);
+      })
+      .catch((error) => {
+        setErrors(true);
+        console.error(error);
+      });
+  };
 
-    const getHours = () => {
-        HTTPRequest.get('hours').then(
-            response => {
-                setHours(response);
-            }
-        ).catch((error) => {
-            console.error(error);
-        });
-    }
+  useEffect(() => {
+    getHours();
+  }, []);
 
-    useEffect(() => {
-        getHours()
-    }, []);
-
-    return (
+  return (
+    <div>
+      Space Hours
+      {!errors && hours ? (
         <div>
-            Space Hours
-
-            { !errors && hours
-                ? <div>
-                    {hours.map((hour: any, index: number | null) => (
-                        <SpaceHourCard hour={hour} key={index} />
-                    ))}
-                </div>
-                : <div>
-                    <SpaceHourCard hour={{}} />
-                    <SpaceHourCard hour={{}} />
-                </div>
-            }
+          {hours.map((hour: any, index: number | null) => (
+            <SpaceHourCard hour={hour} key={index} />
+          ))}
         </div>
-    )
+      ) : (
+        <div>
+          <SpaceHourCard hour={{}} />
+          <SpaceHourCard hour={{}} />
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default SpaceHours;
