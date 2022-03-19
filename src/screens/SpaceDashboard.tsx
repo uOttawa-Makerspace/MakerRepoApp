@@ -9,8 +9,15 @@ import {
   Tabs,
 } from "@mui/material";
 import toast, { Toaster } from "react-hot-toast";
+import { AsyncTypeahead } from "react-bootstrap-typeahead";
 import * as HTTPRequest from "../utils/HTTPRequests";
 import { a11yProps, TabPanel } from "../components/TabPanel";
+import "react-bootstrap-typeahead/css/Typeahead.css";
+
+interface userSearch {
+  name: string;
+  username: string;
+}
 
 function SpaceDashboard() {
   const history = useHistory();
@@ -27,8 +34,11 @@ function SpaceDashboard() {
     string | null
   >(null);
   const [searchedUsers, setSearchedUsers] = useState<string | null>(null);
-  const [value, setValue] = useState<string | null>(null);
+  const [value, setValue] = useState<string>("");
+  const [typeAheadValue, setTypeAheadValue] = useState<string>("");
   const [tabIndex, setTabIndex] = React.useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [options, setOptions] = useState<userSearch[]>([]);
 
   const handleTabChange = (
     event: any,
@@ -167,8 +177,8 @@ function SpaceDashboard() {
       });
   };
 
-  const getSearchedUsers = () => {
-    HTTPRequest.get(`staff_dashboard/search?query=${value}`)
+  const getSearchedUsers = (searchValue: string) => {
+    HTTPRequest.get(`staff_dashboard/search?query=${searchValue}`)
       .then((response) => {
         setSearchedUsers(JSON.stringify(response));
       })
@@ -197,7 +207,6 @@ function SpaceDashboard() {
     HTTPRequest.put(`staff_dashboard/add_users?added_users=${username}`, {})
       .then(() => {
         getCurrentUsers();
-        getSearchedUsers();
         toast.success(`${username} has successfully been signed in!`, {
           position: "bottom-center",
         });
@@ -206,6 +215,28 @@ function SpaceDashboard() {
         console.log(error);
       });
   };
+
+  const handleSearch = (query: string) => {
+    setIsLoading(true);
+
+    HTTPRequest.get(`staff_dashboard/populate_users?search=${query}`)
+      .then((response) => {
+        console.log(response);
+        const selectOptions: userSearch[] = response.users.map(
+          (i: userSearch) => ({
+            name: i.name,
+            username: i.username,
+          })
+        );
+        setOptions(selectOptions);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  const filterBy = () => true;
 
   const sendToUserProfile = (username: string) => {
     history.push(`/profile/${username}`);
@@ -239,6 +270,9 @@ function SpaceDashboard() {
     );
   }
 
+  // @ts-ignore
+  // @ts-ignore
+  // @ts-ignore
   return (
     <div className="w-100vh px-2">
       <Tabs
@@ -306,6 +340,53 @@ function SpaceDashboard() {
         <ChangeSpaceComponent />
         <h3 className="text-center mt-2">Search Users</h3>
 
+        <AsyncTypeahead
+          id="search-users-typeahead"
+          className="mb-2"
+          filterBy={filterBy}
+          isLoading={isLoading}
+          labelKey="name"
+          minLength={3}
+          onSearch={handleSearch}
+          // @ts-ignore
+          onChange={(e) => setTypeAheadValue(e[0].username)}
+          options={options}
+          placeholder="Search for a user..."
+          renderMenuItemChildren={(selectedItem) => (
+            // @ts-ignore
+            <span>{selectedItem.name}</span>
+          )}
+        />
+
+        <div className="row">
+          <div className="col-md-6">
+            <div className="d-grid gap-2">
+              <button
+                type="button"
+                onClick={() => getSearchedUsers(typeAheadValue)}
+                className="btn btn-primary"
+              >
+                Search
+              </button>
+            </div>
+          </div>
+          <div className="col-md-6">
+            <div className="d-grid gap-2">
+              <button
+                type="button"
+                onClick={() => signInUser(typeAheadValue)}
+                className="btn btn-info"
+              >
+                Sign In
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <br />
+
+        <p className="text-center">Or</p>
+
         <input
           type="text"
           id="rounded-email"
@@ -317,7 +398,7 @@ function SpaceDashboard() {
         <div className="d-grid gap-2">
           <button
             type="button"
-            onClick={() => getSearchedUsers()}
+            onClick={() => getSearchedUsers(value)}
             className="btn btn-primary"
           >
             Search
@@ -497,7 +578,7 @@ function SpaceDashboard() {
                         : "Not Completed"}
                     </td>
                     <td>
-                      {session.certifications.length == 0 && (
+                      {session.certifications.length === 0 && (
                         <button
                           onClick={() => certifySession(session.id)}
                           className="btn btn-primary btn-sm"
