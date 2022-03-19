@@ -271,10 +271,8 @@ function SpaceDashboard() {
   }
 
   // @ts-ignore
-  // @ts-ignore
-  // @ts-ignore
   return (
-    <div className="w-100vh px-2">
+    <div className="px-2">
       <Tabs
         style={{ width: "100vw" }}
         value={tabIndex}
