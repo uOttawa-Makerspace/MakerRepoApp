@@ -16,6 +16,4 @@ const production = {
 const config = process.env.NODE_ENV === "production" ? production : dev;
 
 // eslint-disable-next-line import/no-anonymous-default-export
-export default {
-  config,
-};
+export default config;

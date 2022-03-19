@@ -1,27 +1,15 @@
 import React, { useEffect, useState } from "react";
 import "../utils/EnvVariables";
 import SpaceDashboard from "./SpaceDashboard";
-import { getUser, removeUserSession, setUserSession } from "../utils/Common";
+import { getUser } from "../utils/Common";
 import SpaceHours from "./SpaceHours";
-import * as HTTPRequest from "../utils/HTTPRequests";
 
-function Home(props: { history: string[] }) {
-  const [user, setUser] = useState<{ [key: string]: string } | null>(null);
+function Home() {
+  const [user, setUser] = useState<Record<string, string> | null>(null);
 
   useEffect(() => {
     setUser(getUser());
   }, []);
-
-  const handleLogout = () => {
-    HTTPRequest.get("logout")
-      .then(() => {
-        removeUserSession();
-        props.history.push("/login");
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
 
   return (
     <div>

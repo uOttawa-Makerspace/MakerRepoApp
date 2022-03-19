@@ -1,7 +1,7 @@
 import React from "react";
 import { Skeleton } from "@mui/material";
 
-export const replaceNoneWithNotAvailable = (inputString: string) => {
+export const replaceNoneWithNotAvailable = (inputString: string): string => {
   if (inputString === undefined || inputString == null) {
     return "Not Available";
   }

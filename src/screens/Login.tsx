@@ -4,23 +4,23 @@ import logo from "../assets/logo192.png";
 import { LoggedInContext } from "../utils/Contexts";
 import * as HTTPRequest from "../utils/HTTPRequests";
 
-function Login(props: { history: string[] }) {
+function Login({ history }: { history: string[] }) {
   const [usernameEmail, setUsernameEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState(false);
-  const { loggedIn, setLoggedIn } = useContext(LoggedInContext);
+  const { setLoggedIn } = useContext(LoggedInContext);
 
   const handleLogin = () => {
     HTTPRequest.post("login_authentication", {
       username_email: usernameEmail,
-      password: password,
+      password,
     })
       .then((response) => {
         if (response.status === 200) {
           setUserSession(response.data.token, response.data.user);
           setLoggedIn(true);
           setLoginError(false);
-          props.history.push("/");
+          history.push("/");
         } else {
           setLoggedIn(false);
           setLoginError(true);
@@ -29,6 +29,7 @@ function Login(props: { history: string[] }) {
       .catch((error) => {
         setLoggedIn(false);
         setLoginError(true);
+        // eslint-disable-next-line no-console
         console.log("Something went wrong. Please try again later.", error);
       });
   };

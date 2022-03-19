@@ -7,9 +7,7 @@ export const getUser = () => {
   }
 };
 
-export const getToken = () => {
-  return window.localStorage.getItem("token") || null;
-};
+export const getToken = () => window.localStorage.getItem("token") || null;
 
 export const removeUserSession = () => {
   window.localStorage.removeItem("token");

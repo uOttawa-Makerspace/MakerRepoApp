@@ -3,7 +3,7 @@ import EnvVariables from "./EnvVariables";
 
 export const get = (route: string) =>
   axios
-    .get(`${EnvVariables.config.api_url}/${route}`, {
+    .get(`${EnvVariables.api_url}/${route}`, {
       withCredentials: true,
       headers: {
         Accept: "application/json",
@@ -18,7 +18,7 @@ export const get = (route: string) =>
 
 export const patch = (route: string, body: any) =>
   axios
-    .patch(`${EnvVariables.config.api_url}/${route}`, {
+    .patch(`${EnvVariables.api_url}/${route}`, {
       withCredentials: true,
       headers: {
         Accept: "application/json",
@@ -32,7 +32,7 @@ export const patch = (route: string, body: any) =>
 
 export const put = (route: string, body: any) =>
   axios
-    .put(`${EnvVariables.config.api_url}/${route}`, body, {
+    .put(`${EnvVariables.api_url}/${route}`, body, {
       withCredentials: true,
       headers: {
         Accept: "application/json",
@@ -45,7 +45,7 @@ export const put = (route: string, body: any) =>
 
 export const post = (route: string, body: any) =>
   axios
-    .post(`${EnvVariables.config.api_url}/${route}`, body, {
+    .post(`${EnvVariables.api_url}/${route}`, body, {
       withCredentials: true,
       headers: {
         Accept: "application/json",

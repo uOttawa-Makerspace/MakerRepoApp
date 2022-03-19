@@ -2,36 +2,41 @@ import React, { useContext, useState } from "react";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { Button } from "@mui/material";
 import toast, { Toaster } from "react-hot-toast";
-import env_variables from "../utils/EnvVariables";
+import EnvVariables from "../utils/EnvVariables";
 import * as HTTPRequest from "../utils/HTTPRequests";
 import { removeUserSession } from "../utils/Common";
 import { LoggedInContext } from "../utils/Contexts";
 
-function Help(props: { history: string[] }) {
-  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+interface FormValidationParams {
+  validateList: string[][];
+  formErrorFunction?: Function;
+}
+
+function Help({ history }: { history: string[] }) {
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("");
   const [comments, setComments] = useState("");
-  const { loggedIn, setLoggedIn } = useContext(LoggedInContext);
+  const { setLoggedIn } = useContext(LoggedInContext);
 
   const handleLogout = () => {
     HTTPRequest.get("logout")
       .then(() => {
         setLoggedIn(false);
         removeUserSession();
-        props.history.push("/login");
+        history.push("/login");
       })
       .catch((error) => {
         console.error(error);
       });
   };
 
-  const formValidation = (
-    validateList: string[][],
-    formErrorFunction?: Function
-  ) => {
-    const errorsObject: { [key: string]: string } = {};
+  const formValidation = ({
+    validateList,
+    formErrorFunction,
+  }: FormValidationParams) => {
+    const errorsObject: Record<string, string> = {};
     validateList.forEach((item) => {
       if (!item[1]) {
         errorsObject[item[0]] = `The ${item[0]} field is required`;
@@ -50,13 +55,13 @@ function Help(props: { history: string[] }) {
       ["subject", subject],
       ["comments", comments],
     ];
-    if (formValidation(validateList, setFormErrors)) {
+    if (formValidation({ validateList, formErrorFunction: setFormErrors })) {
       HTTPRequest.put("send_email", {
         name,
         email,
         subject,
         comments,
-        app_version: `${env_variables.config.app_version} ${env_variables.config.app_release_type}`,
+        app_version: `${EnvVariables.app_version} ${EnvVariables.app_release_type}`,
       })
         .then(() => {
           toast.success(
@@ -66,8 +71,7 @@ function Help(props: { history: string[] }) {
             }
           );
         })
-        .catch((error) => {
-          console.log(error);
+        .catch(() => {
           toast.error(
             "An error occurred while sending the email. Please try again later or contact uottawa.makerepo@gmail.com",
             {
@@ -84,8 +88,7 @@ function Help(props: { history: string[] }) {
         <h2>MakerRepo App</h2>
         <p>
           Version
-          {env_variables.config.app_version}{" "}
-          {env_variables.config.app_release_type}
+          {EnvVariables.app_version} {EnvVariables.app_release_type}
         </p>
       </div>
       <div>

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { Tabs, Tab } from "@mui/material";
 import { replaceNoneWithNotAvailable } from "../helpers";
 import { getUser } from "../utils/Common";
 import * as HTTPRequest from "../utils/HTTPRequests";
-import { Tabs, Tab } from "@mui/material";
 import { TabPanel, a11yProps } from "../components/TabPanel";
 
 type ProfileParams = {
@@ -81,7 +81,7 @@ const Profile = () => {
   const setUserRole = () => {
     HTTPRequest.patch("admin/users/set_role", {
       id: profileUser.id,
-      role: role,
+      role,
     })
       .then(() => {
         getProfile();
