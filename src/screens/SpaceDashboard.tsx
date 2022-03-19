@@ -356,7 +356,7 @@ function SpaceDashboard() {
         />
 
         <div className="row">
-          <div className="col-md-6 mb-2">
+          <div className="col-md-6 mt-2">
             <div className="d-grid gap-2">
               <button
                 type="button"
@@ -367,8 +367,8 @@ function SpaceDashboard() {
               </button>
             </div>
           </div>
-          <div className="col-md-6">
-            <div className="d-grid gap-2 mb-2">
+          <div className="col-md-6 mt-2">
+            <div className="d-grid gap-2">
               <button
                 type="button"
                 onClick={() => signInUser(typeAheadValue)}
