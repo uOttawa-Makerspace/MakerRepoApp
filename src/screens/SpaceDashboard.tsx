@@ -342,7 +342,6 @@ function SpaceDashboard() {
 
         <AsyncTypeahead
           id="search-users-typeahead"
-          className="mb-2"
           filterBy={filterBy}
           isLoading={isLoading}
           labelKey="name"
@@ -359,7 +358,7 @@ function SpaceDashboard() {
         />
 
         <div className="row">
-          <div className="col-md-6">
+          <div className="col-md-6 mb-2">
             <div className="d-grid gap-2">
               <button
                 type="button"
@@ -371,7 +370,7 @@ function SpaceDashboard() {
             </div>
           </div>
           <div className="col-md-6">
-            <div className="d-grid gap-2">
+            <div className="d-grid gap-2 mb-2">
               <button
                 type="button"
                 onClick={() => signInUser(typeAheadValue)}
