@@ -16,7 +16,11 @@ function Home() {
       {user && (
         <>
           <h1 className="text-center">Hello {user.name}</h1>
-          {user.role === "admin" ? <SpaceDashboard /> : <SpaceHours />}
+          {user.role === "admin" || user.role === "staff" ? (
+            <SpaceDashboard />
+          ) : (
+            <SpaceHours />
+          )}
           <br />
         </>
       )}
