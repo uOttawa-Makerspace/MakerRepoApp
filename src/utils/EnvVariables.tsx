@@ -2,7 +2,8 @@ const APP_RELEASE_TYPE = "Beta";
 const APP_VERSION = "1.0.0";
 
 const dev = {
-  api_url: "http://localhost:3000",
+  // api_url: "http://localhost:3000",
+  api_url: "https://staging.makerepo.com",
   app_release_type: APP_RELEASE_TYPE,
   app_version: APP_VERSION,
 };
