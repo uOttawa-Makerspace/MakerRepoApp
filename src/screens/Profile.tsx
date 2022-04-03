@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Tabs, Tab } from "@mui/material";
+import { Tabs, Tab, Alert } from "@mui/material";
 import toast from "react-hot-toast";
 import { replaceNoneWithNotAvailable } from "../helpers";
 import { getUser } from "../utils/Common";
 import * as HTTPRequest from "../utils/HTTPRequests";
 import { TabPanel, a11yProps } from "../components/TabPanel";
+import ErrorIcon from "@mui/icons-material/Error";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 type ProfileParams = {
   username: string;
@@ -335,7 +337,10 @@ const Profile = () => {
           <TabPanel value={tabIndex} index={4}>
             {profileUser.rfid ? (
               <>
-                <p className="text-center">RFID Set</p>
+                <div className="d-flex align-items-center justify-content-center mb-2">
+                  <CheckCircleIcon color="success" />
+                  RFID set
+                </div>
                 <div className="d-grid gap-2">
                   <button
                     type="button"
@@ -348,7 +353,9 @@ const Profile = () => {
               </>
             ) : (
               <>
-                <p>RFID Not Set</p>
+                <Alert severity="error" className="mb-2 justify-content-center">
+                  RFID not set
+                </Alert>
                 <p>
                   <ul className="list-group">
                     {rfidList.map((rfid: RfidInfo) => (
