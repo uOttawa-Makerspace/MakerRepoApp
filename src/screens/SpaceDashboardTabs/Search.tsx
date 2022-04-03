@@ -97,7 +97,10 @@ const Search = ({ handleReloadCurrentUsers }: SearchProps) => {
             <button
               type="button"
               onClick={() => getSearchedUsers(typeAheadValue)}
-              className="btn btn-primary"
+              className={`btn btn-primary ${
+                typeAheadValue === "" ? "disabled" : ""
+              }`}
+              disabled={typeAheadValue === ""}
             >
               Search
             </button>
@@ -108,7 +111,10 @@ const Search = ({ handleReloadCurrentUsers }: SearchProps) => {
             <button
               type="button"
               onClick={() => signInUser(typeAheadValue)}
-              className="btn btn-info"
+              className={`btn btn-primary ${
+                typeAheadValue === "" ? "disabled" : ""
+              }`}
+              disabled={typeAheadValue === ""}
             >
               Sign In
             </button>
@@ -132,13 +138,14 @@ const Search = ({ handleReloadCurrentUsers }: SearchProps) => {
         <button
           type="button"
           onClick={() => getSearchedUsers(value)}
-          className="btn btn-primary"
+          className={`btn btn-primary ${value === "" ? "disabled" : ""}`}
+          disabled={value === ""}
         >
           Search
         </button>
       </div>
       {searchedUsers !== null && (
-        <div className="table-responsive">
+        <div className="table-responsive mt-2">
           <table className="table">
             <thead>
               <tr>

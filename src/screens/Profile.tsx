@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Tabs, Tab } from "@mui/material";
+import toast from "react-hot-toast";
 import { replaceNoneWithNotAvailable } from "../helpers";
 import { getUser } from "../utils/Common";
 import * as HTTPRequest from "../utils/HTTPRequests";
@@ -10,10 +11,16 @@ type ProfileParams = {
   username: string;
 };
 
+interface RfidInfo {
+  cardNumber: string;
+  tappedAt: string;
+}
+
 const Profile = () => {
   const { username } = useParams<ProfileParams>();
   const [user, setUser] = useState<any>(null);
   const [profileUser, setProfileUser] = useState<any>(null);
+  const [rfidList, setRfidList] = useState<RfidInfo[]>([]);
   const [programs, setPrograms] = useState(null);
   const [certifications, setCertifications] = useState<any[] | null>(null);
   const [remainingTrainings, setRemainingTraings] = useState(null);
@@ -55,6 +62,7 @@ const Profile = () => {
   useEffect(() => {
     setUser(getUser());
     getProfile();
+    getUnsetRfids();
   }, []);
 
   const getProfile = () => {
@@ -75,6 +83,66 @@ const Profile = () => {
       })
       .catch((error) => {
         console.error(error);
+      });
+  };
+
+  const getUnsetRfids = () => {
+    HTTPRequest.get("rfid/get_unset_rfids")
+      .then((response) => {
+        setRfidList(response);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  const linkRfid = (cardNumber: string) => {
+    HTTPRequest.put(`staff_dashboard/link_rfid`, {
+      card_number: cardNumber,
+      user_id: profileUser.id,
+    })
+      .then((response) => {
+        if (response.status === "OK") {
+          toast.success(`The RFID Card has successfully been linked!`, {
+            position: "bottom-center",
+          });
+        } else {
+          toast.error(
+            `An error has occurred while linking the RFID Card.. Please try again later.`,
+            {
+              position: "bottom-center",
+            }
+          );
+        }
+        getProfile();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const unlinkRfid = (cardNumber: string) => {
+    HTTPRequest.put(`staff_dashboard/unlink_rfid`, {
+      card_number: cardNumber,
+    })
+      .then((response) => {
+        if (response.status === "OK") {
+          toast.success(`The RFID Card has successfully been unlinked!`, {
+            position: "bottom-center",
+          });
+        } else {
+          toast.error(
+            `An error has occurred while un-linking the RFID Card.. Please try again later.`,
+            {
+              position: "bottom-center",
+            }
+          );
+        }
+        getProfile();
+        getUnsetRfids();
+      })
+      .catch((error) => {
+        console.log(error);
       });
   };
 
@@ -129,6 +197,7 @@ const Profile = () => {
             {user.role === "admin" && (
               <Tab label="Role Manager" {...a11yProps(3)} />
             )}
+            <Tab label="Rfids" {...a11yProps(4)} />
           </Tabs>
 
           <TabPanel value={tabIndex} index={0}>
@@ -256,8 +325,48 @@ const Profile = () => {
                     </label>
                   </div>
                   <br />
-                  <button className="btn btn-primary">Update role</button>
+                  <button type="button" className="btn btn-primary">
+                    Update role
+                  </button>
                 </form>
+              </>
+            )}
+          </TabPanel>
+          <TabPanel value={tabIndex} index={4}>
+            {profileUser.rfid ? (
+              <>
+                <p className="text-center">RFID Set</p>
+                <div className="d-grid gap-2">
+                  <button
+                    type="button"
+                    className="btn btn-danger btn-sm ml-2"
+                    onClick={() => unlinkRfid(profileUser.rfid.card_number)}
+                  >
+                    Remove RFID
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p>RFID Not Set</p>
+                <p>
+                  <ul className="list-group">
+                    {rfidList.map((rfid: RfidInfo) => (
+                      <li className="list-group-item">
+                        <p className="mb-2">{rfid.tappedAt}</p>
+                        <div className="d-grid gap-2">
+                          <button
+                            type="button"
+                            className="btn btn-primary btn-sm"
+                            onClick={() => linkRfid(rfid.cardNumber)}
+                          >
+                            Set RFID
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </p>
               </>
             )}
           </TabPanel>
