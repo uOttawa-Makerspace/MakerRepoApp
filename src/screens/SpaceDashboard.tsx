@@ -7,6 +7,7 @@ import Dashboard from "./SpaceDashboardTabs/Dashboard";
 import Search from "./SpaceDashboardTabs/Search";
 import NewTrainingSession from "./SpaceDashboardTabs/NewTrainingSession";
 import TrainingSessions from "./SpaceDashboardTabs/TrainingSessions";
+import ChangeSpace from "../components/ChangeSpace";
 
 function SpaceDashboard() {
   const [inSpaceUsers, setInSpaceUsers] = useState<any>(null);
@@ -45,44 +46,6 @@ function SpaceDashboard() {
       });
   };
 
-  const changeSpace = (spaceId: number | string) => {
-    HTTPRequest.put(`staff_dashboard/change_space?space_id=${spaceId}`, {})
-      .then(() => {
-        getCurrentUsers();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  function ChangeSpaceComponent() {
-    return (
-      <>
-        <select
-          value={inSpaceUsers !== null && inSpaceUsers?.space?.id}
-          onChange={(e) => changeSpace(e.target.value)}
-          className="form-select mb-2"
-        >
-          {inSpaceUsers !== null &&
-            inSpaceUsers?.space_list?.map((space: any) => (
-              <option key={space[1]} value={space[1]}>
-                {space[0]}
-              </option>
-            ))}
-        </select>
-        <div className="d-grid gap-2">
-          <button
-            type="button"
-            onClick={() => getCurrentUsers()}
-            className="btn btn-primary"
-          >
-            Refresh Space
-          </button>
-        </div>
-      </>
-    );
-  }
-
   // @ts-ignore
   return (
     <div className="w-100vh">
@@ -102,7 +65,10 @@ function SpaceDashboard() {
       </Tabs>
 
       <TabPanel value={tabIndex} index={0}>
-        <ChangeSpaceComponent />
+        <ChangeSpace
+          inSpaceUsers={inSpaceUsers}
+          handleReloadCurrentUsers={() => getCurrentUsers()}
+        />
         <Dashboard
           inSpaceUsers={inSpaceUsers !== null ? inSpaceUsers?.space_users : []}
           handleReloadCurrentUsers={() => getCurrentUsers()}
@@ -110,18 +76,27 @@ function SpaceDashboard() {
       </TabPanel>
 
       <TabPanel value={tabIndex} index={1}>
-        <ChangeSpaceComponent />
+        <ChangeSpace
+          inSpaceUsers={inSpaceUsers}
+          handleReloadCurrentUsers={() => getCurrentUsers()}
+        />
         <Search handleReloadCurrentUsers={() => getCurrentUsers()} />
       </TabPanel>
       <TabPanel value={tabIndex} index={2}>
-        <ChangeSpaceComponent />
+        <ChangeSpace
+          inSpaceUsers={inSpaceUsers}
+          handleReloadCurrentUsers={() => getCurrentUsers()}
+        />
         <NewTrainingSession
           spaceId={inSpaceUsers !== null ? inSpaceUsers?.space?.id : null}
           reloadTrainingSessions={() => getTrainingSessions()}
         />
       </TabPanel>
       <TabPanel value={tabIndex} index={3}>
-        <ChangeSpaceComponent />
+        <ChangeSpace
+          inSpaceUsers={inSpaceUsers}
+          handleReloadCurrentUsers={() => getCurrentUsers()}
+        />
         <TrainingSessions
           trainingSessions={trainingSessions}
           reloadTrainingSessions={() => getTrainingSessions()}

@@ -6,8 +6,8 @@ import { replaceNoneWithNotAvailable } from "../helpers";
 import { getUser } from "../utils/Common";
 import * as HTTPRequest from "../utils/HTTPRequests";
 import { TabPanel, a11yProps } from "../components/TabPanel";
-import ErrorIcon from "@mui/icons-material/Error";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ChangeSpace from "../components/ChangeSpace";
 
 type ProfileParams = {
   username: string;
@@ -30,6 +30,7 @@ const Profile = () => {
   const [devProgram, setDevProgram] = useState(false);
   const [volunteerProgram, setVolunteerProgram] = useState(false);
   const [tabIndex, setTabIndex] = React.useState(0);
+  const [inSpaceUsers, setInSpaceUsers] = useState<any>(null);
 
   const handleTabChange = (
     event: any,
@@ -61,10 +62,21 @@ const Profile = () => {
     }
   };
 
+  const getCurrentUsers = () => {
+    HTTPRequest.get("staff_dashboard")
+      .then((response) => {
+        setInSpaceUsers(response);
+        getUnsetRfids();
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
   useEffect(() => {
     setUser(getUser());
     getProfile();
-    getUnsetRfids();
+    getCurrentUsers();
   }, []);
 
   const getProfile = () => {
@@ -353,9 +365,15 @@ const Profile = () => {
               </>
             ) : (
               <>
-                <Alert severity="error" className="mb-2 justify-content-center">
+                <Alert severity="error" className="justify-content-center">
                   RFID not set
                 </Alert>
+                <div className="my-4">
+                  <ChangeSpace
+                    inSpaceUsers={inSpaceUsers}
+                    handleReloadCurrentUsers={() => getCurrentUsers()}
+                  />
+                </div>
                 <p>
                   <ul className="list-group">
                     {rfidList.map((rfid: RfidInfo) => (
@@ -373,6 +391,15 @@ const Profile = () => {
                       </li>
                     ))}
                   </ul>
+                  {rfidList.length === 0 && (
+                    <Alert
+                      severity="warning"
+                      className="justify-content-center align-items-center text-center"
+                    >
+                      No unset cards in this space, please tap a card or select
+                      a new space.
+                    </Alert>
+                  )}
                 </p>
               </>
             )}
