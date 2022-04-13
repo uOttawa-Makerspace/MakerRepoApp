@@ -82,7 +82,7 @@ const Search = ({ handleReloadCurrentUsers }: SearchProps) => {
         minLength={3}
         onSearch={handleSearch}
         // @ts-ignore
-        onChange={(e) => setTypeAheadValue(e[0].username)}
+        onChange={(e) => e[0] && setTypeAheadValue(e[0].username)}
         options={options}
         placeholder="Search for a user..."
         renderMenuItemChildren={(selectedItem) => (
