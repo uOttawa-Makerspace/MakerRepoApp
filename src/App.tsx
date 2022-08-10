@@ -67,15 +67,12 @@ function App() {
               <Switch>
                 <PublicRoute path="/login" component={<Login />} />
                 <PublicRoute path="/help" component={<Help />} />
-                <PrivateRoute
-                  path="/profile/:username"
-                  component={<Profile />}
-                />
-                <PrivateRoute
-                  user={user}
-                  path="/"
-                  component={<Home user={user} />}
-                />
+                <PrivateRoute path="/profile/:username">
+                  <Profile />
+                </PrivateRoute>
+                <PrivateRoute user={user} path="/">
+                  <Home user={user} />
+                </PrivateRoute>
               </Switch>
             </div>
             {loggedIn && user && <Navbar user={user} />}
