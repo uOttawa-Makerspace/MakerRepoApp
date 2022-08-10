@@ -18,6 +18,7 @@ import { LoggedInContext } from "./utils/Contexts";
 function App() {
   const [authLoading, setAuthLoading] = useState(true);
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
+  const [user, setUser] = useState<Record<string, any> | null>(null);
 
   const airbrake = HTTPRequest.airbrake();
 
@@ -33,6 +34,7 @@ function App() {
         setUserSession(response.token, response.user);
         setLoggedIn(true);
         setAuthLoading(false);
+        setUser(response.user);
       })
       .catch((error) => {
         console.error(error);
@@ -65,13 +67,13 @@ function App() {
               <Switch>
                 <PublicRoute path="/login" component={Login} />
                 <PublicRoute path="/help" component={Help} />
-                <PrivateRoute path="/profile/:username">
+                <PrivateRoute user={user} path="/profile/:username">
                   <Profile />
                 </PrivateRoute>
-                <PrivateRoute path="/" component={Home} />
+                <PrivateRoute user={user} path="/" component={Home} />
               </Switch>
             </div>
-            {loggedIn && <Navbar />}
+            {loggedIn && user && <Navbar user={user} />}
           </div>
         </LoggedInContext.Provider>
       </Router>

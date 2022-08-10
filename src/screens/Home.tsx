@@ -1,16 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import "../utils/EnvVariables";
 import SpaceDashboard from "./SpaceDashboard";
-import { getUser } from "../utils/Common";
 import SpaceHours from "./SpaceHours";
 
-function Home() {
-  const [user, setUser] = useState<Record<string, string> | null>(null);
+interface HomeProps {
+  user: Record<string, any>;
+}
 
-  useEffect(() => {
-    setUser(getUser());
-  }, []);
-
+function Home({ user }: HomeProps) {
   return (
     <div>
       {user && (

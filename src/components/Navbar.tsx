@@ -2,13 +2,11 @@ import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { getUser } from "../utils/Common";
 
-const Navbar = () => {
-  const [user, setUser] = useState<{ [key: string]: string }>({});
+interface NavbarProps {
+  user: Record<string, any>;
+}
 
-  useEffect(() => {
-    setUser(getUser());
-  }, []);
-
+const Navbar = ({ user }: NavbarProps) => {
   return (
     <div>
       <div className="bottom-nav">
