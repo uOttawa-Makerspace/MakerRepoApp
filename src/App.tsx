@@ -2,7 +2,6 @@ import "./index.css";
 import React, { useEffect, useState } from "react";
 import { HashRouter as Router, Switch } from "react-router-dom";
 import useErrorBoundary from "use-error-boundary";
-import { Notifier } from "@airbrake/browser";
 import Login from "./screens/Login";
 import Home from "./screens/Home";
 import Navbar from "./components/Navbar";
