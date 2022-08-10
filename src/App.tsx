@@ -20,10 +20,7 @@ function App() {
   const [authLoading, setAuthLoading] = useState(true);
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
 
-  const airbrake = new Notifier({
-    projectId: 441678,
-    projectKey: "b19323e1288e612e00fc65acf1369c5c",
-  });
+  const airbrake = HTTPRequest.airbrake();
 
   useEffect(() => {
     const token = getToken();

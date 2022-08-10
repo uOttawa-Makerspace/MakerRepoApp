@@ -1,5 +1,16 @@
 import axios from "axios";
+import { Notifier } from "@airbrake/browser";
 import EnvVariables from "./EnvVariables";
+
+export const airbrake = () =>
+  new Notifier({
+    projectId: 441678,
+    projectKey: "b19323e1288e612e00fc65acf1369c5c",
+  });
+
+const notifyAndReturn = (error: Error, route: string) => {
+  airbrake().notify({ error, info: { route } });
+};
 
 export const get = (route: string) =>
   axios
@@ -11,10 +22,11 @@ export const get = (route: string) =>
         Authorization: `Bearer ${window.localStorage.getItem("token")}`,
       },
     })
-    .then((response) => {
-      return response.data;
-    })
-    .catch((error) => error);
+    .then((response) => response.data)
+    .catch((error) => {
+      notifyAndReturn(error, route);
+      return error;
+    });
 
 export const patch = (route: string, body: any) =>
   axios
@@ -28,7 +40,10 @@ export const patch = (route: string, body: any) =>
       body: JSON.stringify(body),
     })
     .then((response) => response.data)
-    .catch((error) => error);
+    .catch((error) => {
+      notifyAndReturn(error, route);
+      return error;
+    });
 
 export const put = (route: string, body: any) =>
   axios
@@ -41,7 +56,10 @@ export const put = (route: string, body: any) =>
       },
     })
     .then((response) => response.data)
-    .catch((error) => error);
+    .catch((error) => {
+      notifyAndReturn(error, route);
+      return error;
+    });
 
 export const post = (route: string, body: any) =>
   axios
@@ -54,4 +72,7 @@ export const post = (route: string, body: any) =>
       },
     })
     .then((response) => response)
-    .catch((error) => error);
+    .catch((error) => {
+      notifyAndReturn(error, route);
+      return error;
+    });
