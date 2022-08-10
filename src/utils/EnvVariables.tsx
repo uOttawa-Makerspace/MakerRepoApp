@@ -1,5 +1,5 @@
-const APP_RELEASE_TYPE = "Beta";
-const APP_VERSION = "1.0.0";
+const APP_RELEASE_TYPE = "Production";
+const APP_VERSION = "1.1.0";
 
 const dev = {
   api_url: "http://localhost:3000",
