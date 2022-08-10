@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "https://app.makerepo.com",
   "dependencies": {
+    "@airbrake/browser": "^2.1.7",
     "@craco/craco": "^6.3.0",
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
@@ -35,6 +36,7 @@
     "react-scripts": "4.0.3",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat",
     "typescript": "^4.5.5",
+    "use-error-boundary": "^2.0.6",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
