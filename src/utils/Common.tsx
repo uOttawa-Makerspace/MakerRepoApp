@@ -1,7 +1,11 @@
 export const getUser = () => {
   const userStr = window.localStorage.getItem("user");
   if (userStr) {
-    return JSON.parse(userStr);
+    try {
+      JSON.parse(userStr);
+    } catch {
+      return null;
+    }
   } else {
     return null;
   }
