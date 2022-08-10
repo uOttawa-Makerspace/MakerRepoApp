@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Tabs, Tab, Alert } from "@mui/material";
 import toast from "react-hot-toast";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { replaceNoneWithNotAvailable } from "../helpers";
 import { getUser } from "../utils/Common";
 import * as HTTPRequest from "../utils/HTTPRequests";
 import { TabPanel, a11yProps } from "../components/TabPanel";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ChangeSpace from "../components/ChangeSpace";
 
 type ProfileParams = {
@@ -80,24 +80,26 @@ const Profile = () => {
   }, []);
 
   const getProfile = () => {
-    HTTPRequest.get(username)
-      .then((response) => {
-        setProfileUser(response.user);
-        setPrograms(response.programs);
-        setCertifications(response.certifications);
-        setRemainingTraings(response.remaining_trainings);
+    if (username) {
+      HTTPRequest.get(username)
+        .then((response) => {
+          setProfileUser(response.user);
+          setPrograms(response.programs);
+          setCertifications(response.certifications);
+          setRemainingTraings(response.remaining_trainings);
 
-        if (response.programs.includes("Volunteer Program")) {
-          setVolunteerProgram(true);
-        }
+          if (response.programs.includes("Volunteer Program")) {
+            setVolunteerProgram(true);
+          }
 
-        if (response.programs.includes("Development Program")) {
-          setDevProgram(true);
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+          if (response.programs.includes("Development Program")) {
+            setDevProgram(true);
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
   };
 
   const getUnsetRfids = () => {
@@ -189,7 +191,8 @@ const Profile = () => {
 
   return (
     <div>
-      {profileUser == null ||
+      {user == null ||
+      profileUser == null ||
       programs == null ||
       certifications == null ||
       remainingTrainings == null ? (

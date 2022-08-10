@@ -1,6 +1,6 @@
 import "./index.css";
 import React, { useEffect, useState } from "react";
-import { HashRouter as Router, Switch } from "react-router-dom";
+import { HashRouter as Router, Route, Routes } from "react-router-dom";
 import useErrorBoundary from "use-error-boundary";
 import Login from "./screens/Login";
 import Home from "./screens/Home";
@@ -8,7 +8,6 @@ import Navbar from "./components/Navbar";
 import Profile from "./screens/Profile";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap";
-import PublicRoute from "./utils/PublicRoute";
 import PrivateRoute from "./utils/PrivateRoute";
 import { getToken, removeUserSession, setUserSession } from "./utils/Common";
 import Help from "./screens/Help";
@@ -64,16 +63,26 @@ function App() {
         <LoggedInContext.Provider value={{ loggedIn, setLoggedIn }}>
           <div className="main">
             <div className="content">
-              <Switch>
-                <PublicRoute path="/login" component={<Login />} />
-                <PublicRoute path="/help" component={<Help />} />
-                <PrivateRoute path="/profile/:username">
-                  <Profile />
-                </PrivateRoute>
-                <PrivateRoute user={user} path="/">
-                  <Home user={user} />
-                </PrivateRoute>
-              </Switch>
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/help" element={<Help />} />
+                <Route
+                  path="/profile/:username"
+                  element={
+                    <PrivateRoute>
+                      <Profile />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/"
+                  element={
+                    <PrivateRoute>
+                      <Home user={user} />
+                    </PrivateRoute>
+                  }
+                ></Route>
+              </Routes>
             </div>
             {loggedIn && user && <Navbar user={user} />}
           </div>

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { AsyncTypeahead } from "react-bootstrap-typeahead";
-import { useHistory } from "react-router-dom";
 import * as HTTPRequest from "../../utils/HTTPRequests";
+import { useNavigate } from "react-router-dom";
 
 type SearchProps = {
   handleReloadCurrentUsers: () => void;
@@ -14,13 +14,12 @@ interface userSearch {
 }
 
 const Search = ({ handleReloadCurrentUsers }: SearchProps) => {
-  const history = useHistory();
-
   const [isLoading, setIsLoading] = useState(false);
   const [options, setOptions] = useState<userSearch[]>([]);
   const [searchedUsers, setSearchedUsers] = useState<string | null>(null);
   const [value, setValue] = useState<string>("");
   const [typeAheadValue, setTypeAheadValue] = useState<string>("");
+  const navigate = useNavigate();
 
   const filterBy = () => true;
 
@@ -67,7 +66,7 @@ const Search = ({ handleReloadCurrentUsers }: SearchProps) => {
   };
 
   const sendToUserProfile = (username: string) => {
-    history.push(`/profile/${username}`);
+    navigate(`/profile/${username}`);
   };
 
   return (

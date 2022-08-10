@@ -1,16 +1,16 @@
 import React, { useContext, useState } from "react";
-import { useHistory } from "react-router-dom";
 import { setUserSession } from "../utils/Common";
 import logo from "../assets/logo192.png";
 import { LoggedInContext } from "../utils/Contexts";
 import * as HTTPRequest from "../utils/HTTPRequests";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
-  const { history } = useHistory();
   const [usernameEmail, setUsernameEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState(false);
   const { setLoggedIn } = useContext(LoggedInContext);
+  const navigate = useNavigate();
 
   const handleLogin = () => {
     HTTPRequest.post("login_authentication", {
@@ -22,7 +22,7 @@ function Login() {
           setUserSession(response.data.token, response.data.user);
           setLoggedIn(true);
           setLoginError(false);
-          history.push("/");
+          navigate("/");
         } else {
           setLoggedIn(false);
           setLoginError(true);

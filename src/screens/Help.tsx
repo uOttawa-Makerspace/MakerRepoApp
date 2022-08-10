@@ -6,7 +6,7 @@ import EnvVariables from "../utils/EnvVariables";
 import * as HTTPRequest from "../utils/HTTPRequests";
 import { removeUserSession } from "../utils/Common";
 import { LoggedInContext } from "../utils/Contexts";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface FormValidationParams {
   validateList: string[][];
@@ -20,14 +20,14 @@ function Help() {
   const [subject, setSubject] = useState("");
   const [comments, setComments] = useState("");
   const { setLoggedIn } = useContext(LoggedInContext);
-  const { history } = useHistory();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     HTTPRequest.get("logout")
       .then(() => {
         setLoggedIn(false);
         removeUserSession();
-        history.push("/login");
+        navigate("/login");
       })
       .catch((error) => {
         console.error(error);

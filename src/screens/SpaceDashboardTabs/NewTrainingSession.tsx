@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { Button, Checkbox, FormControlLabel, FormGroup } from "@mui/material";
 import * as HTTPRequest from "../../utils/HTTPRequests";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 type TrainingSessionsProps = {
   spaceId: number | string | null;
@@ -13,7 +13,7 @@ const NewTrainingSession = ({
   spaceId,
   reloadTrainingSessions,
 }: TrainingSessionsProps) => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [newTrainingSession, setNewTrainingSession] = useState<string | null>(
     null
@@ -79,7 +79,7 @@ const NewTrainingSession = ({
             toast.success("Training session created successfully!", {
               position: "bottom-center",
             });
-            history.push("/staff/training_sessions");
+            navigate("/staff/training_sessions");
           } else {
             toast.error("Error creating training session!", {
               position: "bottom-center",

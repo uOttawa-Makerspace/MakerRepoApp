@@ -1,7 +1,7 @@
 import React from "react";
 import toast, { Toaster } from "react-hot-toast";
-import { useHistory } from "react-router-dom";
 import * as HTTPRequest from "../../utils/HTTPRequests";
+import { useNavigate } from "react-router-dom";
 
 type DashboardProps = {
   inSpaceUsers: any;
@@ -12,10 +12,9 @@ const Dashboard = ({
   inSpaceUsers,
   handleReloadCurrentUsers,
 }: DashboardProps) => {
-  const history = useHistory();
-
+  const navigate = useNavigate();
   const sendToUserProfile = (username: string) => {
-    history.push(`/profile/${username}`);
+    navigate(`/profile/${username}`);
   };
 
   const signOutUser = (username: string) => {
