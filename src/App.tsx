@@ -67,9 +67,11 @@ function App() {
               <Switch>
                 <PublicRoute path="/login" component={Login} />
                 <PublicRoute path="/help" component={Help} />
-                <PrivateRoute user={user} path="/profile/:username">
-                  <Profile />
-                </PrivateRoute>
+                <PrivateRoute
+                  user={user}
+                  path="/profile/:username"
+                  component={Profile}
+                />
                 <PrivateRoute user={user} path="/" component={Home} />
               </Switch>
             </div>
