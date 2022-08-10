@@ -81,7 +81,7 @@ function App() {
                       <Home user={user} />
                     </PrivateRoute>
                   }
-                ></Route>
+                />
               </Routes>
             </div>
             {loggedIn && user && <Navbar user={user} />}
