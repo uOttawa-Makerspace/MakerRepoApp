@@ -6,19 +6,21 @@ import EnvVariables from "../utils/EnvVariables";
 import * as HTTPRequest from "../utils/HTTPRequests";
 import { removeUserSession } from "../utils/Common";
 import { LoggedInContext } from "../utils/Contexts";
+import { useHistory } from "react-router-dom";
 
 interface FormValidationParams {
   validateList: string[][];
   formErrorFunction?: Function;
 }
 
-function Help({ history }: { history: string[] }) {
+function Help() {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("");
   const [comments, setComments] = useState("");
   const { setLoggedIn } = useContext(LoggedInContext);
+  const { history } = useHistory();
 
   const handleLogout = () => {
     HTTPRequest.get("logout")

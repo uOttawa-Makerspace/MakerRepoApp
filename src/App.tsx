@@ -65,14 +65,17 @@ function App() {
           <div className="main">
             <div className="content">
               <Switch>
-                <PublicRoute path="/login" component={Login} />
-                <PublicRoute path="/help" component={Help} />
+                <PublicRoute path="/login" component={<Login />} />
+                <PublicRoute path="/help" component={<Help />} />
+                <PrivateRoute
+                  path="/profile/:username"
+                  component={<Profile />}
+                />
                 <PrivateRoute
                   user={user}
-                  path="/profile/:username"
-                  component={Profile}
+                  path="/"
+                  component={<Home user={user} />}
                 />
-                <PrivateRoute user={user} path="/" component={Home} />
               </Switch>
             </div>
             {loggedIn && user && <Navbar user={user} />}

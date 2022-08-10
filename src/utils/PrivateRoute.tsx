@@ -3,7 +3,7 @@ import React, { cloneElement } from "react";
 
 const PrivateRoute = ({ children, user }: any) => {
   const token = localStorage.getItem("token");
-  return token && user !== null ? (
+  return token ? (
     cloneElement(children, { user })
   ) : (
     <Redirect

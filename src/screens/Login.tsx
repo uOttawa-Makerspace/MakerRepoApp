@@ -1,10 +1,12 @@
 import React, { useContext, useState } from "react";
+import { useHistory } from "react-router-dom";
 import { setUserSession } from "../utils/Common";
 import logo from "../assets/logo192.png";
 import { LoggedInContext } from "../utils/Contexts";
 import * as HTTPRequest from "../utils/HTTPRequests";
 
-function Login({ history }: { history: string[] }) {
+function Login() {
+  const { history } = useHistory();
   const [usernameEmail, setUsernameEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState(false);

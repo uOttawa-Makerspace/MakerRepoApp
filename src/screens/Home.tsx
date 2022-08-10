@@ -4,7 +4,7 @@ import SpaceDashboard from "./SpaceDashboard";
 import SpaceHours from "./SpaceHours";
 
 interface HomeProps {
-  user: Record<string, any>;
+  user: Record<string, any> | null;
 }
 
 function Home({ user }: HomeProps) {
