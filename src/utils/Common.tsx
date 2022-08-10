@@ -4,7 +4,7 @@ export const getUser = () => {
     try {
       JSON.parse(userStr);
     } catch {
-      return null;
+      removeUserSession();
     }
   } else {
     return null;
