@@ -66,7 +66,7 @@ function App() {
               <Routes>
                 <Route
                   path="/login"
-                  element={<Login setUser={(user) => setUser(user)} />}
+                  element={<Login setUser={(userProp) => setUser(userProp)} />}
                 />
                 <Route path="/help" element={<Help />} />
                 <Route
