@@ -5,7 +5,12 @@ import logo from "../assets/logo192.png";
 import { LoggedInContext } from "../utils/Contexts";
 import * as HTTPRequest from "../utils/HTTPRequests";
 
-function Login() {
+interface LoginProps {
+  // eslint-disable-next-line no-unused-vars
+  setUser: (user: any) => void;
+}
+
+function Login({ setUser }: LoginProps) {
   const [usernameEmail, setUsernameEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState(false);
@@ -20,6 +25,7 @@ function Login() {
       .then((response) => {
         if (response.status === 200) {
           setUserSession(response.data.token, response.data.user);
+          setUser(response.data.user);
           setLoggedIn(true);
           setLoginError(false);
           navigate("/");

@@ -64,7 +64,10 @@ function App() {
           <div className="main">
             <div className="content">
               <Routes>
-                <Route path="/login" element={<Login />} />
+                <Route
+                  path="/login"
+                  element={<Login setUser={(user) => setUser(user)} />}
+                />
                 <Route path="/help" element={<Help />} />
                 <Route
                   path="/profile/:username"
