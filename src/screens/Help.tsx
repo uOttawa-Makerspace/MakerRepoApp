@@ -89,8 +89,7 @@ function Help() {
       <div className="py-4 text-center">
         <h2>MakerRepo App</h2>
         <p>
-          Version
-          {EnvVariables.app_version} {EnvVariables.app_release_type}
+          Version {EnvVariables.app_version} {EnvVariables.app_release_type}
         </p>
       </div>
       <div>
