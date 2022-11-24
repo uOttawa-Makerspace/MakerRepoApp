@@ -30,10 +30,16 @@ function App() {
 
     HTTPRequest.get("check_signed_in")
       .then((response) => {
-        setUserSession(response.token, response.user);
-        setLoggedIn(true);
-        setAuthLoading(false);
-        setUser(response.user);
+        if (response.signed_in === true) {
+          setUserSession(response.token, response.user);
+          setLoggedIn(true);
+          setAuthLoading(false);
+          setUser(response.user);
+        } else {
+          setLoggedIn(false);
+          setAuthLoading(false);
+          setUser(null);
+        }
       })
       .catch((error) => {
         console.error(error);
