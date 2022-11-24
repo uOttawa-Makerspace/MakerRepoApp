@@ -30,7 +30,7 @@ function App() {
 
     HTTPRequest.get("check_signed_in")
       .then((response) => {
-        if (response.signed_in === true) {
+        if (response.signed_in === "true") {
           setUserSession(response.token, response.user);
           setLoggedIn(true);
           setAuthLoading(false);
@@ -38,7 +38,7 @@ function App() {
         } else {
           setLoggedIn(false);
           setAuthLoading(false);
-          setUser(null);
+          removeUserSession();
         }
       })
       .catch((error) => {
