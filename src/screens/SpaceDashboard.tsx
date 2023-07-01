@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Tab, Tabs } from "@mui/material";
+import { Button, Tab, Tabs } from "@mui/material";
 import * as HTTPRequest from "../utils/HTTPRequests";
 import { a11yProps, TabPanel } from "../components/TabPanel";
 import "react-bootstrap-typeahead/css/Typeahead.css";
@@ -13,6 +13,20 @@ function SpaceDashboard() {
   const [inSpaceUsers, setInSpaceUsers] = useState<any>(null);
   const [trainingSessions, setTrainingSessions] = useState<string | null>(null);
   const [tabIndex, setTabIndex] = React.useState(0);
+  const [rfid, setRfid] = useState<string | null>(null);
+
+  const startScanning = async () => {
+    try {
+      // eslint-disable-next-line no-undef
+      const ndef = new NDEFReader();
+      await ndef.scan();
+      ndef.addEventListener("reading", ({ message, serialNumber }) => {
+        setRfid(serialNumber);
+      });
+    } catch (error) {
+      console.log(`Error! Scan failed to start: ${error}.`);
+    }
+  };
 
   const handleTabChange = (
     event: any,
@@ -62,6 +76,7 @@ function SpaceDashboard() {
         <Tab label="Search" {...a11yProps(1)} />
         <Tab label="New Training Session" {...a11yProps(2)} />
         <Tab label="Training Sessions" {...a11yProps(3)} />
+        <Tab label="RFID" {...a11yProps(4)} />
       </Tabs>
 
       <TabPanel value={tabIndex} index={0}>
@@ -101,6 +116,21 @@ function SpaceDashboard() {
           trainingSessions={trainingSessions}
           reloadTrainingSessions={() => getTrainingSessions()}
         />
+      </TabPanel>
+      <TabPanel value={tabIndex} index={4}>
+        {"NDEFReader" in window && (
+          <div>
+            NFC
+            <button
+              type="button"
+              onClick={() => startScanning()}
+              className="btn btn-primary btn-sm"
+            >
+              Start Scanning
+            </button>
+            {rfid ?? "Not scanned yet"}
+          </div>
+        )}
       </TabPanel>
     </div>
   );
