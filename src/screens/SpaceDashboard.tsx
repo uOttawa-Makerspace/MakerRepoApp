@@ -20,7 +20,8 @@ function SpaceDashboard() {
       // eslint-disable-next-line no-undef
       const ndef = new NDEFReader();
       await ndef.scan();
-      ndef.addEventListener("reading", ({ message, serialNumber }) => {
+      // @ts-ignore
+      ndef.addEventListener("reading", ({ serialNumber }) => {
         setRfid(serialNumber);
       });
     } catch (error) {
