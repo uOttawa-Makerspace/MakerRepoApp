@@ -32,9 +32,12 @@ function Rfid(): JSX.Element {
           }
         }
       })
-      .catch((error) => {
-        // eslint-disable-next-line no-console
-        console.log("Something went wrong. Please try again later.", error);
+      .catch(() => {
+        setStatus({
+          status: "error",
+          message:
+            "An error has occurred... Please make sure the card is registered",
+        });
       });
   };
 
@@ -48,7 +51,7 @@ function Rfid(): JSX.Element {
         // @ts-ignore
         ndef.addEventListener("reading", ({ serialNumber }) => {
           if (serialNumber) {
-            handleRfidCardTap(serialNumber);
+            handleRfidCardTap(serialNumber.replace(":", "").uppercase());
           }
         });
       } catch (error) {
@@ -63,8 +66,7 @@ function Rfid(): JSX.Element {
   return (
     <div>
       {"NDEFReader" in window && (
-        <div>
-          NFC
+        <div className="justify-content-center">
           <button
             type="button"
             onClick={() => startStopScanning()}
