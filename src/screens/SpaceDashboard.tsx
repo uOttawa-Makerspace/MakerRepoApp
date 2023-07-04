@@ -105,7 +105,7 @@ function SpaceDashboard() {
         />
       </TabPanel>
       <TabPanel value={tabIndex} index={4}>
-        <Rfid />
+        <Rfid spaceId={inSpaceUsers?.space?.id} />
       </TabPanel>
     </div>
   );

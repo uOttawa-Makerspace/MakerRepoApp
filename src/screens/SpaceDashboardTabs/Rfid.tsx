@@ -7,13 +7,18 @@ interface RfidStatus {
   message: string;
 }
 
-function Rfid(): JSX.Element {
+interface RfidProps {
+  spaceId: number | undefined;
+}
+
+const Rfid = ({ spaceId }: RfidProps) => {
   const [scanRfid, setScanRfid] = useState<boolean>(false);
   const [status, setStatus] = useState<null | RfidStatus>(null);
 
   const handleRfidCardTap = (rfidCardNumber: string) => {
     HTTPRequest.post("/rfid/card_number", {
       rfid: rfidCardNumber,
+      space_id: spaceId,
     })
       .then((response) => {
         if (response.status === 200) {
@@ -86,6 +91,6 @@ function Rfid(): JSX.Element {
       )}
     </div>
   );
-}
+};
 
 export default Rfid;
