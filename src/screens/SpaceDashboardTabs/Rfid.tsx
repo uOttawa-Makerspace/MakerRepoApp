@@ -15,6 +15,14 @@ const Rfid = ({ spaceId }: RfidProps) => {
   const [scanRfid, setScanRfid] = useState<boolean>(false);
   const [status, setStatus] = useState<null | RfidStatus>(null);
 
+  const setErrorStatus = () => {
+    setStatus({
+      status: "error",
+      message:
+        "An error has occurred... Please make sure the card is registered",
+    });
+  };
+
   const handleRfidCardTap = (rfidCardNumber: string) => {
     HTTPRequest.post("/rfid/card_number", {
       rfid: rfidCardNumber,
@@ -24,25 +32,19 @@ const Rfid = ({ spaceId }: RfidProps) => {
         if (response.status === 200) {
           if (response.data.success) {
             if (response.data.success === "RFID sign out") {
-              setStatus({ status: "warning", message: "Signed In!" });
+              setStatus({ status: "warning", message: "Signed Out!" });
             } else {
-              setStatus({ status: "success", message: "Signed Out!" });
+              setStatus({ status: "success", message: "Signed In!" });
             }
           } else {
-            setStatus({
-              status: "error",
-              message:
-                "An error has occurred... Please make sure the card is registered",
-            });
+            setErrorStatus();
           }
+        } else {
+          setErrorStatus();
         }
       })
       .catch(() => {
-        setStatus({
-          status: "error",
-          message:
-            "An error has occurred... Please make sure the card is registered",
-        });
+        setErrorStatus();
       });
   };
 
@@ -64,7 +66,7 @@ const Rfid = ({ spaceId }: RfidProps) => {
         console.log(`Error! Scan failed to start: ${error}.`);
       }
     } else {
-      setScanRfid(true);
+      setScanRfid(false);
     }
   };
 
