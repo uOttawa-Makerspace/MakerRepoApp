@@ -51,7 +51,7 @@ function Rfid(): JSX.Element {
         // @ts-ignore
         ndef.addEventListener("reading", ({ serialNumber }) => {
           if (serialNumber) {
-            handleRfidCardTap(serialNumber.replace(":", "").toUpperCase());
+            handleRfidCardTap(serialNumber.replaceAll(":", "").toUpperCase());
           }
         });
       } catch (error) {
