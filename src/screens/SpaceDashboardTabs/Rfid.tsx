@@ -12,6 +12,7 @@ interface RfidProps {
 }
 
 const Rfid = ({ spaceId }: RfidProps) => {
+  const [firstRfidScan, setFirstRfidScan] = useState(false);
   const [scanRfid, setScanRfid] = useState<boolean>(false);
   const [status, setStatus] = useState<null | RfidStatus>(null);
 
@@ -52,20 +53,25 @@ const Rfid = ({ spaceId }: RfidProps) => {
 
   const startStopScanning = async () => {
     if (!scanRfid) {
-      try {
-        // eslint-disable-next-line no-undef
-        const ndef = new NDEFReader();
-        await ndef.scan();
+      if (firstRfidScan) {
         setScanRfid(true);
-        // @ts-ignore
-        ndef.addEventListener("reading", ({ serialNumber }) => {
-          if (serialNumber) {
-            handleRfidCardTap(serialNumber.replaceAll(":", "").toUpperCase());
-          }
-        });
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.log(`Error! Scan failed to start: ${error}.`);
+      } else {
+        try {
+          // eslint-disable-next-line no-undef
+          const ndef = new NDEFReader();
+          await ndef.scan();
+          setScanRfid(true);
+          // @ts-ignore
+          ndef.addEventListener("reading", ({ serialNumber }) => {
+            if (serialNumber) {
+              handleRfidCardTap(serialNumber.replaceAll(":", "").toUpperCase());
+            }
+          });
+          setFirstRfidScan(true);
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.log(`Error! Scan failed to start: ${error}.`);
+        }
       }
     } else {
       setScanRfid(false);
