@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Alert } from "@mui/material";
 import * as HTTPRequest from "../../utils/HTTPRequests";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 interface RfidStatus {
   status: "error" | "warning" | "success";
@@ -25,28 +24,30 @@ const Rfid = ({ spaceId }: RfidProps) => {
   };
 
   const handleRfidCardTap = (rfidCardNumber: string) => {
-    HTTPRequest.post("/rfid/card_number", {
-      rfid: rfidCardNumber,
-      space_id: spaceId,
-    })
-      .then((response) => {
-        if (response.status === 200) {
-          if (response.data.success) {
-            if (response.data.success === "RFID sign out") {
-              setStatus({ status: "warning", message: "Signed Out!" });
+    if (scanRfid) {
+      HTTPRequest.post("/rfid/card_number", {
+        rfid: rfidCardNumber,
+        space_id: spaceId,
+      })
+        .then((response) => {
+          if (response.status === 200) {
+            if (response.data.success) {
+              if (response.data.success === "RFID sign out") {
+                setStatus({ status: "warning", message: "Signed Out!" });
+              } else {
+                setStatus({ status: "success", message: "Signed In!" });
+              }
             } else {
-              setStatus({ status: "success", message: "Signed In!" });
+              setErrorStatus();
             }
           } else {
             setErrorStatus();
           }
-        } else {
+        })
+        .catch(() => {
           setErrorStatus();
-        }
-      })
-      .catch(() => {
-        setErrorStatus();
-      });
+        });
+    }
   };
 
   const startStopScanning = async () => {
@@ -58,7 +59,7 @@ const Rfid = ({ spaceId }: RfidProps) => {
         setScanRfid(true);
         // @ts-ignore
         ndef.addEventListener("reading", ({ serialNumber }) => {
-          if (serialNumber && scanRfid) {
+          if (serialNumber) {
             handleRfidCardTap(serialNumber.replaceAll(":", "").toUpperCase());
           }
         });
@@ -75,11 +76,11 @@ const Rfid = ({ spaceId }: RfidProps) => {
     <div>
       {"NDEFReader" in window && (
         <div className="justify-content-center">
-          <div className="d-grid gap-2">
+          <div className="d-grid gap-2 my-2">
             <button
               type="button"
               onClick={() => startStopScanning()}
-              className="btn btn-info"
+              className="btn btn-info text-white"
             >
               {scanRfid ? "Stop" : "Start"} Scanning
             </button>
