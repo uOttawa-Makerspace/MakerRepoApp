@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Alert } from "@mui/material";
 import * as HTTPRequest from "../../utils/HTTPRequests";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 interface RfidStatus {
   status: "error" | "warning" | "success";
@@ -57,7 +58,7 @@ const Rfid = ({ spaceId }: RfidProps) => {
         setScanRfid(true);
         // @ts-ignore
         ndef.addEventListener("reading", ({ serialNumber }) => {
-          if (serialNumber) {
+          if (serialNumber && scanRfid) {
             handleRfidCardTap(serialNumber.replaceAll(":", "").toUpperCase());
           }
         });
@@ -74,13 +75,15 @@ const Rfid = ({ spaceId }: RfidProps) => {
     <div>
       {"NDEFReader" in window && (
         <div className="justify-content-center">
-          <button
-            type="button"
-            onClick={() => startStopScanning()}
-            className="btn btn-primary btn-sm"
-          >
-            {scanRfid ? "Stop" : "Start"} Scanning
-          </button>
+          <div className="d-grid gap-2">
+            <button
+              type="button"
+              onClick={() => startStopScanning()}
+              className="btn btn-info"
+            >
+              {scanRfid ? "Stop" : "Start"} Scanning
+            </button>
+          </div>
           {status && (
             <Alert
               severity={status.status}

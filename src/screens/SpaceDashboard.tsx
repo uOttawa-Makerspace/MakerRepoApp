@@ -74,6 +74,7 @@ function SpaceDashboard() {
         <Dashboard
           inSpaceUsers={inSpaceUsers !== null ? inSpaceUsers?.space_users : []}
           handleReloadCurrentUsers={() => getCurrentUsers()}
+          spaceId={inSpaceUsers?.space?.id}
         />
       </TabPanel>
 
@@ -103,9 +104,6 @@ function SpaceDashboard() {
           trainingSessions={trainingSessions}
           reloadTrainingSessions={() => getTrainingSessions()}
         />
-      </TabPanel>
-      <TabPanel value={tabIndex} index={4}>
-        <Rfid spaceId={inSpaceUsers?.space?.id} />
       </TabPanel>
     </div>
   );
