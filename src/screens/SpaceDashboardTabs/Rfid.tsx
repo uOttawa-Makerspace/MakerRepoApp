@@ -12,7 +12,6 @@ interface RfidProps {
 }
 
 const Rfid = ({ spaceId }: RfidProps) => {
-  const [firstRfidScan, setFirstRfidScan] = useState(false);
   const [scanRfid, setScanRfid] = useState<boolean>(false);
   const [status, setStatus] = useState<null | RfidStatus>(null);
 
@@ -25,53 +24,46 @@ const Rfid = ({ spaceId }: RfidProps) => {
   };
 
   const handleRfidCardTap = (rfidCardNumber: string) => {
-    if (scanRfid) {
-      HTTPRequest.post("/rfid/card_number", {
-        rfid: rfidCardNumber,
-        space_id: spaceId,
-      })
-        .then((response) => {
-          if (response.status === 200) {
-            if (response.data.success) {
-              if (response.data.success === "RFID sign out") {
-                setStatus({ status: "warning", message: "Signed Out!" });
-              } else {
-                setStatus({ status: "success", message: "Signed In!" });
-              }
+    HTTPRequest.post("/rfid/card_number", {
+      rfid: rfidCardNumber,
+      space_id: spaceId,
+    })
+      .then((response) => {
+        if (response.status === 200) {
+          if (response.data.success) {
+            if (response.data.success === "RFID sign out") {
+              setStatus({ status: "warning", message: "Signed Out!" });
             } else {
-              setErrorStatus();
+              setStatus({ status: "success", message: "Signed In!" });
             }
           } else {
             setErrorStatus();
           }
-        })
-        .catch(() => {
+        } else {
           setErrorStatus();
-        });
-    }
+        }
+      })
+      .catch(() => {
+        setErrorStatus();
+      });
   };
 
-  const startStopScanning = async () => {
+  const startScanning = async () => {
     if (!scanRfid) {
-      if (firstRfidScan) {
+      try {
+        // eslint-disable-next-line no-undef
+        const ndef = new NDEFReader();
+        await ndef.scan();
         setScanRfid(true);
-      } else {
-        try {
-          // eslint-disable-next-line no-undef
-          const ndef = new NDEFReader();
-          await ndef.scan();
-          setScanRfid(true);
-          // @ts-ignore
-          ndef.addEventListener("reading", ({ serialNumber }) => {
-            if (serialNumber) {
-              handleRfidCardTap(serialNumber.replaceAll(":", "").toUpperCase());
-            }
-          });
-          setFirstRfidScan(true);
-        } catch (error) {
-          // eslint-disable-next-line no-console
-          console.log(`Error! Scan failed to start: ${error}.`);
-        }
+        // @ts-ignore
+        ndef.addEventListener("reading", ({ serialNumber }) => {
+          if (serialNumber) {
+            handleRfidCardTap(serialNumber.replaceAll(":", "").toUpperCase());
+          }
+        });
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.log(`Error! Scan failed to start: ${error}.`);
       }
     } else {
       setScanRfid(false);
@@ -85,10 +77,11 @@ const Rfid = ({ spaceId }: RfidProps) => {
           <div className="d-grid gap-2 my-2">
             <button
               type="button"
-              onClick={() => startStopScanning()}
+              onClick={() => startScanning()}
+              disabled={scanRfid}
               className="btn btn-info text-white"
             >
-              {scanRfid ? "Stop" : "Start"} Scanning
+              {scanRfid ? "Scanning..." : "Start Scanning"}
             </button>
           </div>
           {status && (
