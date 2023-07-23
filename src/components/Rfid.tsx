@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Alert, Snackbar } from "@mui/material";
+import { Alert } from "@mui/material";
 import * as HTTPRequest from "../utils/HTTPRequests";
 
 interface RfidStatus {
@@ -21,17 +21,6 @@ const Rfid = ({ spaceId }: RfidProps) => {
       message:
         "An error has occurred... Please make sure the card is registered",
     });
-  };
-
-  const handleSnackBarClose = (
-    event?: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setStatus(null);
   };
 
   const handleRfidCardTap = (rfidCardNumber: string) => {
@@ -95,21 +84,15 @@ const Rfid = ({ spaceId }: RfidProps) => {
               {scanRfid ? "Scanning..." : "Start Scanning"}
             </button>
           </div>
-          <Snackbar
-            anchorOrigin={{ vertical: "top", horizontal: "center" }}
-            open={!!status}
-            autoHideDuration={5000}
-            onClose={handleSnackBarClose}
-          >
+          {!!status && (
             <Alert
-              sx={{ width: "100%" }}
-              onClose={handleSnackBarClose}
+              onClose={() => setStatus(null)}
               severity={status?.status}
               className="justify-content-center mt-2"
             >
               {status?.message}
             </Alert>
-          </Snackbar>
+          )}
         </div>
       )}
     </div>
