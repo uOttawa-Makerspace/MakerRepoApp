@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Alert } from "@mui/material";
-import * as HTTPRequest from "../../utils/HTTPRequests";
+import { Alert, Snackbar } from "@mui/material";
+import * as HTTPRequest from "../utils/HTTPRequests";
 
 interface RfidStatus {
   status: "error" | "warning" | "success";
@@ -14,6 +14,7 @@ interface RfidProps {
 const Rfid = ({ spaceId }: RfidProps) => {
   const [scanRfid, setScanRfid] = useState<boolean>(false);
   const [status, setStatus] = useState<null | RfidStatus>(null);
+  const [openSnackBar, setOpenSnackBar] = useState<boolean>(false);
 
   const setErrorStatus = () => {
     setStatus({
@@ -21,6 +22,17 @@ const Rfid = ({ spaceId }: RfidProps) => {
       message:
         "An error has occurred... Please make sure the card is registered",
     });
+  };
+
+  const handleSnackBarClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpenSnackBar(false);
   };
 
   const handleRfidCardTap = (rfidCardNumber: string) => {
@@ -46,6 +58,8 @@ const Rfid = ({ spaceId }: RfidProps) => {
       .catch(() => {
         setErrorStatus();
       });
+
+    setOpenSnackBar(true);
   };
 
   const startScanning = async () => {
@@ -85,12 +99,18 @@ const Rfid = ({ spaceId }: RfidProps) => {
             </button>
           </div>
           {status && (
-            <Alert
-              severity={status.status}
-              className="justify-content-center mt-2"
+            <Snackbar
+              open={openSnackBar}
+              autoHideDuration={5000}
+              onClose={handleSnackBarClose}
             >
-              {status.message}
-            </Alert>
+              <Alert
+                severity={status.status}
+                className="justify-content-center mt-2"
+              >
+                {status.message}
+              </Alert>
+            </Snackbar>
           )}
         </div>
       )}

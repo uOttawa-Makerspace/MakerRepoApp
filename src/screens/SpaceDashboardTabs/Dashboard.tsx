@@ -2,7 +2,7 @@ import React from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import * as HTTPRequest from "../../utils/HTTPRequests";
-import Rfid from "./Rfid";
+import Rfid from "../../components/Rfid";
 
 type DashboardProps = {
   inSpaceUsers: any;

@@ -8,7 +8,6 @@ import Search from "./SpaceDashboardTabs/Search";
 import NewTrainingSession from "./SpaceDashboardTabs/NewTrainingSession";
 import TrainingSessions from "./SpaceDashboardTabs/TrainingSessions";
 import ChangeSpace from "../components/ChangeSpace";
-import Rfid from "./SpaceDashboardTabs/Rfid";
 
 function SpaceDashboard() {
   const [inSpaceUsers, setInSpaceUsers] = useState<any>(null);
@@ -63,7 +62,6 @@ function SpaceDashboard() {
         <Tab label="Search" {...a11yProps(1)} />
         <Tab label="New Training Session" {...a11yProps(2)} />
         <Tab label="Training Sessions" {...a11yProps(3)} />
-        <Tab label="RFID" {...a11yProps(4)} />
       </Tabs>
 
       <TabPanel value={tabIndex} index={0}>
