@@ -14,7 +14,6 @@ interface RfidProps {
 const Rfid = ({ spaceId }: RfidProps) => {
   const [scanRfid, setScanRfid] = useState<boolean>(false);
   const [status, setStatus] = useState<null | RfidStatus>(null);
-  const [openSnackBar, setOpenSnackBar] = useState<boolean>(false);
 
   const setErrorStatus = () => {
     setStatus({
@@ -32,7 +31,7 @@ const Rfid = ({ spaceId }: RfidProps) => {
       return;
     }
 
-    setOpenSnackBar(false);
+    setStatus(null);
   };
 
   const handleRfidCardTap = (rfidCardNumber: string) => {
@@ -58,8 +57,6 @@ const Rfid = ({ spaceId }: RfidProps) => {
       .catch(() => {
         setErrorStatus();
       });
-
-    setOpenSnackBar(true);
   };
 
   const startScanning = async () => {
@@ -98,20 +95,19 @@ const Rfid = ({ spaceId }: RfidProps) => {
               {scanRfid ? "Scanning..." : "Start Scanning"}
             </button>
           </div>
-          {status && (
-            <Snackbar
-              open={openSnackBar}
-              autoHideDuration={5000}
-              onClose={handleSnackBarClose}
+          <Snackbar
+            open={!!status}
+            autoHideDuration={5000}
+            onClose={handleSnackBarClose}
+          >
+            <Alert
+              sx={{ width: "100%" }}
+              severity={status?.status}
+              className="justify-content-center mt-2"
             >
-              <Alert
-                severity={status.status}
-                className="justify-content-center mt-2"
-              >
-                {status.message}
-              </Alert>
-            </Snackbar>
-          )}
+              {status?.message}
+            </Alert>
+          </Snackbar>
         </div>
       )}
     </div>
