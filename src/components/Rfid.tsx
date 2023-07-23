@@ -96,12 +96,14 @@ const Rfid = ({ spaceId }: RfidProps) => {
             </button>
           </div>
           <Snackbar
+            anchorOrigin={{ vertical: "top", horizontal: "center" }}
             open={!!status}
             autoHideDuration={5000}
             onClose={handleSnackBarClose}
           >
             <Alert
               sx={{ width: "100%" }}
+              onClose={handleSnackBarClose}
               severity={status?.status}
               className="justify-content-center mt-2"
             >
