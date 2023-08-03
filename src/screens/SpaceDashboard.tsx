@@ -72,6 +72,7 @@ function SpaceDashboard() {
         <Dashboard
           inSpaceUsers={inSpaceUsers !== null ? inSpaceUsers?.space_users : []}
           handleReloadCurrentUsers={() => getCurrentUsers()}
+          spaceId={inSpaceUsers?.space?.id}
         />
       </TabPanel>
 
