@@ -48,9 +48,10 @@ To install the React App to contribute to new changes:
    ```sh
    git clone https://github.com/uOttawa-Makerspace/makerepo-react-app
    ```
-2. Install NPM packages
+2. Enable corepack and install NPM packages
 
    ```sh
+   corepack enable
    yarn install
    ```
 
