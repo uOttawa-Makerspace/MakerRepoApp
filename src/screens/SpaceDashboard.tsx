@@ -8,6 +8,7 @@ import Search from "./SpaceDashboardTabs/Search";
 import NewTrainingSession from "./SpaceDashboardTabs/NewTrainingSession";
 import TrainingSessions from "./SpaceDashboardTabs/TrainingSessions";
 import ChangeSpace from "../components/ChangeSpace";
+import Shifts from "./SpaceDashboardTabs/Shifts";
 
 function SpaceDashboard() {
   const [inSpaceUsers, setInSpaceUsers] = useState<any>(null);
@@ -62,6 +63,7 @@ function SpaceDashboard() {
         <Tab label="Search" {...a11yProps(1)} />
         <Tab label="New Training Session" {...a11yProps(2)} />
         <Tab label="Training Sessions" {...a11yProps(3)} />
+        <Tab label="Shifts" {...a11yProps(4)} />
       </Tabs>
 
       <TabPanel value={tabIndex} index={0}>
@@ -102,6 +104,14 @@ function SpaceDashboard() {
           trainingSessions={trainingSessions}
           reloadTrainingSessions={() => getTrainingSessions()}
         />
+      </TabPanel>
+      <TabPanel value={tabIndex} index={4}>
+        <ChangeSpace
+          inSpaceUsers={inSpaceUsers}
+          handleReloadCurrentUsers={() => getCurrentUsers()}
+        />
+        <Shifts reloadShifts={() => {
+        }} />
       </TabPanel>
     </div>
   );
