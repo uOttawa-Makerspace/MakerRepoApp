@@ -4,6 +4,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import googleCalendarPlugin from '@fullcalendar/google-calendar';
 import toast, { Toaster } from "react-hot-toast";
+import { get } from '../../utils/HTTPRequests';
 
 type ExtendedProps = {
     reason?: string;
@@ -31,15 +32,8 @@ const Shifts: React.FC<ShiftsProps> = ({ reloadShifts }) => {
     useEffect(() => {
         const fetchShifts = async () => {
             try {
-                const response = await fetch("staff/shifts_schedule/get_shifts", {
-                    credentials: 'include',
-                });
-                if (!response.ok) {
-                    throw new Error('Failed to fetch shifts');
-                }
-                const data = await response.json();
+                const data = await get("staff/shifts_schedule/get_shifts");
                 const formattedShifts = data.map((shift: any) => ({
-                    id: shift.id.toString(),
                     title: shift.title,
                     start: shift.start,
                     end: shift.end,
