@@ -6,6 +6,7 @@ import googleCalendarPlugin from '@fullcalendar/google-calendar';
 import toast, { Toaster } from "react-hot-toast";
 import { get } from '../../utils/HTTPRequests';
 
+// Type definition for the (optional) extended properties of a shift
 type ExtendedProps = {
     reason?: string;
     training?: string;
@@ -13,8 +14,8 @@ type ExtendedProps = {
     language?: string;
 };
 
+// Type definition for a shift object
 type Shift = {
-    id: string;
     title: string;
     start: string;
     end: string;
@@ -22,6 +23,7 @@ type Shift = {
     extendedProps?: ExtendedProps;
 };
 
+// Props for the Shifts component
 type ShiftsProps = {
     reloadShifts: () => void;
 };
@@ -29,6 +31,7 @@ type ShiftsProps = {
 const Shifts: React.FC<ShiftsProps> = ({ reloadShifts }) => {
     const [shifts, setShifts] = useState<Shift[]>([]);
 
+    // Fetch shifts from the server and format them for the calendar
     useEffect(() => {
         const fetchShifts = async () => {
             try {
@@ -50,6 +53,7 @@ const Shifts: React.FC<ShiftsProps> = ({ reloadShifts }) => {
         fetchShifts();
     }, [reloadShifts]);
 
+    // Define the minimum and maximum time slots for the calendar
     const SLOT_MIN_TIME = new Date(new Date().setHours(7, 0, 0, 0));
     const SLOT_MAX_TIME = new Date(new Date().setHours(23, 0, 0, 0));
 
