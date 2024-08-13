@@ -1,4 +1,4 @@
-import "./index.css";
+import "./index.scss";
 import React, { useEffect, useState } from "react";
 import { HashRouter as Router, Route, Routes } from "react-router-dom";
 import useErrorBoundary from "use-error-boundary";
@@ -6,7 +6,6 @@ import Login from "./screens/Login";
 import Home from "./screens/Home";
 import Navbar from "./components/Navbar";
 import Profile from "./screens/Profile";
-import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap";
 import PrivateRoute from "./utils/PrivateRoute";
 import { getToken, removeUserSession, setUserSession } from "./utils/Common";
