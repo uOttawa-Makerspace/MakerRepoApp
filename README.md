@@ -57,7 +57,7 @@ To install the React App to contribute to new changes:
 
 3. Launch Dev Version of the MakerRepo Rails Server (See [MakerRepo Github Repo](https://github.com/uOttawa-Makerspace/MakerSpaceRepo))
 
-4. Launch App
+4. Launch App on `localhost:3001`
    ```sh
    yarn start
    ```
