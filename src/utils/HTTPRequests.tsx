@@ -30,14 +30,13 @@ export const get = (route: string) =>
 
 export const patch = (route: string, body: any) =>
   axios
-    .patch(`${EnvVariables.api_url}/${route}`, {
+    .patch(`${EnvVariables.api_url}/${route}`, JSON.stringify(body), {
       withCredentials: true,
       headers: {
-        Accept: "application/json",
+        "Accept": "application/json",
         "Content-Type": "application/json",
         Authorization: `Bearer ${window.localStorage.getItem("token")}`,
       },
-      body: JSON.stringify(body),
     })
     .then((response) => response.data)
     .catch((error) => {

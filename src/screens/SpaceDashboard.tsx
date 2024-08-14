@@ -9,22 +9,22 @@ import NewTrainingSession from "./SpaceDashboardTabs/NewTrainingSession";
 import TrainingSessions from "./SpaceDashboardTabs/TrainingSessions";
 import ChangeSpace from "../components/ChangeSpace";
 import Shifts from "./SpaceDashboardTabs/Shifts";
+import Printers from "./SpaceDashboardTabs/Printers";
 
 function SpaceDashboard() {
   const [inSpaceUsers, setInSpaceUsers] = useState<any>(null);
   const [trainingSessions, setTrainingSessions] = useState<string | null>(null);
+  const [printers, setPrinters] = useState<string | null>(null);
   const [tabIndex, setTabIndex] = React.useState(0);
 
-  const handleTabChange = (
-    event: any,
-    newValue: React.SetStateAction<number>
-  ) => {
+  const handleTabChange = (event: any, newValue: React.SetStateAction<number>) => {
     setTabIndex(newValue);
   };
 
   useEffect(() => {
     getCurrentUsers();
     getTrainingSessions();
+    getPrinterData();
   }, []);
 
   const getCurrentUsers = () => {
@@ -41,6 +41,16 @@ function SpaceDashboard() {
     HTTPRequest.get("staff/training_sessions")
       .then((response) => {
         setTrainingSessions(response);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  const getPrinterData = () => {
+    HTTPRequest.get("printers")
+      .then((response) => {
+        setPrinters(response);
       })
       .catch((error) => {
         console.error(error);
@@ -64,6 +74,7 @@ function SpaceDashboard() {
         <Tab label="New Training Session" {...a11yProps(2)} />
         <Tab label="Training Sessions" {...a11yProps(3)} />
         <Tab label="Shifts" {...a11yProps(4)} />
+        <Tab label="Printers" {...a11yProps(5)} />
       </Tabs>
 
       <TabPanel value={tabIndex} index={0}>
@@ -110,8 +121,18 @@ function SpaceDashboard() {
           inSpaceUsers={inSpaceUsers}
           handleReloadCurrentUsers={() => getCurrentUsers()}
         />
-        <Shifts reloadShifts={() => {
-        }} />
+        <Shifts reloadShifts={() => {}} />
+      </TabPanel>
+      <TabPanel value={tabIndex} index={5}>
+        <ChangeSpace
+          inSpaceUsers={inSpaceUsers}
+          handleReloadCurrentUsers={() => getCurrentUsers()}
+        />
+        <Printers
+          inSpaceUsers={inSpaceUsers}
+          handleReloadCurrentUsers={() => getCurrentUsers()}
+          reloadPrinters={() => getPrinterData()}
+        />
       </TabPanel>
     </div>
   );
