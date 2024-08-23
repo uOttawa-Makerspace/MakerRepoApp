@@ -4,7 +4,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { Tab, Tabs } from "@mui/material";
 import * as HTTPRequest from "../../utils/HTTPRequests";
 import { a11yProps, TabPanel } from "../../components/TabPanel";
-import PrinterIssues from "./PrinterIssues"
+import PrinterIssues, { PrinterIssue } from "./PrinterIssues"
 
 type PrinterType = {
   id: number;
@@ -30,7 +30,7 @@ type PrintersProps = {
 type PrinterLinkFormProps = {
   pt: PrinterType;
   inSpaceUsers: any;
-  reloadPrinters: () => void;
+  /*   reloadPrinters: () => void; */
 };
 
 interface userSearch {
@@ -41,7 +41,6 @@ interface userSearch {
 const PrinterLinkForm: React.FC<PrinterLinkFormProps> = ({
   pt,
   inSpaceUsers,
-  reloadPrinters,
 }) => {
   const [printerTypeAheadValue, setPrinterTypeAheadValue] = useState<userSearch[]>([]);
   // @ts-ignore
@@ -126,6 +125,7 @@ const Printers: React.FC<PrintersProps> = ({
   reloadPrinters,
 }) => {
   const [printers, setPrinters] = useState<PrinterType[]>([]);
+  const [printerIssues, setPrinterIssues] = useState<PrinterIssue[]>([]);
   const [tabIndex, setTabIndex] = React.useState(0);
 
   const handleTabChange = (event: any, newValue: React.SetStateAction<number>) => {
@@ -134,6 +134,7 @@ const Printers: React.FC<PrintersProps> = ({
 
   useEffect(() => {
     const fetchPrinters = async () => {
+      // Fetch printers
       try {
         const data = await HTTPRequest.get("printers/printer_data");
         const formattedPrinters = data.map((pt: PrinterType) => ({
@@ -153,17 +154,47 @@ const Printers: React.FC<PrintersProps> = ({
         console.error(error);
         toast.error("Failed to load printers");
       }
+      try {
+        const data = await HTTPRequest.get("printer_issues");
+        const formattedIssues = data['issues'].map((i: PrinterIssue) => {
+          // Get printer name
+          let printer_name = undefined
+          for (let pt of printers) {
+            let printer = pt.printers.find((p) => p.id == i.printer_id)
+            // Printer found
+            if (printer) {
+              printer_name = pt.short_form + ' - ' + printer.number
+            }
+          }
+          //const printer = printers.map((pt) => pt.printers).flat().find((p) => p.id == i.printer_id)
+          //console.log(printer)
+          return {
+            id: i['id'],
+            printer_id: i['printer_id'],
+            printer_name: printer_name,
+            reporter: i['reporter'],
+            summary: i['summary'],
+            description: i['description'],
+            created_at: i['created_at']
+          }
+        })
+        setPrinterIssues(formattedIssues);
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to load printer issues")
+      }
+      console.log(printerIssues)
     };
 
     fetchPrinters();
-  }, [reloadPrinters]);
+  }, [reloadPrinters]); // This is for reloading with the big button...
+  // How does this even work dude
 
   const linkForms = printers.map((pt) => (
     <PrinterLinkForm
       key={pt.id}
       pt={pt}
       inSpaceUsers={inSpaceUsers}
-      reloadPrinters={reloadPrinters}
     />
   ));
 
@@ -182,8 +213,7 @@ const Printers: React.FC<PrintersProps> = ({
     </TabPanel>
     <Toaster />
     <TabPanel value={tabIndex} index={1} >
-      <h3 className="text-center mt-2">Issues</h3>
-      <PrinterIssues />
+      <PrinterIssues issues={printerIssues} />
     </TabPanel>
     </>
   );
