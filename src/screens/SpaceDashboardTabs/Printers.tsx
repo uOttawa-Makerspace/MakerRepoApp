@@ -1,7 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Typeahead } from "react-bootstrap-typeahead";
 import toast, { Toaster } from "react-hot-toast";
+import { Tab, Tabs } from "@mui/material";
 import * as HTTPRequest from "../../utils/HTTPRequests";
+import { a11yProps, TabPanel } from "../../components/TabPanel";
+import PrinterIssues from "./PrinterIssues"
 
 type PrinterType = {
   id: number;
@@ -48,11 +51,11 @@ const PrinterLinkForm: React.FC<PrinterLinkFormProps> = ({
   const [userTypeAheadValue, setUserTypeAheadValue] = useState<userSearch[]>([]);
 
   const printers = pt.printers
-    .map((printer: Printer) => ({
-      name: pt.short_form + " - " + printer.number,
-      id: printer.id,
-    }))
-    .sort((a, b) => (a.name >= b.name && a.name.length >= b.name.length ? 1 : 0));
+                     .map((printer: Printer) => ({
+                       name: pt.short_form + " - " + printer.number,
+                       id: printer.id,
+                     }))
+                     .sort((a, b) => (a.name >= b.name && a.name.length >= b.name.length ? 1 : 0));
   const users = inSpaceUsers.space_users.map((u: userSearch) => ({
     name: u.name,
     id: u.id,
@@ -74,12 +77,12 @@ const PrinterLinkForm: React.FC<PrinterLinkFormProps> = ({
         printer_id: printerid,
       },
     })
-      .then(() => {
-        toast.success(`Linked to ${printerTypeAheadValue[0].name}`);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+               .then(() => {
+                 toast.success(`Linked to ${printerTypeAheadValue[0].name}`);
+               })
+               .catch((error) => {
+                 console.error(error);
+               });
     // UI only I think?
     // printerSelect.current.clear();
     // userSelect.current?.clear();
@@ -123,6 +126,11 @@ const Printers: React.FC<PrintersProps> = ({
   reloadPrinters,
 }) => {
   const [printers, setPrinters] = useState<PrinterType[]>([]);
+  const [tabIndex, setTabIndex] = React.useState(0);
+
+  const handleTabChange = (event: any, newValue: React.SetStateAction<number>) => {
+    setTabIndex(newValue);
+  };
 
   useEffect(() => {
     const fetchPrinters = async () => {
@@ -161,9 +169,22 @@ const Printers: React.FC<PrintersProps> = ({
 
   return (
     <>
+      <Tabs className="w-100"
+            value={tabIndex}
+            onChange={handleTabChange}
+      >
+        <Tab label="Link" className="w-50" {...a11yProps(0)} />
+        <Tab label="Issue" className="w-50" {...a11yProps(1)} />
+      </Tabs>
+    <TabPanel value={tabIndex} index={0}>
       <h3 className="text-center mt-2">Printers</h3>
       <div className="container">{linkForms}</div>
-      <Toaster />
+    </TabPanel>
+    <Toaster />
+    <TabPanel value={tabIndex} index={1} >
+      <h3 className="text-center mt-2">Issues</h3>
+      <PrinterIssues />
+    </TabPanel>
     </>
   );
 };
