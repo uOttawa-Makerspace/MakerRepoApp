@@ -1,32 +1,58 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { NavLink } from "react-router-dom";
-import { getUser } from "../utils/Common";
+import { 
+    Home, 
+    Person, 
+    HelpOutline,
+    HomeOutlined,
+    PersonOutline
+} from '@mui/icons-material';
+import './Navbar.scss';
 
 interface NavbarProps {
   user: Record<string, any>;
 }
 
-const Navbar = ({ user }: NavbarProps) => {
+const Navbar: React.FC<NavbarProps> = ({ user }) => {
   return (
-    <div>
-      <div className="bottom-nav">
-        <NavLink to="/" className="bottom-nav-item active">
-          <i className="material-icons home-icon">home</i>
-          <span className="bottom-nav-text">Home</span>
-        </NavLink>
-        <NavLink
-          to={`/profile/${user ? user.username : ""}`}
-          className="bottom-nav-item"
+    <nav className="bottom-navbar">
+      <div className="bottom-navbar-container">
+        <NavLink 
+          to="/" 
+          className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+          aria-label="Home"
         >
-          <i className="material-icons person-icon">person</i>
-          <span className="bottom-nav-text">Profile</span>
+          {({ isActive }) => (
+            <>
+              {isActive ? <Home className="nav-icon" /> : <HomeOutlined className="nav-icon" />}
+              <span className="nav-label">Home</span>
+            </>
+          )}
         </NavLink>
-        <NavLink to="/help" className="bottom-nav-item">
-          <i className="material-icons person-info">help</i>
-          <span className="bottom-nav-text">Help</span>
+
+        <NavLink 
+          to={`/profile/${user?.username || ''}`}
+          className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+          aria-label="Profile"
+        >
+          {({ isActive }) => (
+            <>
+              {isActive ? <Person className="nav-icon" /> : <PersonOutline className="nav-icon" />}
+              <span className="nav-label">Profile</span>
+            </>
+          )}
+        </NavLink>
+
+        <NavLink 
+          to="/help" 
+          className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+          aria-label="Help"
+        >
+          <HelpOutline className="nav-icon" />
+          <span className="nav-label">Help</span>
         </NavLink>
       </div>
-    </div>
+    </nav>
   );
 };
 

@@ -1,4 +1,4 @@
-import ReactHtmlParser from "react-html-parser";
+import parse from 'html-react-parser';
 import { Skeleton } from "@mui/material";
 import { valueOrSkeleton } from "../helpers";
 
@@ -26,7 +26,7 @@ export function SpaceHourCard(props: { hour: any }) {
                 "rectangular",
                 undefined,
                 150,
-                ReactHtmlParser
+                parse
               )}
             </div>
           </div>
@@ -39,7 +39,7 @@ export function SpaceHourCard(props: { hour: any }) {
                 "text",
                 undefined,
                 undefined,
-                ReactHtmlParser
+                parse
               )}
             </div>
           </div>
@@ -52,7 +52,7 @@ export function SpaceHourCard(props: { hour: any }) {
                 "text",
                 undefined,
                 undefined,
-                ReactHtmlParser
+                parse
               )}
             </div>
           </div>

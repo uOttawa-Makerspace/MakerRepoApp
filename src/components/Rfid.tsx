@@ -8,7 +8,7 @@ interface RfidStatus {
 }
 
 interface RfidProps {
-  spaceId: number | undefined;
+  spaceId: string | number | undefined;
 }
 
 const Rfid = ({ spaceId }: RfidProps) => {

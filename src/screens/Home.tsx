@@ -1,28 +1,19 @@
-import React from "react";
-import "../utils/EnvVariables";
 import SpaceDashboard from "./SpaceDashboard";
 import SpaceHours from "./SpaceHours";
+import "../utils/EnvVariables";
 
 interface HomeProps {
   user: Record<string, any> | null;
 }
 
 function Home({ user }: HomeProps) {
-  return (
-    <div>
-      {user && (
-        <>
-          <h1 className="text-center">Hello {user.name}</h1>
-          {user.role === "admin" || user.role === "staff" ? (
-            <SpaceDashboard />
-          ) : (
-            <SpaceHours />
-          )}
-          <br />
-        </>
-      )}
-    </div>
-  );
+  if (!user) {
+    return null;
+  }
+
+  const isStaffOrAdmin = user.role === "admin" || user.role === "staff";
+
+  return isStaffOrAdmin ? <SpaceDashboard /> : <SpaceHours />;
 }
 
 export default Home;
