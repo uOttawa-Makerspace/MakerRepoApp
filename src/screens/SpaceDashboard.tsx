@@ -373,16 +373,12 @@ function SpaceDashboard() {
       {/* Tab Content */}
       <Box
         sx={{
-          px: isMobile ? 0 : 3,
           py: isMobile ? 0 : 3,
         }}
       >
         <Container
           maxWidth="xl"
           disableGutters={isMobile}
-          sx={{
-            px: isMobile ? 0 : 3,
-          }}
         >
           {/* Dashboard Tab */}
           <TabPanel value={tabIndex} index={0}>
@@ -397,14 +393,14 @@ function SpaceDashboard() {
 
           {/* Search Tab */}
           <TabPanel value={tabIndex} index={1}>
-            <Box sx={{ px: isMobile ? 2 : 0 }}>
+            <Box sx={{ px: isMobile ? 0 : 2 }}>
               <Search handleReloadCurrentUsers={getCurrentUsers} />
             </Box>
           </TabPanel>
 
           {/* New Training Session Tab */}
           <TabPanel value={tabIndex} index={2}>
-            <Box sx={{ px: isMobile ? 2 : 0 }}>
+            <Box sx={{ px: isMobile ? 0 : 2 }}>
               {errors.sessions && (
                 <Alert severity="error" sx={{ mb: 2 }}>
                   {errors.sessions}
@@ -419,7 +415,7 @@ function SpaceDashboard() {
 
           {/* Training Sessions Tab */}
           <TabPanel value={tabIndex} index={3}>
-            <Box sx={{ px: isMobile ? 2 : 0 }}>
+            <Box sx={{ px: isMobile ? 0 : 2 }}>
               {loading.sessions ? (
                 <Box display="flex" justifyContent="center" py={8}>
                   <CircularProgress />
@@ -439,14 +435,14 @@ function SpaceDashboard() {
 
           {/* Shifts Tab */}
           <TabPanel value={tabIndex} index={4}>
-            <Box sx={{ px: isMobile ? 2 : 0 }}>
+            <Box sx={{ px: isMobile ? 0 : 2 }}>
               <Shifts reloadShifts={() => {}} />
             </Box>
           </TabPanel>
 
           {/* Printers Tab */}
           <TabPanel value={tabIndex} index={5}>
-            <Box sx={{ px: isMobile ? 2 : 0 }}>
+            <Box sx={{ px: isMobile ? 0 : 2 }}>
               {loading.printers ? (
                 <Box display="flex" justifyContent="center" py={8}>
                   <CircularProgress />
