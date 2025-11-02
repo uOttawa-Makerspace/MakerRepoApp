@@ -1,24 +1,91 @@
+// Theme Colors
 $primary: #E44726;
 $secondary: #868686;
 
-@import "~bootstrap/scss/bootstrap";
+// Bootstrap Configuration
+$theme-colors: (
+  "primary": $primary,
+  "secondary": $secondary,
+);
 
+@import "bootstrap/scss/bootstrap";
+
+// CSS Variables for consistency across Bootstrap and MUI
+:root {
+  // Primary Colors
+  --color-primary: #{$primary};
+  --color-primary-hover: #d63f1f;
+  --color-primary-active: #c23618;
+  --color-primary-light: rgba(228, 71, 38, 0.08);
+  --color-primary-border: rgba(228, 71, 38, 0.3);
+
+  // Secondary Colors
+  --color-secondary: #{$secondary};
+  --color-secondary-light: #A3A3A3;
+  --color-secondary-dark: #6B6B6B;
+
+  // Background
+  --color-background: #F5F5F5;
+  --color-surface: #FFFFFF;
+  --color-border: #E0E0E0;
+
+  // Text
+  --color-text-primary: #212121;
+  --color-text-secondary: #757575;
+
+  // Shadows
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+  --shadow-navbar: 0 -2px 10px rgba(0, 0, 0, 0.1);
+
+  // Navbar Heights
+  --navbar-height-mobile: 60px;
+  --navbar-height-desktop: 70px;
+  --safe-area-bottom: env(safe-area-inset-bottom, 0);
+}
+
+// Bootstrap Button Overrides
 .btn-primary {
   --bs-btn-font-weight: 700;
   --bs-btn-color: var(--bs-white);
+  --bs-btn-bg: #{$primary};
+  --bs-btn-border-color: #{$primary};
+  --bs-btn-hover-bg: #d63f1f;
+  --bs-btn-hover-border-color: #d63f1f;
+  --bs-btn-active-bg: #c23618;
+  --bs-btn-active-border-color: #c23618;
 }
 
+.btn-secondary {
+  --bs-btn-bg: #{$secondary};
+  --bs-btn-border-color: #{$secondary};
+  --bs-btn-hover-bg: #6B6B6B;
+  --bs-btn-hover-border-color: #6B6B6B;
+}
+
+// Body Styles
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  display: flex;
+  margin: 0;
+  padding: 0;
   min-height: 100vh;
   width: 100vw;
-  margin: 0;
-  padding-bottom: 110px;
+  overflow-x: hidden;
+  background-color: var(--color-background);
+  
+  // Adjust padding for new bottom navbar
+  @media (max-width: 768px) {
+    padding-bottom: calc(var(--navbar-height-mobile) + var(--safe-area-bottom));
+  }
+  
+  @media (min-width: 769px) {
+    padding-bottom: var(--navbar-height-desktop);
+  }
 }
 
 code {
@@ -26,6 +93,27 @@ code {
     monospace;
 }
 
+// Main Layout
+.main {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.content {
+  flex: 1;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  
+  @media (max-width: 768px) {
+    padding-bottom: 1rem;
+  }
+}
+
+// Legacy bottom nav styles
 .bottom-nav {
   display: flex;
   flex-wrap: wrap;
@@ -37,6 +125,7 @@ code {
   width: 100vw;
   background-color: #fff;
   padding: 25px 20px;
+  z-index: 1000;
 }
 
 .bottom-nav-item {
@@ -49,6 +138,10 @@ code {
   transition: all 0.2s ease-out;
   color: unset;
   text-decoration: none;
+
+  &:hover {
+    color: $primary;
+  }
 }
 
 .bottom-nav-text {
@@ -66,15 +159,14 @@ code {
 }
 
 .bottom-navbar {
-  height: 100px;
+  height: var(--navbar-height-mobile);
+  
+  @media (min-width: 769px) {
+    height: var(--navbar-height-desktop);
+  }
 }
 
-.content {
-  width: 100vw;
-  display: flex;
-  justify-content: center;
-}
-
+// Utility Classes
 .p-5p {
   padding-left: 7%;
   padding-right: 7%;
@@ -83,9 +175,231 @@ code {
 .v-center {
   display: flex;
   align-items: center;
-  height: 100vh;
+  justify-content: center;
+  min-height: 100vh;
 }
 
 .w-100vh {
   width: 100vw;
+}
+
+// Scrollbar Customization
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $secondary;
+  border-radius: 4px;
+  
+  &:hover {
+    background: darken($secondary, 10%);
+  }
+}
+
+// Firefox scrollbar
+* {
+  scrollbar-width: thin;
+  scrollbar-color: $secondary #f1f1f1;
+}
+
+// MUI Component Overrides for better integration with Bootstrap
+.MuiContainer-root {
+  @media (max-width: 768px) {
+    &.MuiContainer-disableGutters {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+}
+
+// MUI Paper adjustments
+.MuiPaper-root {
+  background-color: var(--color-surface) !important;
+}
+
+// Make MUI buttons match Bootstrap spacing
+.MuiButton-root {
+  font-family: inherit;
+}
+
+// Responsive Container
+.container-responsive {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+
+  @media (min-width: 768px) {
+    padding: 0 2rem;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 0 3rem;
+  }
+}
+
+// Card Styles (works with both Bootstrap and MUI)
+.card,
+.MuiCard-root {
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+  }
+}
+
+// Loading State
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+  width: 100%;
+}
+
+// Authentication Loading
+.auth-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100vw;
+  font-size: 1.2rem;
+  color: $secondary;
+}
+
+// Alert Adjustments
+.alert {
+  border-radius: 8px;
+  border: none;
+  
+  &.alert-primary {
+    background-color: var(--color-primary-light);
+    color: $primary;
+    border-left: 4px solid $primary;
+  }
+  
+  &.alert-secondary {
+    background-color: rgba(134, 134, 134, 0.1);
+    color: $secondary;
+    border-left: 4px solid $secondary;
+  }
+}
+
+// MUI Alert adjustments
+.MuiAlert-root {
+  border-radius: 8px;
+}
+
+// Form Controls
+.form-control:focus,
+.form-select:focus {
+  border-color: $primary;
+  box-shadow: 0 0 0 0.2rem rgba(228, 71, 38, 0.25);
+}
+
+// Links
+a {
+  color: $primary;
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: darken($primary, 10%);
+    text-decoration: underline;
+  }
+}
+
+// Responsive Typography
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--color-text-primary);
+}
+
+p {
+  color: var(--color-text-primary);
+  line-height: 1.6;
+}
+
+// Mobile-specific adjustments
+@media (max-width: 768px) {
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+  h4 { font-size: 1.1rem; }
+  h5 { font-size: 1rem; }
+  h6 { font-size: 0.9rem; }
+}
+
+// Print Styles
+@media print {
+  .bottom-navbar,
+  .bottom-nav,
+  .MuiBottomNavigation-root {
+    display: none !important;
+  }
+
+  body {
+    padding-bottom: 0;
+  }
+}
+
+// Animations
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+// Accessibility
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+// Focus visible for keyboard navigation
+*:focus-visible {
+  outline: 2px solid $primary;
+  outline-offset: 2px;
+}
+
+// Disable focus outline for mouse users
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+// Safe area insets for iOS devices
+@supports (padding: max(0px)) {
+  body {
+    padding-bottom: max(60px, env(safe-area-inset-bottom));
+    
+    @media (min-width: 769px) {
+      padding-bottom: max(70px, env(safe-area-inset-bottom));
+    }
+  }
 }
