@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -36,17 +36,19 @@ type Shift = {
 
 type ShiftsProps = {
     reloadShifts: () => void;
+    spaceId?: number | string | null;
 };
 
 type MobileView = 'day' | 'week' | 'list';
 
-const Shifts: React.FC<ShiftsProps> = ({ reloadShifts }) => {
-    const [shifts, setShifts] = useState<Shift[]>([]);
-    const [loading, setLoading] = useState(true);
+const Shifts: React.FC<ShiftsProps> = ({ reloadShifts, spaceId }) => {
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isMobile, setIsMobile] = useState(false);
     const [mobileView, setMobileView] = useState<MobileView>('day');
     const [currentDate, setCurrentDate] = useState(new Date());
+    const [mobileShifts, setMobileShifts] = useState<Shift[]>([]);
+    const calendarRef = useRef<FullCalendar>(null);
 
     // Detect mobile screen size
     useEffect(() => {
@@ -59,11 +61,23 @@ const Shifts: React.FC<ShiftsProps> = ({ reloadShifts }) => {
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    const fetchShifts = async () => {
+    // Fetch shifts for mobile views (day/week overview)
+    const fetchMobileShifts = async (start: Date, end: Date) => {
+        if (!spaceId) {
+            setError("No space selected");
+            return;
+        }
+        
         setLoading(true);
         setError(null);
         try {
-            const data = await get("staff/shifts_schedule/get_shifts");
+            const params = new URLSearchParams({
+                space_id: spaceId.toString(),
+                start: start.toISOString(),
+                end: end.toISOString()
+            });
+            
+            const data = await get(`staff/shifts_schedule/get_shifts?${params}`);
             const formattedShifts = data.map((shift: any) => ({
                 title: shift.title,
                 start: shift.start,
@@ -71,7 +85,7 @@ const Shifts: React.FC<ShiftsProps> = ({ reloadShifts }) => {
                 color: shift.color,
                 extendedProps: shift.extendedProps,
             }));
-            setShifts(formattedShifts);
+            setMobileShifts(formattedShifts);
         } catch (error) {
             console.error(error);
             setError("Failed to load shifts. Please try again.");
@@ -81,13 +95,59 @@ const Shifts: React.FC<ShiftsProps> = ({ reloadShifts }) => {
         }
     };
 
+    // Fetch mobile shifts when needed
     useEffect(() => {
-        fetchShifts();
-    }, [reloadShifts]);
+        if (isMobile && (mobileView === 'day' || mobileView === 'week')) {
+            const start = new Date(currentDate);
+            start.setDate(start.getDate() - 7); // 1 week before
+            const end = new Date(currentDate);
+            end.setDate(end.getDate() + 14); // 2 weeks after
+            fetchMobileShifts(start, end);
+        }
+    }, [spaceId, currentDate, mobileView, isMobile]);
 
     const handleRefresh = () => {
-        fetchShifts();
-        toast.success("Shifts refreshed!");
+        if (calendarRef.current) {
+            calendarRef.current.getApi().refetchEvents();
+            toast.success("Shifts refreshed!");
+        } else if (isMobile) {
+            const start = new Date(currentDate);
+            start.setDate(start.getDate() - 7);
+            const end = new Date(currentDate);
+            end.setDate(end.getDate() + 14);
+            fetchMobileShifts(start, end);
+        }
+    };
+
+    // Dynamic event fetcher for FullCalendar
+    const fetchEvents = async (fetchInfo: any, successCallback: any, failureCallback: any) => {
+        if (!spaceId) {
+            failureCallback(new Error("No space selected"));
+            return;
+        }
+
+        try {
+            const params = new URLSearchParams({
+                space_id: spaceId.toString(),
+                start: fetchInfo.startStr,
+                end: fetchInfo.endStr
+            });
+            
+            const data = await get(`staff/shifts_schedule/get_shifts?${params}`);
+            const formattedShifts = data.map((shift: any) => ({
+                title: shift.title,
+                start: shift.start,
+                end: shift.end,
+                color: shift.color,
+                extendedProps: shift.extendedProps,
+            }));
+            
+            successCallback(formattedShifts);
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to load shifts.");
+            failureCallback(error);
+        }
     };
 
     // Navigate days
@@ -109,7 +169,7 @@ const Shifts: React.FC<ShiftsProps> = ({ reloadShifts }) => {
 
     // Get shifts for a specific day
     const getShiftsForDay = (date: Date) => {
-        return shifts.filter(shift => {
+        return mobileShifts.filter(shift => {
             const shiftDate = new Date(shift.start);
             return shiftDate.toDateString() === date.toDateString();
         });
@@ -149,17 +209,6 @@ const Shifts: React.FC<ShiftsProps> = ({ reloadShifts }) => {
     const weekShifts = getShiftsForWeek();
     const isToday = currentDate.toDateString() === new Date().toDateString();
 
-    // Calculate statistics
-    const totalShifts = shifts.length;
-    const thisWeekShifts = shifts.filter(shift => {
-        const shiftDate = new Date(shift.start);
-        const now = new Date();
-        const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
-        const weekEnd = new Date(weekStart);
-        weekEnd.setDate(weekStart.getDate() + 7);
-        return shiftDate >= weekStart && shiftDate < weekEnd;
-    }).length;
-
     return (
         <div className="shifts-container">
             {/* Header */}
@@ -169,15 +218,17 @@ const Shifts: React.FC<ShiftsProps> = ({ reloadShifts }) => {
                         <CalendarMonth className="title-icon" />
                         <h2 className="title-text">My Shifts</h2>
                     </div>
-                    <button 
-                        className="refresh-btn"
-                        onClick={handleRefresh}
-                        disabled={loading}
-                        aria-label="Refresh shifts"
-                    >
-                        <RefreshOutlined className={loading ? 'rotating' : ''} />
-                        {!isMobile && <span>Refresh</span>}
-                    </button>
+                    <div className="header-actions">
+                        <button 
+                            className="refresh-btn"
+                            onClick={handleRefresh}
+                            disabled={loading}
+                            aria-label="Refresh shifts"
+                        >
+                            <RefreshOutlined className={loading ? 'rotating' : ''} />
+                            {!isMobile && <span>Refresh</span>}
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -194,21 +245,13 @@ const Shifts: React.FC<ShiftsProps> = ({ reloadShifts }) => {
                     <div className="error-state">
                         <EventNote className="error-icon" />
                         <p className="error-message">{error}</p>
-                        <button className="retry-btn" onClick={fetchShifts}>
+                        <button className="retry-btn" onClick={handleRefresh}>
                             Try Again
                         </button>
                     </div>
                 )}
 
-                {!loading && !error && shifts.length === 0 && (
-                    <div className="empty-state">
-                        <AccessTime className="empty-icon" />
-                        <h3>No Shifts Scheduled</h3>
-                        <p>You don't have any shifts scheduled at the moment.</p>
-                    </div>
-                )}
-
-                {!loading && !error && shifts.length > 0 && (
+                {!error && (
                     <>
                         {isMobile ? (
                             // Custom Mobile View
@@ -397,6 +440,7 @@ const Shifts: React.FC<ShiftsProps> = ({ reloadShifts }) => {
                                 {mobileView === 'list' && (
                                     <div className="list-view">
                                         <FullCalendar
+                                            ref={calendarRef}
                                             plugins={[listPlugin]}
                                             initialView="listWeek"
                                             headerToolbar={{
@@ -406,7 +450,7 @@ const Shifts: React.FC<ShiftsProps> = ({ reloadShifts }) => {
                                             }}
                                             height="auto"
                                             timeZone="America/New_York"
-                                            events={shifts}
+                                            events={fetchEvents}
                                             eventTimeFormat={{ 
                                                 hour: 'numeric', 
                                                 minute: '2-digit', 
@@ -420,6 +464,7 @@ const Shifts: React.FC<ShiftsProps> = ({ reloadShifts }) => {
                             // Desktop Calendar View
                             <div className="calendar-wrapper">
                                 <FullCalendar
+                                    ref={calendarRef}
                                     plugins={[timeGridPlugin, dayGridPlugin, listPlugin, googleCalendarPlugin]}
                                     initialView="timeGridWeek"
                                     headerToolbar={{
@@ -440,7 +485,7 @@ const Shifts: React.FC<ShiftsProps> = ({ reloadShifts }) => {
                                         hour12: true 
                                     }}
                                     dayMaxEvents={true}
-                                    events={shifts}
+                                    events={fetchEvents}  // Dynamic fetching!
                                     nowIndicator={true}
                                     eventDisplay="block"
                                     eventContent={(eventInfo) => (
@@ -461,18 +506,6 @@ const Shifts: React.FC<ShiftsProps> = ({ reloadShifts }) => {
                                 />
                             </div>
                         )}
-
-                        {/* Shift Statistics */}
-                        <div className="shift-stats">
-                            <div className="stat-item">
-                                <span className="stat-label">Total Shifts</span>
-                                <span className="stat-value">{totalShifts}</span>
-                            </div>
-                            <div className="stat-item">
-                                <span className="stat-label">This Week</span>
-                                <span className="stat-value">{thisWeekShifts}</span>
-                            </div>
-                        </div>
                     </>
                 )}
             </div>

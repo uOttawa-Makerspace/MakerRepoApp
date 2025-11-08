@@ -436,7 +436,10 @@ function SpaceDashboard() {
           {/* Shifts Tab */}
           <TabPanel value={tabIndex} index={4}>
             <Box sx={{ px: isMobile ? 0 : 2 }}>
-              <Shifts reloadShifts={() => {}} />
+              <Shifts 
+                spaceId={inSpaceUsers?.space?.id} 
+                reloadShifts={() => {}} 
+              />
             </Box>
           </TabPanel>
 
