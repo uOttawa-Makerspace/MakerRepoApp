@@ -416,46 +416,63 @@ const Printers: React.FC<PrintersProps> = ({
     try {
       // Fetch printers
       const printerData = await HTTPRequest.get("printers/printer_data");
-      const formattedPrinters = printerData.map((pt: PrinterType) => ({
-        id: pt.id,
-        name: pt.name,
-        short_form: pt.short_form,
-        available: pt.available,
-        printers: pt.printers.map((p: Printer) => ({
-          id: p.id,
-          number: p.number,
-          maintenance: p.maintenance,
-          has_issues: p.has_issues,
-        })),
-      }));
-      setPrinters(formattedPrinters);
+      
+      if (printerData && Array.isArray(printerData)) {
+        const formattedPrinters = printerData.map((pt: PrinterType) => ({
+          id: pt.id,
+          name: pt.name,
+          short_form: pt.short_form,
+          available: pt.available,
+          printers: (pt.printers || []).map((p: Printer) => ({
+            id: p.id,
+            number: p.number,
+            maintenance: p.maintenance,
+            has_issues: p.has_issues,
+          })),
+        }));
+        setPrinters(formattedPrinters);
 
-      // Fetch printer issues
-      const issuesData = await HTTPRequest.get("printer_issues");
-      const formattedIssues = issuesData.issues.map((i: any) => {
-        // Find printer name
-        let printer_name = undefined;
-        for (let pt of formattedPrinters) {
-          let printer = pt.printers.find((p: Printer) => p.id == i.printer_id);
-          if (printer) {
-            printer_name = pt.short_form + " - " + printer.number;
-            break;
-          }
+        // Fetch printer issues
+        const issuesData = await HTTPRequest.get("printer_issues");
+
+        if (issuesData && issuesData.issues && Array.isArray(issuesData.issues)) {
+          const formattedIssues = issuesData.issues.map((i: any) => {
+            let printer_name = undefined;
+            for (let pt of formattedPrinters) {
+              let printer = pt.printers.find((p: Printer) => p.id == i.printer_id);
+              if (printer) {
+                printer_name = pt.short_form + " - " + printer.number;
+                break;
+              }
+            }
+
+            return {
+              id: i.id,
+              printer_id: i.printer_id,
+              printer_name: printer_name,
+              reporter: i.reporter,
+              summary: i.summary,
+              description: i.description,
+              created_at: i.created_at,
+            };
+          });
+          setPrinterIssues(formattedIssues);
+        } else {
+          console.warn("Invalid or missing issues data");
+          setPrinterIssues([]);
         }
-
-        return {
-          id: i.id,
-          printer_id: i.printer_id,
-          printer_name: printer_name,
-          reporter: i.reporter,
-          summary: i.summary,
-          description: i.description,
-          created_at: i.created_at,
-        };
-      });
-      setPrinterIssues(formattedIssues);
+      } else {
+        console.warn("Invalid or missing printer data");
+        setPrinters([]);
+        setPrinterIssues([]);
+        toast.error("Failed to load printer data", {
+          position: "bottom-center",
+        });
+      }
     } catch (error) {
-      console.error(error);
+      console.error("Fetch error:", error);
+      setPrinters([]);
+      setPrinterIssues([]);
       toast.error("Failed to load printer data", {
         position: "bottom-center",
       });
@@ -586,11 +603,7 @@ const Printers: React.FC<PrintersProps> = ({
             {...a11yProps(0)}
           />
           <Tab
-            label={
-              <Badge badgeContent={stats.issues} color="error">
-                Issues
-              </Badge>
-            }
+            label={stats.issues > 0 ? `Issues (${stats.issues})` : "Issues"}
             icon={<WarningIcon />}
             iconPosition="start"
             {...a11yProps(1)}
