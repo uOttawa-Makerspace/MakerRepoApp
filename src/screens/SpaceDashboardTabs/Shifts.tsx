@@ -77,7 +77,17 @@ const Shifts: React.FC<ShiftsProps> = ({ reloadShifts, spaceId }) => {
                 end: end.toISOString()
             });
             
-            const data = await get(`staff/shifts_schedule/get_shifts?${params}`);
+            // use admin/calendar endpoint
+            const data = await get(`admin/calendar/shifts_json?${params}`);
+            
+            if (!data) {
+                throw new Error("No data received");
+            }
+            
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            
             const formattedShifts = data.map((shift: any) => ({
                 title: shift.title,
                 start: shift.start,
@@ -133,7 +143,17 @@ const Shifts: React.FC<ShiftsProps> = ({ reloadShifts, spaceId }) => {
                 end: fetchInfo.endStr
             });
             
-            const data = await get(`staff/shifts_schedule/get_shifts?${params}`);
+            // use admin/calendar endpoint
+            const data = await get(`admin/calendar/shifts_json?${params}`);
+            
+            if (!data) {
+                throw new Error("No data received");
+            }
+            
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            
             const formattedShifts = data.map((shift: any) => ({
                 title: shift.title,
                 start: shift.start,
