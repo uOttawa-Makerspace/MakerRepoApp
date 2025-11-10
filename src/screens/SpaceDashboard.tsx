@@ -51,6 +51,10 @@ interface SpaceData {
     id: string | number;
     name?: string;
   };
+  current_user?: {
+    id: number;
+    name?: string;
+  };
 }
 
 interface LoadingState {
@@ -84,6 +88,8 @@ function SpaceDashboard() {
   const [tabIndex, setTabIndex] = useState(0);
   const [spaceDrawerOpen, setSpaceDrawerOpen] = useState(false);
   const [tabMenuAnchor, setTabMenuAnchor] = useState<null | HTMLElement>(null);
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  const [shiftsReloadTrigger, setShiftsReloadTrigger] = useState(0);
 
   // Track which tabs have been visited
   const [visitedTabs, setVisitedTabs] = useState<Set<number>>(new Set([0]));
@@ -115,6 +121,11 @@ function SpaceDashboard() {
     try {
       const response = await HTTPRequest.get("staff_dashboard");
       setInSpaceUsers(response);
+      
+      // Extract current user ID
+      if (response.current_user?.id) {
+        setCurrentUserId(response.current_user.id);
+      }
     } catch (error) {
       console.error(error);
       setErrors((prev) => ({ ...prev, users: "Failed to load users" }));
@@ -156,6 +167,11 @@ function SpaceDashboard() {
     }
   }, []);
 
+  // Trigger shift reload
+  const handleReloadShifts = useCallback(() => {
+    setShiftsReloadTrigger((prev) => prev + 1);
+  }, []);
+
   // Only load users on mount
   useEffect(() => {
     getCurrentUsers();
@@ -174,6 +190,13 @@ function SpaceDashboard() {
       getPrinterData();
     }
   }, [visitedTabs, printers, loading.printers, getPrinterData]);
+
+  // Reload shifts when space changes
+  useEffect(() => {
+    if (inSpaceUsers?.space?.id && visitedTabs.has(4)) {
+      handleReloadShifts();
+    }
+  }, [inSpaceUsers?.space?.id, visitedTabs, handleReloadShifts]);
 
   const isInitialLoading = loading.users && !inSpaceUsers;
   const userCount = inSpaceUsers?.space_users?.length || 0;
@@ -437,8 +460,9 @@ function SpaceDashboard() {
           <TabPanel value={tabIndex} index={4}>
             <Box sx={{ px: isMobile ? 0 : 2 }}>
               <Shifts 
-                spaceId={inSpaceUsers?.space?.id} 
-                reloadShifts={() => {}} 
+                reloadShifts={shiftsReloadTrigger}
+                spaceId={inSpaceUsers?.space?.id ? Number(inSpaceUsers.space.id) : undefined}
+                currentUserId={currentUserId || undefined}
               />
             </Box>
           </TabPanel>
