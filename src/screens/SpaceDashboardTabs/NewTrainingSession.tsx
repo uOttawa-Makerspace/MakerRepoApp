@@ -48,6 +48,7 @@ import {
 } from "@mui/icons-material";
 import * as HTTPRequest from "../../utils/HTTPRequests";
 import { useNavigate } from "react-router-dom";
+import { getUser } from "../../utils/Common";
 
 // TypeScript Interfaces
 interface Training {
@@ -88,6 +89,9 @@ const NewTrainingSession = ({
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
+  // Get current user
+  const currentUser = getUser();
 
   // Form State
   const [data, setData] = useState<NewTrainingSessionData | null>(null);
@@ -131,7 +135,19 @@ const NewTrainingSession = ({
       if (response.course_names?.length > 0) {
         setTrainingCourse(response.course_names[0]);
       }
-      if (response.admins?.length > 0) {
+      
+      // Set instructor to current user if they're in the admins list
+      if (response.admins?.length > 0 && currentUser?.id) {
+        const currentUserId = String(currentUser.id);
+        const isInAdminsList = response.admins.some(
+          (admin: any[]) => String(admin[0]) === currentUserId
+        );
+        
+        // Set current user as instructor if they're in the list, otherwise use first admin
+        setTrainingInstructor(
+          isInAdminsList ? currentUserId : String(response.admins[0][0])
+        );
+      } else if (response.admins?.length > 0) {
         setTrainingInstructor(String(response.admins[0][0]));
       }
     } catch (error) {
@@ -246,7 +262,20 @@ const NewTrainingSession = ({
       setTrainingId(data.trainings[0]?.[0] ? String(data.trainings[0][0]) : "");
       setTrainingLevel(data.level[0] || "");
       setTrainingCourse(data.course_names[0] || "");
-      setTrainingInstructor(data.admins[0]?.[0] ? String(data.admins[0][0]) : "");
+      
+      // Reset instructor to current user if they're in the admins list
+      if (data.admins?.length > 0 && currentUser?.id) {
+        const currentUserId = String(currentUser.id);
+        const isInAdminsList = data.admins.some(
+          (admin) => String(admin[0]) === currentUserId
+        );
+        
+        setTrainingInstructor(
+          isInAdminsList ? currentUserId : String(data.admins[0][0])
+        );
+      } else if (data.admins?.length > 0) {
+        setTrainingInstructor(String(data.admins[0][0]));
+      }
     }
   };
 
