@@ -25,7 +25,7 @@ export const get = (route: string) =>
     .then((response) => response.data)
     .catch((error) => {
       notifyAndReturn(error, route);
-      return error;
+      return null;
     });
 
 export const patch = (route: string, body: any) =>
@@ -41,7 +41,7 @@ export const patch = (route: string, body: any) =>
     .then((response) => response.data)
     .catch((error) => {
       notifyAndReturn(error, route);
-      return error;
+      return null;
     });
 
 export const put = (route: string, body: any) =>

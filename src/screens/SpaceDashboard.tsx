@@ -146,7 +146,7 @@ function SpaceDashboard() {
     setErrors((prev) => ({ ...prev, printers: null }));
 
     try {
-      const response = await HTTPRequest.get("printers");
+      const response = await HTTPRequest.get("printers/printer_data");
       setPrinters(response);
     } catch (error) {
       console.error(error);
