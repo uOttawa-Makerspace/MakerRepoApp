@@ -24,23 +24,39 @@ type ExtendedProps = {
     training?: string;
     course?: string;
     language?: string;
+    name?: string;
+    draft?: boolean;
+    description?: string;
+    eventType?: string;
+    hasCurrentUser?: boolean;
+    background?: string;
 };
 
 type Shift = {
+    id?: string;
     title: string;
     start: string;
     end: string;
-    color: string;
+    color?: string;
+    rrule?: string;
+    duration?: number;
+    allDay?: boolean;
     extendedProps?: ExtendedProps;
 };
 
 type ShiftsProps = {
-    reloadShifts: () => void;
+    reloadShifts: number;
+    spaceId?: number;
+    currentUserId?: number;
 };
 
 type MobileView = 'day' | 'week' | 'list';
 
-const Shifts: React.FC<ShiftsProps> = ({ reloadShifts }) => {
+const Shifts: React.FC<ShiftsProps> = ({ 
+    reloadShifts, 
+    spaceId,
+    currentUserId 
+}) => {
     const [shifts, setShifts] = useState<Shift[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -63,17 +79,47 @@ const Shifts: React.FC<ShiftsProps> = ({ reloadShifts }) => {
         setLoading(true);
         setError(null);
         try {
-            const data = await get("staff/shifts_schedule/get_shifts");
-            const formattedShifts = data.map((shift: any) => ({
-                title: shift.title,
-                start: shift.start,
-                end: shift.end,
-                color: shift.color,
-                extendedProps: shift.extendedProps,
-            }));
+            const startDate = new Date();
+            startDate.setMonth(startDate.getMonth() - 3);
+            const endDate = new Date();
+            endDate.setMonth(endDate.getMonth() + 3);
+
+            const params = new URLSearchParams({
+                event_type: 'shift',
+                start: startDate.toISOString(),
+                end: endDate.toISOString(),
+            });
+
+            if (currentUserId) {
+                params.append('user_id', currentUserId.toString());
+            }
+
+            const data = await get(`staff/my_calendar/json/${spaceId}?${params.toString()}`);
+            
+            if (!Array.isArray(data)) {
+                throw new Error('Invalid response format from server');
+            }
+            
+            const formattedShifts = data
+                .filter((event: any) => event.extendedProps?.eventType === 'shift')
+                .map((event: any) => ({
+                    id: event.id,
+                    title: event.title,
+                    start: event.start,
+                    end: event.end,
+                    color: extractColorFromBackground(event.extendedProps?.background),
+                    allDay: event.allDay,
+                    extendedProps: {
+                        reason: event.extendedProps?.description,
+                        training: event.extendedProps?.training,
+                        course: event.extendedProps?.course,
+                        language: event.extendedProps?.language,
+                        ...event.extendedProps
+                    },
+                }));
+            
             setShifts(formattedShifts);
         } catch (error) {
-            console.error(error);
             setError("Failed to load shifts. Please try again.");
             toast.error("Failed to load shifts.");
         } finally {
@@ -81,9 +127,17 @@ const Shifts: React.FC<ShiftsProps> = ({ reloadShifts }) => {
         }
     };
 
+    const extractColorFromBackground = (background?: string): string => {
+        if (!background) return '#3788d8';
+        const match = background.match(/#[0-9A-Fa-f]{6}/);
+        return match ? match[0] : '#3788d8';
+    };
+
     useEffect(() => {
-        fetchShifts();
-    }, [reloadShifts]);
+        if (spaceId) {
+            fetchShifts();
+        }
+    }, [reloadShifts, spaceId, currentUserId]);
 
     const handleRefresh = () => {
         fetchShifts();
@@ -287,7 +341,7 @@ const Shifts: React.FC<ShiftsProps> = ({ reloadShifts }) => {
                                             ) : (
                                                 dayShifts.map((shift, index) => (
                                                     <div 
-                                                        key={index} 
+                                                        key={shift.id || index} 
                                                         className="shift-card"
                                                         style={{ borderLeftColor: shift.color }}
                                                     >
@@ -371,7 +425,7 @@ const Shifts: React.FC<ShiftsProps> = ({ reloadShifts }) => {
                                                                     </div>
                                                                     {day.shifts.map((shift, idx) => (
                                                                         <div 
-                                                                            key={idx}
+                                                                            key={shift.id || idx}
                                                                             className="mini-shift"
                                                                             style={{ backgroundColor: shift.color }}
                                                                         >
