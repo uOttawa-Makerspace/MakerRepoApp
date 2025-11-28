@@ -233,8 +233,8 @@ const Profile = () => {
     setSaving(true);
     try {
       await HTTPRequest.patch("admin/users/set_role", {
-        id: profileUser.id,
-        role,
+        user_ids: [profileUser.id],
+        role: role,
       });
 
       toast.success("Role updated successfully!", {
