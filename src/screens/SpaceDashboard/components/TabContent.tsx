@@ -11,7 +11,7 @@ import Dashboard from "../../SpaceDashboardTabs/Dashboard/index";
 import Search from "../../SpaceDashboardTabs/Search/index";
 import NewTrainingSession from "../../SpaceDashboardTabs/NewTrainingSession/index";
 import TrainingSessions from "../../SpaceDashboardTabs/TrainingSessions";
-import Shifts from "../../SpaceDashboardTabs/Shifts";
+import Shifts from "../../SpaceDashboardTabs/Shifts/index";
 import Printers from "../../SpaceDashboardTabs/Printers/index";
 import LoadingErrorWrapper from "./LoadingErrorWrapper";
 import { SpaceData, LoadingState, ErrorState } from "../types";
