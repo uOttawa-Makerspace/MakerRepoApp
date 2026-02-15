@@ -12,7 +12,7 @@ import Search from "../../SpaceDashboardTabs/Search";
 import NewTrainingSession from "../../SpaceDashboardTabs/NewTrainingSession/index";
 import TrainingSessions from "../../SpaceDashboardTabs/TrainingSessions";
 import Shifts from "../../SpaceDashboardTabs/Shifts";
-import Printers from "../../SpaceDashboardTabs/Printers";
+import Printers from "../../SpaceDashboardTabs/Printers/index";
 import LoadingErrorWrapper from "./LoadingErrorWrapper";
 import { SpaceData, LoadingState, ErrorState } from "../types";
 
