@@ -4,7 +4,7 @@ import { HashRouter as Router, Route, Routes } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import useErrorBoundary from "use-error-boundary";
-import Login from "./screens/Login";
+import Login from "./screens/Login/index";
 import Home from "./screens/Home";
 import Navbar from "./components/Navbar";
 import Profile from "./screens/Profile/index";
