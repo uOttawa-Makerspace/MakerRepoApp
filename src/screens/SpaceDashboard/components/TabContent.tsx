@@ -10,7 +10,7 @@ import { TabPanel } from "../../../components/TabPanel";
 import Dashboard from "../../SpaceDashboardTabs/Dashboard/index";
 import Search from "../../SpaceDashboardTabs/Search/index";
 import NewTrainingSession from "../../SpaceDashboardTabs/NewTrainingSession/index";
-import TrainingSessions from "../../SpaceDashboardTabs/TrainingSessions";
+import TrainingSessions from "../../SpaceDashboardTabs/TrainingSessions/index";
 import Shifts from "../../SpaceDashboardTabs/Shifts/index";
 import Printers from "../../SpaceDashboardTabs/Printers/index";
 import LoadingErrorWrapper from "./LoadingErrorWrapper";
