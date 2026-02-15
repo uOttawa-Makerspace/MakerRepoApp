@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { TabPanel } from "../../../components/TabPanel";
 import Dashboard from "../../SpaceDashboardTabs/Dashboard/index";
-import Search from "../../SpaceDashboardTabs/Search";
+import Search from "../../SpaceDashboardTabs/Search/index";
 import NewTrainingSession from "../../SpaceDashboardTabs/NewTrainingSession/index";
 import TrainingSessions from "../../SpaceDashboardTabs/TrainingSessions";
 import Shifts from "../../SpaceDashboardTabs/Shifts";
