@@ -36,7 +36,7 @@ import {
 import * as HTTPRequest from "../utils/HTTPRequests";
 import { a11yProps, TabPanel } from "../components/TabPanel";
 import "react-bootstrap-typeahead/css/Typeahead.css";
-import Dashboard from "./SpaceDashboardTabs/Dashboard";
+import Dashboard from "./SpaceDashboardTabs/Dashboard/index";
 import Search from "./SpaceDashboardTabs/Search";
 import NewTrainingSession from "./SpaceDashboardTabs/NewTrainingSession";
 import TrainingSessions from "./SpaceDashboardTabs/TrainingSessions";
