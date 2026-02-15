@@ -11,7 +11,7 @@ import Profile from "./screens/Profile/index";
 import "bootstrap/dist/js/bootstrap";
 import PrivateRoute from "./utils/PrivateRoute";
 import { getToken, removeUserSession, setUserSession } from "./utils/Common";
-import Help from "./screens/Help";
+import Help from "./screens/Help/index";
 import * as HTTPRequest from "./utils/HTTPRequests";
 import { LoggedInContext } from "./utils/Contexts";
 import theme from "./theme";
