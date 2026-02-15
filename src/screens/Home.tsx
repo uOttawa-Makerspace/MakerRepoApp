@@ -1,4 +1,4 @@
-import SpaceDashboard from "./SpaceDashboard";
+import SpaceDashboard from "./SpaceDashboard/index";
 import SpaceHours from "./SpaceHours";
 import "../utils/EnvVariables";
 
