@@ -7,7 +7,7 @@ import useErrorBoundary from "use-error-boundary";
 import Login from "./screens/Login";
 import Home from "./screens/Home";
 import Navbar from "./components/Navbar";
-import Profile from "./screens/Profile";
+import Profile from "./screens/Profile/index";
 import "bootstrap/dist/js/bootstrap";
 import PrivateRoute from "./utils/PrivateRoute";
 import { getToken, removeUserSession, setUserSession } from "./utils/Common";
