@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { Alert } from "@mui/material";
+import { useState } from "react";
+import { Alert, Button } from "@mui/material";
+import NfcIcon from "@mui/icons-material/Nfc";
 import * as HTTPRequest from "../utils/HTTPRequests";
 
 interface RfidStatus {
@@ -75,14 +76,33 @@ const Rfid = ({ spaceId }: RfidProps) => {
       {"NDEFReader" in window && (
         <div className="justify-content-center">
           <div className="d-grid gap-2 my-2">
-            <button
-              type="button"
+            <Button
+              variant="contained"
+              size="large"
               onClick={() => startScanning()}
               disabled={scanRfid}
-              className="btn btn-info text-white"
+              startIcon={<NfcIcon />}
+              sx={{
+                py: 2,
+                fontSize: "1.25rem",
+                fontWeight: "bold",
+                letterSpacing: 1,
+                backgroundColor: scanRfid ? "grey.500" : "info.main",
+                "&:hover": {
+                  backgroundColor: "info.dark",
+                },
+                animation: scanRfid
+                  ? "pulse 1.5s ease-in-out infinite"
+                  : "none",
+                "@keyframes pulse": {
+                  "0%": { opacity: 1 },
+                  "50%": { opacity: 0.6 },
+                  "100%": { opacity: 1 },
+                },
+              }}
             >
               {scanRfid ? "Scanning..." : "Start Scanning"}
-            </button>
+            </Button>
           </div>
           {!!status && (
             <Alert
