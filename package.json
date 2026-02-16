@@ -95,7 +95,7 @@
     "pretty-quick": "^4.2.2",
     "vite": "^7.1.12"
   },
-  "packageManager": "yarn@4.1.0",
+  "packageManager": "yarn@4.12.0",
   "engines": {
     "node": "^18.12.0"
   }
