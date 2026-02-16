@@ -38,7 +38,7 @@ const CertificationItem: React.FC<{ cert: Certification }> = memo(
           </Avatar>
           <Box>
             <Typography variant="body1" fontWeight={600}>
-              {cert.training.name}
+              {cert.training.name_en}
             </Typography>
             <Typography variant="caption" color="text.secondary">
               Certified on {formatDate(cert.updated_at)}

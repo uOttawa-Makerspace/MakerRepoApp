@@ -50,7 +50,7 @@ export const useUserSearch = (handleReloadCurrentUsers: () => void) => {
           );
         } catch (error) {
           console.error(error);
-          toast.error("Failed to search users", { position: "bottom-center" });
+          toast.error("Failed to search users");
         } finally {
           setAutocompleteLoading(false);
         }
@@ -84,13 +84,11 @@ export const useUserSearch = (handleReloadCurrentUsers: () => void) => {
       setSearchResults(response);
 
       if (response.length === 0) {
-        toast.error("No users found", { position: "bottom-center" });
+        toast.error("No users found");
       }
     } catch (error) {
       console.error(error);
-      toast.error("Search failed. Please try again.", {
-        position: "bottom-center",
-      });
+      toast.error("Search failed. Please try again.");
     } finally {
       setSearching(false);
     }
@@ -115,9 +113,7 @@ export const useUserSearch = (handleReloadCurrentUsers: () => void) => {
       );
       handleReloadCurrentUsers();
       toast.success(`${signInDialog.user.name} signed in successfully!`, {
-        position: "bottom-center",
         icon: "👍",
-        duration: 3000,
       });
       closeSignInDialog();
       setSelectedUser(null);
@@ -125,9 +121,7 @@ export const useUserSearch = (handleReloadCurrentUsers: () => void) => {
       setSearchResults([]);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to sign in user. Please try again.", {
-        position: "bottom-center",
-      });
+      toast.error("Failed to sign in user. Please try again.");
     } finally {
       setSigningIn(false);
     }

@@ -4,6 +4,7 @@ import { Box, CircularProgress } from "@mui/material";
 
 import { ProfileParams } from "./types";
 import { useProfileData } from "./hooks/useProfileData";
+import { useLogout } from "./hooks/useLogout";
 
 import ProfileHeader from "./components/ProfileHeader";
 import ProfileTabs from "./components/ProfileTabs";
@@ -13,6 +14,8 @@ import CertificationsTab from "./components/CertificationsTab";
 import RoleManagerTab from "./components/RoleManagerTab";
 import RfidTab from "./components/RfidTab";
 import UnlinkRfidDialog from "./components/UnlinkRfidDialog";
+import LogoutSection from "./components/LogoutSection";
+import LogoutDialog from "./components/LogoutDialog";
 
 const Profile: React.FC = () => {
   const { username } = useParams<ProfileParams>();
@@ -49,9 +52,20 @@ const Profile: React.FC = () => {
     getCurrentUsers,
   } = useProfileData(username);
 
+  const {
+    logoutDialogOpen,
+    loggingOut,
+    openLogoutDialog,
+    closeLogoutDialog,
+    handleLogout,
+  } = useLogout();
+
   const handleTabChange = useCallback((newValue: number) => {
     setTabIndex(newValue);
   }, []);
+
+  // Only show logout on own profile
+  const isOwnProfile = currentUser?.username === profileUser?.username;
 
   if (loading || !profileUser || !currentUser) {
     return (
@@ -124,6 +138,12 @@ const Profile: React.FC = () => {
           onOpenUnlinkDialog={openUnlinkDialog}
           onReloadCurrentUsers={getCurrentUsers}
         />
+
+        {isOwnProfile && (
+          <Box sx={{ mt: 4 }}>
+            <LogoutSection onLogoutClick={openLogoutDialog} />
+          </Box>
+        )}
       </Box>
 
       <UnlinkRfidDialog
@@ -132,6 +152,13 @@ const Profile: React.FC = () => {
         userName={profileUser.name}
         onClose={closeUnlinkDialog}
         onConfirm={handleUnlinkRfid}
+      />
+
+      <LogoutDialog
+        open={logoutDialogOpen}
+        loggingOut={loggingOut}
+        onClose={closeLogoutDialog}
+        onConfirm={handleLogout}
       />
     </Box>
   );

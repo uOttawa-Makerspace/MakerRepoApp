@@ -28,6 +28,7 @@ export interface RfidInfo {
 export interface Certification {
   id: number;
   training: {
+    name_en: ReactNode;
     id: number;
     name: string;
   };
