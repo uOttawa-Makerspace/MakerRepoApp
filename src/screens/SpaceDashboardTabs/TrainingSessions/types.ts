@@ -1,6 +1,6 @@
 export interface Training {
   id: string | number;
-  name: string;
+  name_en: string;
 }
 
 export interface Space {

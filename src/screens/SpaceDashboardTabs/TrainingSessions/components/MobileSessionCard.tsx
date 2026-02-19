@@ -65,7 +65,7 @@ const MobileSessionCard = React.memo(
             >
               <Box sx={{ flexGrow: 1, minWidth: 0 }}>
                 <Typography variant="h6" fontWeight={600} gutterBottom noWrap>
-                  {session.training.name}
+                  {session.training.name_en}
                 </Typography>
                 <Chip
                   label={completed ? "Completed" : "Pending"}
@@ -86,11 +86,11 @@ const MobileSessionCard = React.memo(
               />
               <DetailRow
                 icon={<LocationIcon fontSize="small" color="action" />}
-                text={session.space.name}
+                text={session.space?.name ?? "N/A"}
               />
               <DetailRow
                 icon={<SchoolIcon fontSize="small" color="action" />}
-                text={session.course}
+                text={session.course ?? "N/A"}
               />
             </Stack>
 
