@@ -58,14 +58,18 @@ const SessionRow = React.memo(
         </TableCell>
         <TableCell>
           <Typography variant="body2" fontWeight={500}>
-            {session.training.name}
+            {session.training?.name_en ?? "N/A"}
           </Typography>
         </TableCell>
         <TableCell>
-          <Typography variant="body2">{session.space.name}</Typography>
+          <Typography variant="body2">
+            {session.space?.name ?? "N/A"}
+          </Typography>
         </TableCell>
         <TableCell>
-          <Typography variant="body2">{session.course}</Typography>
+          <Typography variant="body2">
+            {session.course ?? "N/A"}
+          </Typography>
         </TableCell>
         <TableCell>
           <Chip
