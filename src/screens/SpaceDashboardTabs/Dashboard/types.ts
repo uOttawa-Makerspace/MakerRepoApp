@@ -12,7 +12,8 @@ export interface User {
   flag_message?: string;
   avatar_url?: string;
   active: boolean;
-  read_and_accepted_waiver_form: boolean;
+  signed_safety_sheet: boolean;
+  membership_status: boolean;
   certifications?: Certification[];
 }
 

@@ -13,8 +13,8 @@ export function getUserCompliance(
   user: User,
   spaceName?: string
 ): ComplianceStatus {
-  const hasMembership = user.active === true;
-  const hasConsentForm = user.read_and_accepted_waiver_form === true;
+  const hasMembership = user.membership_status === true;
+  const hasConsentForm = user.signed_safety_sheet === true;
 
   const isBrunsfield =
     spaceName?.toLowerCase().includes("brunsfield") ?? false;
