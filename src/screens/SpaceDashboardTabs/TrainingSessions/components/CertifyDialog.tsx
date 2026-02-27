@@ -65,7 +65,7 @@ const CertifyDialog = React.memo(
         <DialogContent sx={{ pt: isMobile ? 3 : 2 }}>
           <DialogContentText>
             Are you sure you want to certify all trainees in{" "}
-            <strong>{session?.training.name}</strong>?
+            <strong>{session?.training.name_en}</strong>?
             <br />
             <br />
             This will grant them the certification for this training.
