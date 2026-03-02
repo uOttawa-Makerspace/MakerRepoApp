@@ -7,7 +7,7 @@ import {
 } from "@mui/icons-material";
 import type { Printer, PrinterStatus } from "../types";
 
-export function getPrinterStatus(printer: Printer): PrinterStatus {
+function getPrinterStatus(printer: Printer): PrinterStatus {
   if (printer.maintenance) return "maintenance";
   if (printer.has_issues) return "issues";
   return "available";
