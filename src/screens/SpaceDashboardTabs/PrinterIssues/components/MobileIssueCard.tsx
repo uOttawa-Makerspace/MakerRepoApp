@@ -1,4 +1,5 @@
 import React, { memo, useCallback } from "react";
+import DOMPurify from "dompurify";
 import {
   Card,
   CardContent,
@@ -64,7 +65,7 @@ const MobileIssueCard = memo<MobileIssueCardProps>(
         sx={{
           mb: 2,
           border: 1,
-          borderColor: issue.resolved ? "success.main" : "error.main",
+          borderColor: issue.active ? "success.main" : "error.main",
           borderRadius: 2,
         }}
       >
@@ -84,13 +85,13 @@ const MobileIssueCard = memo<MobileIssueCardProps>(
                   sx={{ mb: 0.5 }}
                 >
                   <PrinterChip name={issue.printer_name} />
-                  <StatusChip resolved={issue.resolved} />
+                  <StatusChip resolved={!issue.active} />
                 </Stack>
                 <Typography variant="subtitle1" fontWeight={600}>
                   {issue.summary}
                 </Typography>
               </Box>
-              {!issue.resolved && (
+              {issue.active && (
                 <IconButton size="small" onClick={handleMenu}>
                   <MoreVertIcon />
                 </IconButton>
@@ -131,16 +132,18 @@ const MobileIssueCard = memo<MobileIssueCardProps>(
                     variant="outlined"
                     sx={{ p: 2, bgcolor: "background.default" }}
                   >
-                    <Typography variant="body2" color="text.secondary">
-                      {issue.description}
-                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(issue.description) }}
+                    />
                   </Paper>
                 </Collapse>
               </>
             )}
 
             {/* Resolve */}
-            {!issue.resolved && (
+            {issue.active && (
               <Button
                 fullWidth
                 variant="contained"

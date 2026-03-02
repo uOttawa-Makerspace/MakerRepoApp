@@ -27,12 +27,14 @@ const IssueActionsMenu = memo<IssueActionsMenuProps>(
         open={Boolean(anchorEl)}
         onClose={onClose}
       >
-        <MenuItem onClick={handleResolve}>
-          <ListItemIcon>
-            <DoneIcon fontSize="small" color="success" />
-          </ListItemIcon>
-          <ListItemText>Mark as Resolved</ListItemText>
-        </MenuItem>
+        {issue?.active && (
+          <MenuItem onClick={handleResolve}>
+            <ListItemIcon>
+              <DoneIcon fontSize="small" color="success" />
+            </ListItemIcon>
+            <ListItemText>Mark as Resolved</ListItemText>
+          </MenuItem>
+        )}
       </Menu>
     );
   }
