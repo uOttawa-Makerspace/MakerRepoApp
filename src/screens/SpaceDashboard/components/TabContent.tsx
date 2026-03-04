@@ -61,6 +61,7 @@ const TabContent: React.FC<TabContentProps> = memo(
                 inSpaceUsers={inSpaceUsers?.space_users ?? []}
                 handleReloadCurrentUsers={onReloadUsers}
                 spaceId={spaceId ?? undefined}
+                spaceName={inSpaceUsers?.space?.name}
               />
             </Box>
           </TabPanel>

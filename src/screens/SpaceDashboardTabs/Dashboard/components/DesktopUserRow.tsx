@@ -1,4 +1,4 @@
-import React, { memo, useCallback } from "react";
+import React, { memo, useCallback, useMemo } from "react";
 import {
   TableRow,
   TableCell,
@@ -10,20 +10,24 @@ import {
   Button,
   Tooltip,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import {
   Logout as LogoutIcon,
   Warning as WarningIcon,
 } from "@mui/icons-material";
 import { User } from "../types";
+import { getUserCompliance } from "../utils/userCompliance";
+import UserComplianceIcons from "./UserComplianceIcons";
 
 interface DesktopUserRowProps {
   user: User;
+  spaceName?: string;
   onNavigate: (username: string) => void;
   onSignOut: (user: User) => void;
 }
 
 const DesktopUserRow: React.FC<DesktopUserRowProps> = memo(
-  ({ user, onNavigate, onSignOut }) => {
+  ({ user, spaceName, onNavigate, onSignOut }) => {
     const handleNavigate = useCallback(
       () => onNavigate(user.username),
       [onNavigate, user.username]
@@ -34,12 +38,24 @@ const DesktopUserRow: React.FC<DesktopUserRowProps> = memo(
       [onSignOut, user]
     );
 
+    const compliance = useMemo(
+      () => getUserCompliance(user, spaceName),
+      [user, spaceName]
+    );
+
     return (
       <TableRow
         hover
         sx={{
           "&:last-child td, &:last-child th": { border: 0 },
           cursor: "pointer",
+          ...(!compliance.isCompliant && {
+            bgcolor: (theme) => alpha(theme.palette.error.main, 0.06),
+            "& td:first-of-type": {
+              borderLeft: "4px solid",
+              borderLeftColor: "error.main",
+            },
+          }),
         }}
       >
         <TableCell onClick={handleNavigate}>
@@ -72,6 +88,9 @@ const DesktopUserRow: React.FC<DesktopUserRowProps> = memo(
           <Typography variant="body2">{user.email}</Typography>
         </TableCell>
         <TableCell>
+          <UserComplianceIcons compliance={compliance} />
+        </TableCell>
+        <TableCell>
           {user.flagged ? (
             <Tooltip title="This user has been flagged">
               <Chip
@@ -81,8 +100,19 @@ const DesktopUserRow: React.FC<DesktopUserRowProps> = memo(
                 size="small"
               />
             </Tooltip>
-          ) : (
+          ) : compliance.isCompliant ? (
             <Chip label="Active" color="success" size="small" />
+          ) : (
+            <Tooltip
+              title={`Missing: ${compliance.missingItems.join(", ")}`}
+            >
+              <Chip
+                icon={<WarningIcon />}
+                label="Incomplete"
+                color="error"
+                size="small"
+              />
+            </Tooltip>
           )}
         </TableCell>
         <TableCell align="right">
