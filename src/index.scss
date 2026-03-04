@@ -8,7 +8,7 @@ $theme-colors: (
   "secondary": $secondary,
 );
 
-@import "bootstrap/scss/bootstrap";
+@import 'bootstrap/scss/bootstrap';
 
 // CSS Variables for consistency across Bootstrap and MUI
 :root {
