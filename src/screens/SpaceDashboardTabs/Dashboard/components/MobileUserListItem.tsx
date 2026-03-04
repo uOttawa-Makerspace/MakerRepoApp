@@ -1,4 +1,4 @@
-import React, { memo, useCallback } from "react";
+import React, { memo, useCallback, useMemo } from "react";
 import {
   Paper,
   ListItem,
@@ -11,20 +11,24 @@ import {
   Chip,
   IconButton,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import {
   Logout as LogoutIcon,
   Warning as WarningIcon,
 } from "@mui/icons-material";
 import { User } from "../types";
+import { getUserCompliance } from "../utils/userCompliance";
+import UserComplianceIcons from "./UserComplianceIcons";
 
 interface MobileUserListItemProps {
   user: User;
+  spaceName?: string;
   onNavigate: (username: string) => void;
   onSignOut: (user: User) => void;
 }
 
 const MobileUserListItem: React.FC<MobileUserListItemProps> = memo(
-  ({ user, onNavigate, onSignOut }) => {
+  ({ user, spaceName, onNavigate, onSignOut }) => {
     const handleNavigate = useCallback(
       () => onNavigate(user.username),
       [onNavigate, user.username]
@@ -35,17 +39,37 @@ const MobileUserListItem: React.FC<MobileUserListItemProps> = memo(
       [onSignOut, user]
     );
 
+    const compliance = useMemo(
+      () => getUserCompliance(user, spaceName),
+      [user, spaceName]
+    );
+
+    const borderColor = !compliance.isCompliant
+      ? "error.main"
+      : user.flagged
+        ? "warning.main"
+        : "divider";
+
+    const hoverBorderColor = !compliance.isCompliant
+      ? "error.dark"
+      : user.flagged
+        ? "warning.dark"
+        : "primary.light";
+
     return (
       <Paper
         elevation={0}
         sx={{
           mb: 1,
           border: 1,
-          borderColor: user.flagged ? "warning.main" : "divider",
+          borderColor,
           borderRadius: 2,
           overflow: "hidden",
+          ...(!compliance.isCompliant && {
+            bgcolor: (theme) => alpha(theme.palette.error.main, 0.04),
+          }),
           "&:hover": {
-            borderColor: user.flagged ? "warning.dark" : "primary.light",
+            borderColor: hoverBorderColor,
             boxShadow: 1,
           },
           transition: "all 0.2s ease",
@@ -84,7 +108,11 @@ const MobileUserListItem: React.FC<MobileUserListItemProps> = memo(
             <ListItemText
               primary={
                 <Box
-                  sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                  }}
                 >
                   <Typography variant="body1" fontWeight={600}>
                     {user.name}
@@ -101,13 +129,18 @@ const MobileUserListItem: React.FC<MobileUserListItemProps> = memo(
                 </Box>
               }
               secondary={
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  noWrap
-                >
-                  {user.email}
-                </Typography>
+                <Box>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    noWrap
+                  >
+                    {user.email}
+                  </Typography>
+                  <Box sx={{ mt: 0.5 }}>
+                    <UserComplianceIcons compliance={compliance} />
+                  </Box>
+                </Box>
               }
             />
           </ListItemButton>

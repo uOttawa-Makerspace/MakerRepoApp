@@ -17,6 +17,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   inSpaceUsers,
   handleReloadCurrentUsers,
   spaceId,
+  spaceName,
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -70,6 +71,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       ) : isMobile ? (
         <MobileUserList
           users={filteredAndSortedUsers}
+          spaceName={spaceName}
           onNavigate={navigateToProfile}
           onSignOut={openSignOutDialog}
         />
@@ -78,6 +80,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           users={filteredAndSortedUsers}
           sortField={sortField}
           sortOrder={sortOrder}
+          spaceName={spaceName}
           onSort={handleSort}
           onNavigate={navigateToProfile}
           onSignOut={openSignOutDialog}

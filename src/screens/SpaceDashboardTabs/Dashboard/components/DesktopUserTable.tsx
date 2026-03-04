@@ -1,4 +1,4 @@
-import React, { memo, useCallback } from "react";
+import React, { memo } from "react";
 import {
   TableContainer,
   Table,
@@ -13,42 +13,57 @@ import { User, SortField, SortOrder } from "../types";
 import DesktopUserRow from "./DesktopUserRow";
 
 interface ColumnConfig {
-  field: SortField;
+  field: SortField | "compliance";
   label: string;
+  sortable: boolean;
 }
 
 const COLUMNS: ColumnConfig[] = [
-  { field: "name", label: "User" },
-  { field: "email", label: "Email" },
-  { field: "flagged", label: "Status" },
+  { field: "name", label: "User", sortable: true },
+  { field: "email", label: "Email", sortable: true },
+  { field: "compliance", label: "Compliance", sortable: false },
+  { field: "flagged", label: "Status", sortable: true },
 ];
 
 interface DesktopUserTableProps {
   users: User[];
   sortField: SortField;
   sortOrder: SortOrder;
+  spaceName?: string;
   onSort: (field: SortField) => void;
   onNavigate: (username: string) => void;
   onSignOut: (user: User) => void;
 }
 
 const DesktopUserTable: React.FC<DesktopUserTableProps> = memo(
-  ({ users, sortField, sortOrder, onSort, onNavigate, onSignOut }) => (
+  ({
+    users,
+    sortField,
+    sortOrder,
+    spaceName,
+    onSort,
+    onNavigate,
+    onSignOut,
+  }) => (
     <TableContainer component={Paper} elevation={1}>
       <Table>
         <TableHead>
           <TableRow>
             {COLUMNS.map((col) => (
               <TableCell key={col.field}>
-                <TableSortLabel
-                  active={sortField === col.field}
-                  direction={
-                    sortField === col.field ? sortOrder : "asc"
-                  }
-                  onClick={() => onSort(col.field)}
-                >
-                  {col.label}
-                </TableSortLabel>
+                {col.sortable ? (
+                  <TableSortLabel
+                    active={sortField === col.field}
+                    direction={
+                      sortField === col.field ? sortOrder : "asc"
+                    }
+                    onClick={() => onSort(col.field as SortField)}
+                  >
+                    {col.label}
+                  </TableSortLabel>
+                ) : (
+                  col.label
+                )}
               </TableCell>
             ))}
             <TableCell align="right">Actions</TableCell>
@@ -59,6 +74,7 @@ const DesktopUserTable: React.FC<DesktopUserTableProps> = memo(
             <DesktopUserRow
               key={user.id}
               user={user}
+              spaceName={spaceName}
               onNavigate={onNavigate}
               onSignOut={onSignOut}
             />

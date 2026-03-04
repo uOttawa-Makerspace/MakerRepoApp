@@ -17,8 +17,12 @@ export interface SpaceUser {
   username: string;
   name: string;
   email: string;
-  flagged: boolean;
+  flagged: boolean | null;
+  flag_message?: string;
   avatar_url?: string;
+  active: boolean;
+  read_and_accepted_waiver_form: boolean;
+  certifications?: { id: number; name: string }[];
   [key: string]: any;
 }
 
