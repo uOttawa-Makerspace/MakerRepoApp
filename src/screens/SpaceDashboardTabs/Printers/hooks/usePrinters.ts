@@ -75,6 +75,7 @@ export function usePrinters(inSpaceUsers: any) {
               summary: i.summary,
               description: i.description,
               created_at: i.created_at,
+              active: i.active
             }))
           );
         } else {

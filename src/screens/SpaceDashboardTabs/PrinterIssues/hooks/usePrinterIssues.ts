@@ -109,7 +109,7 @@ export function usePrinterIssues(
     const query = searchQuery.toLowerCase();
 
     const filtered = issues.filter((issue) => {
-      const matchesStatus = showResolved ? issue.resolved : !issue.resolved;
+      const matchesStatus = showResolved ? !issue.active : issue.active;
       if (!matchesStatus) return false;
 
       if (!query) return true;
@@ -133,8 +133,8 @@ export function usePrinterIssues(
     let resolved = 0;
 
     for (const issue of issues) {
-      if (issue.resolved) resolved++;
-      else open++;
+      if (issue.active) open++;
+      else resolved++;
     }
 
     return { open, resolved, total: issues.length };

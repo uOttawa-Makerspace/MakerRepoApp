@@ -1,4 +1,5 @@
 import React, { memo, useCallback } from "react";
+import DOMPurify from "dompurify";
 import {
   TableRow,
   TableCell,
@@ -80,10 +81,10 @@ const DesktopIssueRow = memo<DesktopIssueRowProps>(
             </Typography>
           </TableCell>
           <TableCell>
-            <StatusChip resolved={issue.resolved} />
+            <StatusChip resolved={!issue.active} />
           </TableCell>
           <TableCell align="right">
-            {!issue.resolved && (
+            {issue.active && (
               <Tooltip title="More actions">
                 <IconButton size="small" onClick={handleMenu}>
                   <MoreVertIcon />
@@ -111,9 +112,11 @@ const DesktopIssueRow = memo<DesktopIssueRowProps>(
                     variant="outlined"
                     sx={{ p: 2, mt: 1, bgcolor: "background.default" }}
                   >
-                    <Typography variant="body2" color="text.secondary">
-                      {issue.description}
-                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(issue.description) }}
+                    />
                   </Paper>
                 </Box>
               </Collapse>

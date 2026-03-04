@@ -6,7 +6,7 @@ export type PrinterIssue = {
   description: string;
   reporter: string;
   created_at: string;
-  resolved?: boolean;
+  active: boolean;
   resolved_at?: string;
   resolved_by?: string;
 };
