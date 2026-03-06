@@ -1,4 +1,4 @@
-import React, { memo, useState } from "react";
+import React, { memo, useState, useRef, useEffect, useCallback } from "react";
 import {
   Card,
   CardContent,
@@ -65,29 +65,45 @@ LinkedCard.displayName = "LinkedCard";
 
 const AvailableCardItem: React.FC<{
   rfid: RfidInfo;
-  onLink: (cardNumber: string) => void;
-}> = memo(({ rfid, onLink }) => (
-  <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
-    <Stack direction="row" alignItems="center" justifyContent="space-between">
-      <Box>
-        <Typography variant="body2" fontWeight={600}>
-          Card: {rfid.cardNumber}
-        </Typography>
-        <Typography variant="caption" color="text.secondary">
-          Tapped: {rfid.tappedAt}
-        </Typography>
-      </Box>
-      <Button
-        variant="contained"
-        size="small"
-        startIcon={<AddIcon />}
-        onClick={() => onLink(rfid.cardNumber)}
-      >
-        Link Card
-      </Button>
-    </Stack>
-  </Paper>
-));
+  onLink: (cardNumber: string) => Promise<void>;
+}> = memo(({ rfid, onLink }) => {
+  const [linking, setLinking] = useState(false);
+
+  const handleLink = async () => {
+    setLinking(true);
+    try {
+      await onLink(rfid.cardNumber);
+    } catch {
+      // error already handled by parent
+    } finally {
+      setLinking(false);
+    }
+  };
+
+  return (
+    <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
+      <Stack direction="row" alignItems="center" justifyContent="space-between">
+        <Box>
+          <Typography variant="body2" fontWeight={600}>
+            Card: {rfid.cardNumber}
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            Tapped: {rfid.tappedAt}
+          </Typography>
+        </Box>
+        <Button
+          variant="contained"
+          size="small"
+          startIcon={<AddIcon />}
+          onClick={handleLink}
+          disabled={linking}
+        >
+          {linking ? "Linking..." : "Link Card"}
+        </Button>
+      </Stack>
+    </Paper>
+  );
+});
 
 AvailableCardItem.displayName = "AvailableCardItem";
 
@@ -108,9 +124,15 @@ const RfidTab: React.FC<RfidTabProps> = ({
     message: string;
   } | null>(null);
 
+  // Ref keeps the NFC listener from capturing a stale callback
+  const onLinkRfidRef = useRef(onLinkRfid);
+  useEffect(() => {
+    onLinkRfidRef.current = onLinkRfid;
+  }, [onLinkRfid]);
+
   const isNfcSupported = "NDEFReader" in window;
 
-  const startScanning = async () => {
+  const startScanning = useCallback(async () => {
     try {
       // eslint-disable-next-line no-undef
       const ndef = new NDEFReader();
@@ -132,7 +154,7 @@ const RfidTab: React.FC<RfidTabProps> = ({
           });
 
           try {
-            await onLinkRfid(cardNumber);
+            await onLinkRfidRef.current(cardNumber);
             setScanStatus({
               severity: "success",
               message: `Card ${cardNumber} successfully linked!`,
@@ -152,7 +174,7 @@ const RfidTab: React.FC<RfidTabProps> = ({
         message: `Failed to start NFC scan: ${error}`,
       });
     }
-  };
+  }, []);
 
   return (
     <TabPanel value={tabIndex} index={panelIndex}>
