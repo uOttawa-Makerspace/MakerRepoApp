@@ -94,7 +94,6 @@ export const useProfileData = (username?: string) => {
             position: "bottom-center",
             icon: "🎫",
           });
-          window.location.reload();
         } else {
           throw new Error("Link failed");
         }
