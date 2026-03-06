@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
 import { getUser } from "../../../utils/Common";
 import * as HTTPRequest from "../../../utils/HTTPRequests";
@@ -40,47 +40,36 @@ export const useProfileData = (username?: string) => {
     }
   }, []);
 
-  const fetchProfile = useCallback(async () => {
-    if (!username) return;
-    const response = await HTTPRequest.get(username);
-    setProfileUser(response.user);
-    setPrograms(response.programs || []);
-    setCertifications(response.certifications || []);
-    setRemainingTrainings(response.remaining_trainings || []);
-    setRole(response.user.role);
-    setVolunteerProgram(
-      (response.programs || []).includes("Volunteer Program")
-    );
-    setDevProgram(
-      (response.programs || []).includes("Development Program")
-    );
-  }, [username]);
-
   const getProfile = useCallback(async () => {
+    if (!username) return;
+
     setLoading(true);
     try {
-      await fetchProfile();
+      const response = await HTTPRequest.get(username);
+      setProfileUser(response.user);
+      setPrograms(response.programs || []);
+      setCertifications(response.certifications || []);
+      setRemainingTrainings(response.remaining_trainings || []);
+      setRole(response.user.role);
+      setVolunteerProgram(
+        (response.programs || []).includes("Volunteer Program")
+      );
+      setDevProgram(
+        (response.programs || []).includes("Development Program")
+      );
     } catch (error) {
       console.error(error);
       toast.error("Failed to load profile", { position: "bottom-center" });
     } finally {
       setLoading(false);
     }
-  }, [fetchProfile]);
-
-  const refreshProfile = useCallback(async () => {
-    try {
-      await fetchProfile();
-    } catch (error) {
-      console.error(error);
-    }
-  }, [fetchProfile]);
+  }, [username]);
 
   const getCurrentUsers = useCallback(async () => {
     try {
       const response = await HTTPRequest.get("staff_dashboard");
       setInSpaceUsers(response);
-      await getUnsetRfids();
+      getUnsetRfids();
     } catch (error) {
       console.error(error);
     }
@@ -105,8 +94,7 @@ export const useProfileData = (username?: string) => {
             position: "bottom-center",
             icon: "🎫",
           });
-          await refreshProfile();
-          await getUnsetRfids();
+          window.location.reload();
         } else {
           throw new Error("Link failed");
         }
@@ -115,10 +103,9 @@ export const useProfileData = (username?: string) => {
         toast.error("Failed to link RFID card. Please try again.", {
           position: "bottom-center",
         });
-        throw error;
       }
     },
-    [profileUser, refreshProfile, getUnsetRfids]
+    [profileUser]
   );
 
   const handleUnlinkRfid = useCallback(async () => {
@@ -131,8 +118,8 @@ export const useProfileData = (username?: string) => {
         toast.success("RFID card unlinked successfully!", {
           position: "bottom-center",
         });
-        await refreshProfile();
-        await getUnsetRfids();
+        getProfile();
+        getUnsetRfids();
         setUnlinkDialog({ open: false, cardNumber: null });
       } else {
         throw new Error("Unlink failed");
@@ -143,7 +130,7 @@ export const useProfileData = (username?: string) => {
         position: "bottom-center",
       });
     }
-  }, [unlinkDialog.cardNumber, refreshProfile, getUnsetRfids]);
+  }, [unlinkDialog.cardNumber, getProfile, getUnsetRfids]);
 
   const handleSaveRole = useCallback(async () => {
     if (!profileUser) return;
@@ -157,7 +144,7 @@ export const useProfileData = (username?: string) => {
         position: "bottom-center",
       });
       setEditingRole(false);
-      await refreshProfile();
+      getProfile();
     } catch (error) {
       console.error(error);
       toast.error("Failed to update role. Please try again.", {
@@ -166,7 +153,7 @@ export const useProfileData = (username?: string) => {
     } finally {
       setSaving(false);
     }
-  }, [profileUser, role, refreshProfile]);
+  }, [profileUser, role, getProfile]);
 
   const handleSavePrograms = useCallback(async () => {
     if (!profileUser) return;
@@ -181,7 +168,7 @@ export const useProfileData = (username?: string) => {
         position: "bottom-center",
       });
       setEditingPrograms(false);
-      await refreshProfile();
+      getProfile();
     } catch (error) {
       console.error(error);
       toast.error("Failed to update programs. Please try again.", {
@@ -190,7 +177,7 @@ export const useProfileData = (username?: string) => {
     } finally {
       setSaving(false);
     }
-  }, [profileUser, devProgram, volunteerProgram, refreshProfile]);
+  }, [profileUser, devProgram, volunteerProgram, getProfile]);
 
   const cancelEditRole = useCallback(() => {
     setEditingRole(false);
