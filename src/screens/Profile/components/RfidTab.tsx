@@ -28,7 +28,7 @@ interface RfidTabProps {
   isAdmin: boolean;
   rfidList: RfidInfo[];
   inSpaceUsers: any;
-  onLinkRfid: (cardNumber: string) => void;
+  onLinkRfid: (cardNumber: string) => Promise<void>;
   onOpenUnlinkDialog: (cardNumber: string) => void;
   onReloadCurrentUsers: () => void;
 }
@@ -122,15 +122,27 @@ const RfidTab: React.FC<RfidTabProps> = ({
       });
 
       // @ts-ignore
-      ndef.addEventListener("reading", ({ serialNumber }) => {
+      ndef.addEventListener("reading", async ({ serialNumber }) => {
         if (serialNumber) {
           const cardNumber = serialNumber.replaceAll(":", "").toUpperCase();
           setScanning(false);
           setScanStatus({
-            severity: "success",
-            message: `Card ${cardNumber} scanned! Linking to profile...`,
+            severity: "info",
+            message: `Card ${cardNumber} detected. Linking...`,
           });
-          onLinkRfid(cardNumber);
+
+          try {
+            await onLinkRfid(cardNumber);
+            setScanStatus({
+              severity: "success",
+              message: `Card ${cardNumber} successfully linked!`,
+            });
+          } catch {
+            setScanStatus({
+              severity: "error",
+              message: "Failed to link card. Please try again.",
+            });
+          }
         }
       });
     } catch (error) {
