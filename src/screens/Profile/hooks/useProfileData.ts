@@ -94,6 +94,8 @@ export const useProfileData = (username?: string) => {
             position: "bottom-center",
             icon: "🎫",
           });
+          getProfile();
+          getUnsetRfids();
         } else {
           throw new Error("Link failed");
         }
@@ -104,7 +106,7 @@ export const useProfileData = (username?: string) => {
         });
       }
     },
-    [profileUser]
+    [profileUser, getProfile, getUnsetRfids]
   );
 
   const handleUnlinkRfid = useCallback(async () => {
