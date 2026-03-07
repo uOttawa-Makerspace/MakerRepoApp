@@ -40,6 +40,7 @@ export const useProfileData = (username?: string) => {
     }
   }, []);
 
+  // Does NOT touch `loading` — safe to call for refreshes
   const getProfile = useCallback(async () => {
     if (!username) return;
     try {
@@ -65,14 +66,16 @@ export const useProfileData = (username?: string) => {
     try {
       const response = await HTTPRequest.get("staff_dashboard");
       setInSpaceUsers(response);
-      getUnsetRfids();
+      await getUnsetRfids();
     } catch (error) {
       console.error(error);
     }
   }, [getUnsetRfids]);
 
+  // Only place that manages `loading`
   useEffect(() => {
     const init = async () => {
+      setLoading(true);
       setCurrentUser(getUser());
       await Promise.all([getProfile(), getCurrentUsers()]);
       setLoading(false);
@@ -84,25 +87,23 @@ export const useProfileData = (username?: string) => {
     async (cardNumber: string) => {
       if (!profileUser) return;
       try {
-        const response = await HTTPRequest.put("staff_dashboard/link_rfid", {
+        await HTTPRequest.put("staff_dashboard/link_rfid", {
           card_number: cardNumber,
           user_id: profileUser.id,
         });
-        if (response.status === "OK") {
-          toast.success("RFID card linked successfully!", {
-            position: "bottom-center",
-            icon: "🎫",
-          });
-          await getProfile();      // refresh profile so user.rfid updates
-          await getUnsetRfids();   // refresh available cards list
-        } else {
-          throw new Error("Link failed");
-        }
+        toast.success("RFID card linked successfully!", {
+          position: "bottom-center",
+          icon: "🎫",
+        });
+        // Refresh profile so user.rfid updates, and refresh available cards
+        await getProfile();
+        await getUnsetRfids();
       } catch (error) {
         console.error(error);
         toast.error("Failed to link RFID card. Please try again.", {
           position: "bottom-center",
         });
+        throw error; // Re-throw so NFC scan UI can show error status
       }
     },
     [profileUser, getProfile, getUnsetRfids]
@@ -111,24 +112,23 @@ export const useProfileData = (username?: string) => {
   const handleUnlinkRfid = useCallback(async () => {
     if (!unlinkDialog.cardNumber) return;
     try {
-      const response = await HTTPRequest.put("staff_dashboard/unlink_rfid", {
+      await HTTPRequest.put("staff_dashboard/unlink_rfid", {
         card_number: unlinkDialog.cardNumber,
       });
-      if (response.status === "OK") {
-        toast.success("RFID card unlinked successfully!", {
-          position: "bottom-center",
-        });
-        setUnlinkDialog({ open: false, cardNumber: null });
-        await getProfile();      // refresh in-place, no spinner
-        await getUnsetRfids();
-      } else {
-        throw new Error("Unlink failed");
-      }
+      toast.success("RFID card unlinked successfully!", {
+        position: "bottom-center",
+      });
+      // Refresh profile so user.rfid clears, and refresh available cards
+      await getProfile();
+      await getUnsetRfids();
     } catch (error) {
       console.error(error);
       toast.error("Failed to unlink RFID card. Please try again.", {
         position: "bottom-center",
       });
+    } finally {
+      // ALWAYS close the dialog, even if something went wrong
+      setUnlinkDialog({ open: false, cardNumber: null });
     }
   }, [unlinkDialog.cardNumber, getProfile, getUnsetRfids]);
 

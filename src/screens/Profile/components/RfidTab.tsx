@@ -1,4 +1,4 @@
-import React, { memo, useState } from "react";
+import React, { memo, useState, useRef, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -108,6 +108,12 @@ const RfidTab: React.FC<RfidTabProps> = ({
     message: string;
   } | null>(null);
 
+  // Keep a ref to always have the latest onLinkRfid inside the NFC listener
+  const onLinkRfidRef = useRef(onLinkRfid);
+  useEffect(() => {
+    onLinkRfidRef.current = onLinkRfid;
+  }, [onLinkRfid]);
+
   const isNfcSupported = "NDEFReader" in window;
 
   const startScanning = async () => {
@@ -132,7 +138,8 @@ const RfidTab: React.FC<RfidTabProps> = ({
           });
 
           try {
-            await onLinkRfid(cardNumber);
+            // Use ref to avoid stale closure
+            await onLinkRfidRef.current(cardNumber);
             setScanStatus({
               severity: "success",
               message: `Card ${cardNumber} successfully linked!`,
