@@ -8,6 +8,7 @@ import type {
   StatusFilter,
   SessionStats,
   CertifyDialogState,
+  UsersDialogState,
 } from "../types";
 import { isSessionCompleted, sortSessions } from "../utils/utils";
 
@@ -25,6 +26,11 @@ export const useTrainingSessions = (
     session: null,
   });
   const [certifying, setCertifying] = useState(false);
+
+  const [usersDialog, setUsersDialog] = useState<UsersDialogState>({
+    open: false,
+    session: null,
+  });
 
   // Sorting
   const handleSort = useCallback(
@@ -64,7 +70,7 @@ export const useTrainingSessions = (
 
       if (response.data.certified === true) {
         toast.success(
-          `Successfully certified trainees for ${certifyDialog.session.training.name}!`,
+          `Successfully certified trainees for ${certifyDialog.session.training.name_en}!`,
           {
             position: "bottom-center",
             icon: "🎓",
@@ -89,6 +95,15 @@ export const useTrainingSessions = (
     }
   }, [certifyDialog.session, reloadTrainingSessions, closeCertifyDialog]);
 
+  // Users dialog
+  const openUsersDialog = useCallback((session: TrainingSession) => {
+    setUsersDialog({ open: true, session });
+  }, []);
+
+  const closeUsersDialog = useCallback(() => {
+    setUsersDialog({ open: false, session: null });
+  }, []);
+
   // Filtered and sorted results
   const filteredAndSortedSessions = useMemo(() => {
     if (!trainingSessions) return [];
@@ -98,9 +113,9 @@ export const useTrainingSessions = (
     const filtered = trainingSessions.filter((session) => {
       const matchesSearch =
         !lowerQuery ||
-        session.training.name.toLowerCase().includes(lowerQuery) ||
-        session.space.name.toLowerCase().includes(lowerQuery) ||
-        session.course.toLowerCase().includes(lowerQuery);
+        (session.training?.name_en ?? "").toLowerCase().includes(lowerQuery) ||
+        (session.space?.name ?? "").toLowerCase().includes(lowerQuery) ||
+        (session.course ?? "").toLowerCase().includes(lowerQuery);
 
       const completed = isSessionCompleted(session);
       const matchesStatus =
@@ -146,7 +161,10 @@ export const useTrainingSessions = (
     closeCertifyDialog,
     confirmCertify,
 
-    // Derived
+    usersDialog,
+    openUsersDialog,
+    closeUsersDialog,
+
     filteredAndSortedSessions,
     stats,
   };

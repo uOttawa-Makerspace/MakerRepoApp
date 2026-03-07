@@ -13,6 +13,7 @@ import SearchAndFilters from "./components/SearchAndFilters";
 import EmptyState from "./components/EmptyState";
 import SessionResults from "./components/SessionResults";
 import CertifyDialog from "./components/CertifyDialog";
+import UsersDialog from "./components/UsersDialog";
 
 interface TrainingSessionsProps {
   trainingSessions: TrainingSession[] | null;
@@ -40,6 +41,9 @@ const TrainingSessions = ({
     openCertifyDialog,
     closeCertifyDialog,
     confirmCertify,
+    usersDialog,
+    openUsersDialog,
+    closeUsersDialog,
     filteredAndSortedSessions,
     stats,
   } = useTrainingSessions(trainingSessions, reloadTrainingSessions);
@@ -85,18 +89,26 @@ const TrainingSessions = ({
           sortOrder={sortOrder}
           onSort={handleSort}
           onCertifyClick={openCertifyDialog}
+          onSessionClick={openUsersDialog}
         />
       ) : (
         <EmptyState hasActiveFilters={hasActiveFilters} isMobile={isMobile} />
       )}
 
-      {/* Dialog */}
+      {/* Certify Dialog */}
       <CertifyDialog
         open={certifyDialog.open}
         session={certifyDialog.session}
         loading={certifying}
         onConfirm={confirmCertify}
         onCancel={closeCertifyDialog}
+      />
+
+      {/* Users Dialog */}
+      <UsersDialog
+        open={usersDialog.open}
+        session={usersDialog.session}
+        onClose={closeUsersDialog}
       />
     </Box>
   );

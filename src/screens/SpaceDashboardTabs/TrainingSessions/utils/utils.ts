@@ -34,13 +34,15 @@ export const sortSessions = (
           new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime();
         break;
       case "training":
-        comparison = a.training.name.localeCompare(b.training.name);
+        comparison = (a.training?.name_en ?? "").localeCompare(
+          b.training?.name_en ?? ""
+        );
         break;
       case "space":
-        comparison = a.space.name.localeCompare(b.space.name);
+        comparison = (a.space?.name ?? "").localeCompare(b.space?.name ?? "");
         break;
       case "course":
-        comparison = a.course.localeCompare(b.course);
+        comparison = (a.course ?? "").localeCompare(b.course ?? "");
         break;
       case "status":
         comparison =
