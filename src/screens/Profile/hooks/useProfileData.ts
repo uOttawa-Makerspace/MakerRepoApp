@@ -42,8 +42,6 @@ export const useProfileData = (username?: string) => {
 
   const getProfile = useCallback(async () => {
     if (!username) return;
-
-    setLoading(true);
     try {
       const response = await HTTPRequest.get(username);
       setProfileUser(response.user);
@@ -60,8 +58,6 @@ export const useProfileData = (username?: string) => {
     } catch (error) {
       console.error(error);
       toast.error("Failed to load profile", { position: "bottom-center" });
-    } finally {
-      setLoading(false);
     }
   }, [username]);
 
@@ -76,9 +72,12 @@ export const useProfileData = (username?: string) => {
   }, [getUnsetRfids]);
 
   useEffect(() => {
-    setCurrentUser(getUser());
-    getProfile();
-    getCurrentUsers();
+    const init = async () => {
+      setCurrentUser(getUser());
+      await Promise.all([getProfile(), getCurrentUsers()]);
+      setLoading(false);
+    };
+    init();
   }, [getProfile, getCurrentUsers]);
 
   const handleLinkRfid = useCallback(
@@ -94,8 +93,8 @@ export const useProfileData = (username?: string) => {
             position: "bottom-center",
             icon: "🎫",
           });
-          getProfile();
-          getUnsetRfids();
+          await getProfile();      // refresh profile so user.rfid updates
+          await getUnsetRfids();   // refresh available cards list
         } else {
           throw new Error("Link failed");
         }
@@ -119,9 +118,9 @@ export const useProfileData = (username?: string) => {
         toast.success("RFID card unlinked successfully!", {
           position: "bottom-center",
         });
-        getProfile();
-        getUnsetRfids();
         setUnlinkDialog({ open: false, cardNumber: null });
+        await getProfile();      // refresh in-place, no spinner
+        await getUnsetRfids();
       } else {
         throw new Error("Unlink failed");
       }
@@ -145,7 +144,7 @@ export const useProfileData = (username?: string) => {
         position: "bottom-center",
       });
       setEditingRole(false);
-      getProfile();
+      await getProfile();
     } catch (error) {
       console.error(error);
       toast.error("Failed to update role. Please try again.", {
@@ -169,7 +168,7 @@ export const useProfileData = (username?: string) => {
         position: "bottom-center",
       });
       setEditingPrograms(false);
-      getProfile();
+      await getProfile();
     } catch (error) {
       console.error(error);
       toast.error("Failed to update programs. Please try again.", {
