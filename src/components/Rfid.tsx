@@ -10,9 +10,10 @@ interface RfidStatus {
 
 interface RfidProps {
   spaceId: string | number | undefined;
+  onSignIn?: () => void;
 }
 
-const Rfid = ({ spaceId }: RfidProps) => {
+const Rfid = ({ spaceId, onSignIn }: RfidProps) => {
   const [scanRfid, setScanRfid] = useState<boolean>(false);
   const [status, setStatus] = useState<null | RfidStatus>(null);
 
@@ -34,8 +35,10 @@ const Rfid = ({ spaceId }: RfidProps) => {
           if (response.data.success) {
             if (response.data.success === "RFID sign out") {
               setStatus({ status: "warning", message: "Signed Out!" });
+              onSignIn?.();
             } else {
               setStatus({ status: "success", message: "Signed In!" });
+              onSignIn?.();
             }
           } else {
             setErrorStatus();

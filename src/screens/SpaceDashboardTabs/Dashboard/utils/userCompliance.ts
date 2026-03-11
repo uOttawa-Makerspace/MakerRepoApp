@@ -4,6 +4,7 @@ export interface ComplianceStatus {
   hasMembership: boolean;
   hasConsentForm: boolean;
   requiresShopFundamentals: boolean;
+  requiresConsentForm: boolean;
   hasShopFundamentals: boolean;
   isCompliant: boolean;
   missingItems: string[];
@@ -35,6 +36,7 @@ export function getUserCompliance(
     hasMembership,
     hasConsentForm,
     requiresShopFundamentals: isBrunsfield,
+    requiresConsentForm: isBrunsfield,
     hasShopFundamentals,
     isCompliant: missingItems.length === 0,
     missingItems,

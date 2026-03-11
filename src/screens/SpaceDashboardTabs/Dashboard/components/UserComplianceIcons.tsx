@@ -17,6 +17,7 @@ const UserComplianceIcons: React.FC<UserComplianceIconsProps> = memo(
       hasMembership,
       hasConsentForm,
       requiresShopFundamentals,
+      requiresConsentForm,
       hasShopFundamentals,
     } = compliance;
 
@@ -39,22 +40,24 @@ const UserComplianceIcons: React.FC<UserComplianceIconsProps> = memo(
           />
         </Tooltip>
 
-        <Tooltip
-          title={
-            hasConsentForm
-              ? "Consent Form Signed ✓"
-              : "⚠ Missing: Consent Form"
-          }
-          arrow
-        >
-          <ConsentIcon
-            fontSize="small"
-            sx={{
-              color: hasConsentForm ? "success.main" : "error.main",
-              cursor: "help",
-            }}
-          />
-        </Tooltip>
+        {requiresConsentForm && (
+          <Tooltip
+            title={
+              hasConsentForm
+                ? "Consent Form Signed ✓"
+                : "⚠ Missing: Consent Form"
+            }
+            arrow
+          >
+            <ConsentIcon
+              fontSize="small"
+              sx={{
+                color: hasConsentForm ? "success.main" : "error.main",
+                cursor: "help",
+              }}
+            />
+          </Tooltip>
+        )}
 
         {requiresShopFundamentals && (
           <Tooltip

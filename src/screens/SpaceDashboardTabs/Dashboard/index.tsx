@@ -55,7 +55,7 @@ const Dashboard: React.FC<DashboardProps> = ({
     <Box>
       {/* RFID */}
       <Box sx={{ px: isMobile ? 2 : 0, py: isMobile ? 2 : 0 }}>
-        <Rfid spaceId={spaceId} />
+        <Rfid spaceId={spaceId} onSignIn={handleReloadCurrentUsers} />
       </Box>
 
       {/* Search */}
