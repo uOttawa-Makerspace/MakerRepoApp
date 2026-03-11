@@ -31,3 +31,13 @@ export interface SignOutDialogState {
   open: boolean;
   user: User | null;
 }
+
+export interface SearchUser {
+  name: string;
+  username: string;
+}
+
+export interface SignInDialogState {
+  open: boolean;
+  user: SearchUser | null;
+}

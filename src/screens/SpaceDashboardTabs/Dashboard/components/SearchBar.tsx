@@ -33,7 +33,7 @@ const SearchBar: React.FC<SearchBarProps> = memo(
     return (
       <Box sx={{ px: isMobile ? 2 : 0, mb: 2 }}>
         <TextField
-          placeholder="Search signed in users..."
+          placeholder="Search users..."
           value={value}
           onChange={handleChange}
           size={isMobile ? "medium" : "small"}

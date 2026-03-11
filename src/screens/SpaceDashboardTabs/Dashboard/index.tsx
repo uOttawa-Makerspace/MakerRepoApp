@@ -1,10 +1,18 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, useMediaQuery, useTheme } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Alert,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 
 import { DashboardProps } from "./types";
 import { useFilteredUsers } from "./hooks/useFilteredUsers";
 import { useSignOut } from "./hooks/useSignOut";
+import { useSignIn } from "./hooks/useSignIn";
+import { useGlobalSearch } from "./hooks/useGlobalSearch";
 
 import Rfid from "../../../components/Rfid";
 import SearchBar from "./components/SearchBar";
@@ -12,6 +20,8 @@ import EmptyState from "./components/EmptyState";
 import MobileUserList from "./components/MobileUserList";
 import DesktopUserTable from "./components/DesktopUserTable";
 import SignOutDialog from "./components/SignOutDialog";
+import SignInDialog from "./components/SignInDialog";
+import GlobalSearchResults from "./components/GlobalSearchResults";
 
 const Dashboard: React.FC<DashboardProps> = ({
   inSpaceUsers,
@@ -23,6 +33,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
 
+  // Client-side filtering of signed-in users
   const {
     searchQuery,
     sortField,
@@ -33,6 +44,17 @@ const Dashboard: React.FC<DashboardProps> = ({
     handleSort,
   } = useFilteredUsers(inSpaceUsers);
 
+  // Server-side search for all users
+  const signedInUsernames = useMemo(
+    () => new Set(inSpaceUsers.map((u) => u.username)),
+    [inSpaceUsers]
+  );
+
+  const { globalResults, globalSearchLoading } = useGlobalSearch(
+    searchQuery,
+    signedInUsernames
+  );
+
   const {
     signOutDialog,
     signingOut,
@@ -40,6 +62,14 @@ const Dashboard: React.FC<DashboardProps> = ({
     closeSignOutDialog,
     confirmSignOut,
   } = useSignOut(handleReloadCurrentUsers);
+
+  const {
+    signInDialog,
+    signingIn,
+    openSignInDialog,
+    closeSignInDialog,
+    confirmSignIn,
+  } = useSignIn(handleReloadCurrentUsers);
 
   const navigateToProfile = useCallback(
     (username: string) => {
@@ -50,6 +80,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 
   const hasUsers = inSpaceUsers.length > 0;
   const hasResults = filteredAndSortedUsers.length > 0;
+  const isSearching = searchQuery.trim().length > 0;
 
   return (
     <Box>
@@ -65,34 +96,104 @@ const Dashboard: React.FC<DashboardProps> = ({
         onClear={clearSearch}
       />
 
-      {/* User List */}
-      {!hasUsers || !hasResults ? (
-        <EmptyState hasUsers={hasUsers} searchQuery={searchQuery} />
-      ) : isMobile ? (
-        <MobileUserList
-          users={filteredAndSortedUsers}
-          spaceName={spaceName}
-          onNavigate={navigateToProfile}
-          onSignOut={openSignOutDialog}
-        />
+      {/* When not searching: original dashboard behavior */}
+      {!isSearching ? (
+        !hasUsers ? (
+          <EmptyState hasUsers={false} searchQuery="" />
+        ) : isMobile ? (
+          <MobileUserList
+            users={filteredAndSortedUsers}
+            spaceName={spaceName}
+            onNavigate={navigateToProfile}
+            onSignOut={openSignOutDialog}
+          />
+        ) : (
+          <DesktopUserTable
+            users={filteredAndSortedUsers}
+            sortField={sortField}
+            sortOrder={sortOrder}
+            spaceName={spaceName}
+            onSort={handleSort}
+            onNavigate={navigateToProfile}
+            onSignOut={openSignOutDialog}
+          />
+        )
       ) : (
-        <DesktopUserTable
-          users={filteredAndSortedUsers}
-          sortField={sortField}
-          sortOrder={sortOrder}
-          spaceName={spaceName}
-          onSort={handleSort}
+        // Active search: show sign-in suggestions FIRST, then signed-in users
+        <>
+          {/* Global search results (sign-in suggestions) */}
+          <GlobalSearchResults
+            results={globalResults}
+            loading={globalSearchLoading}
+            searchQuery={searchQuery}
+            onSignIn={openSignInDialog}
+            onNavigate={navigateToProfile}
+          />
+
+          {/* Filtered signed-in users */}
+          {hasResults ? (
+            <Box sx={{ mt: 3 }}>
+              <Typography
+                variant="subtitle1"
+                fontWeight={600}
+                sx={{ mb: 1.5, px: isMobile ? 2 : 0 }}
+              >
+                Currently signed in
+              </Typography>
+              {isMobile ? (
+                <MobileUserList
+                  users={filteredAndSortedUsers}
+                  spaceName={spaceName}
+                  onNavigate={navigateToProfile}
+                  onSignOut={openSignOutDialog}
+                />
+              ) : (
+                <DesktopUserTable
+                  users={filteredAndSortedUsers}
+                  sortField={sortField}
+                  sortOrder={sortOrder}
+                  spaceName={spaceName}
+                  onSort={handleSort}
+                  onNavigate={navigateToProfile}
+                  onSignOut={openSignOutDialog}
+                />
+              )}
+            </Box>
+          ) : hasUsers ? (
+            <Alert severity="info" sx={{ mt: 3, mx: isMobile ? 2 : 0 }}>
+              No signed-in users match &ldquo;{searchQuery}&rdquo;
+            </Alert>
+          ) : (
+            <Box sx={{ mt: 3 }}>
+              <EmptyState hasUsers={false} searchQuery="" />
+            </Box>
+          )}
+        </>
+      )}
+
+      {/* Global search results when NOT searching */}
+      {!isSearching && (
+        <GlobalSearchResults
+          results={globalResults}
+          loading={globalSearchLoading}
+          searchQuery={searchQuery}
+          onSignIn={openSignInDialog}
           onNavigate={navigateToProfile}
-          onSignOut={openSignOutDialog}
         />
       )}
 
-      {/* Sign Out Dialog */}
+      {/* Dialogs */}
       <SignOutDialog
         dialog={signOutDialog}
         signingOut={signingOut}
         onClose={closeSignOutDialog}
         onConfirm={confirmSignOut}
+      />
+      <SignInDialog
+        dialog={signInDialog}
+        signingIn={signingIn}
+        onClose={closeSignInDialog}
+        onConfirm={confirmSignIn}
       />
     </Box>
   );

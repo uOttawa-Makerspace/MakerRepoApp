@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -6,8 +6,8 @@ import {
   DialogContentText,
   DialogActions,
   Button,
-  Typography,
   Box,
+  Typography,
   IconButton,
   CircularProgress,
   useMediaQuery,
@@ -17,25 +17,24 @@ import {
   Close as CloseIcon,
   Login as LoginIcon,
 } from "@mui/icons-material";
-import type { User, SearchUser } from "../types";
+import { SignInDialogState } from "../hooks/useSignIn";
 
-interface SignInConfirmDialogProps {
-  open: boolean;
-  user: User | SearchUser | null;
-  loading: boolean;
+interface SignInDialogProps {
+  dialog: SignInDialogState;
+  signingIn: boolean;
+  onClose: () => void;
   onConfirm: () => void;
-  onCancel: () => void;
 }
 
-const SignInConfirmDialog = React.memo(
-  ({ open, user, loading, onConfirm, onCancel }: SignInConfirmDialogProps) => {
+const SignInDialog: React.FC<SignInDialogProps> = memo(
+  ({ dialog, signingIn, onClose, onConfirm }) => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
     return (
       <Dialog
-        open={open}
-        onClose={onCancel}
+        open={dialog.open}
+        onClose={onClose}
         maxWidth="xs"
         fullWidth
         fullScreen={isMobile}
@@ -54,7 +53,7 @@ const SignInConfirmDialog = React.memo(
             <Typography variant="h6" fontWeight={600}>
               Confirm Sign In
             </Typography>
-            <IconButton onClick={onCancel} aria-label="Close">
+            <IconButton onClick={onClose}>
               <CloseIcon />
             </IconButton>
           </Box>
@@ -64,14 +63,24 @@ const SignInConfirmDialog = React.memo(
 
         <DialogContent sx={{ pt: isMobile ? 3 : 2 }}>
           <DialogContentText>
-            Are you sure you want to sign in <strong>{user?.name}</strong>?
+            Are you sure you want to sign in{" "}
+            <strong>{dialog.user?.name}</strong>
+            {dialog.user?.email && (
+              <>
+                {" "}
+                ({dialog.user.email})
+              </>
+            )}
+            ?
           </DialogContentText>
         </DialogContent>
 
-        <DialogActions sx={{ p: isMobile ? 2 : 1, gap: isMobile ? 1 : 0 }}>
+        <DialogActions
+          sx={{ p: isMobile ? 2 : 1, gap: isMobile ? 1 : 0 }}
+        >
           <Button
-            onClick={onCancel}
-            disabled={loading}
+            onClick={onClose}
+            disabled={signingIn}
             fullWidth={isMobile}
             variant={isMobile ? "outlined" : "text"}
             size={isMobile ? "large" : "medium"}
@@ -82,15 +91,15 @@ const SignInConfirmDialog = React.memo(
             onClick={onConfirm}
             color="primary"
             variant="contained"
-            disabled={loading}
+            disabled={signingIn}
             fullWidth={isMobile}
             size={isMobile ? "large" : "medium"}
             autoFocus
             startIcon={
-              loading ? <CircularProgress size={20} /> : <LoginIcon />
+              signingIn ? <CircularProgress size={20} /> : <LoginIcon />
             }
           >
-            {loading ? "Signing In..." : "Sign In"}
+            {signingIn ? "Signing In..." : "Sign In"}
           </Button>
         </DialogActions>
       </Dialog>
@@ -98,6 +107,6 @@ const SignInConfirmDialog = React.memo(
   }
 );
 
-SignInConfirmDialog.displayName = "SignInConfirmDialog";
+SignInDialog.displayName = "SignInDialog";
 
-export default SignInConfirmDialog;
+export default SignInDialog;
