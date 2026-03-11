@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useState, useRef, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -15,6 +15,7 @@ import {
   Error as ErrorIcon,
   Delete as DeleteIcon,
   Add as AddIcon,
+  Nfc as NfcIcon,
 } from "@mui/icons-material";
 import { TabPanel } from "../../../components/TabPanel";
 import ChangeSpace from "../../../components/ChangeSpace";
@@ -27,7 +28,7 @@ interface RfidTabProps {
   isAdmin: boolean;
   rfidList: RfidInfo[];
   inSpaceUsers: any;
-  onLinkRfid: (cardNumber: string) => void;
+  onLinkRfid: (cardNumber: string) => Promise<void>;
   onOpenUnlinkDialog: (cardNumber: string) => void;
   onReloadCurrentUsers: () => void;
 }
@@ -90,18 +91,77 @@ const AvailableCardItem: React.FC<{
 
 AvailableCardItem.displayName = "AvailableCardItem";
 
-const RfidTab: React.FC<RfidTabProps> = memo(
-  ({
-    tabIndex,
-    panelIndex,
-    user,
-    isAdmin,
-    rfidList,
-    inSpaceUsers,
-    onLinkRfid,
-    onOpenUnlinkDialog,
-    onReloadCurrentUsers,
-  }) => (
+const RfidTab: React.FC<RfidTabProps> = ({
+  tabIndex,
+  panelIndex,
+  user,
+  isAdmin,
+  rfidList,
+  inSpaceUsers,
+  onLinkRfid,
+  onOpenUnlinkDialog,
+  onReloadCurrentUsers,
+}) => {
+  const [scanning, setScanning] = useState(false);
+  const [scanStatus, setScanStatus] = useState<{
+    severity: "success" | "error" | "info";
+    message: string;
+  } | null>(null);
+
+  // Keep a ref to always have the latest onLinkRfid inside the NFC listener
+  const onLinkRfidRef = useRef(onLinkRfid);
+  useEffect(() => {
+    onLinkRfidRef.current = onLinkRfid;
+  }, [onLinkRfid]);
+
+  const isNfcSupported = "NDEFReader" in window;
+
+  const startScanning = async () => {
+    try {
+      // eslint-disable-next-line no-undef
+      const ndef = new NDEFReader();
+      await ndef.scan();
+      setScanning(true);
+      setScanStatus({
+        severity: "info",
+        message: "Hold an RFID card near the device to register it...",
+      });
+
+      // @ts-ignore
+      ndef.addEventListener("reading", async ({ serialNumber }) => {
+        if (serialNumber) {
+          const cardNumber = serialNumber.replaceAll(":", "").toUpperCase();
+          setScanning(false);
+          setScanStatus({
+            severity: "info",
+            message: `Card ${cardNumber} detected. Linking...`,
+          });
+
+          try {
+            // Use ref to avoid stale closure
+            await onLinkRfidRef.current(cardNumber);
+            setScanStatus({
+              severity: "success",
+              message: `Card ${cardNumber} successfully linked!`,
+            });
+          } catch {
+            setScanStatus({
+              severity: "error",
+              message: "Failed to link card. Please try again.",
+            });
+          }
+        }
+      });
+    } catch (error) {
+      setScanning(false);
+      setScanStatus({
+        severity: "error",
+        message: `Failed to start NFC scan: ${error}`,
+      });
+    }
+  };
+
+  return (
     <TabPanel value={tabIndex} index={panelIndex}>
       <Card>
         <CardContent>
@@ -121,6 +181,54 @@ const RfidTab: React.FC<RfidTabProps> = memo(
               <Alert severity="error" icon={<ErrorIcon />} sx={{ mb: 3 }}>
                 No RFID card linked to this account
               </Alert>
+
+              {/* NFC Scan Button */}
+              {isAdmin && isNfcSupported && (
+                <Box sx={{ mb: 3 }}>
+                  <Button
+                    variant="contained"
+                    size="large"
+                    fullWidth
+                    onClick={startScanning}
+                    disabled={scanning}
+                    startIcon={<NfcIcon />}
+                    sx={{
+                      py: 2,
+                      fontSize: "1.1rem",
+                      fontWeight: "bold",
+                      letterSpacing: 1,
+                      backgroundColor: scanning
+                        ? "grey.500"
+                        : "success.main",
+                      "&:hover": {
+                        backgroundColor: "success.dark",
+                      },
+                      animation: scanning
+                        ? "pulse 1.5s ease-in-out infinite"
+                        : "none",
+                      "@keyframes pulse": {
+                        "0%": { opacity: 1 },
+                        "50%": { opacity: 0.6 },
+                        "100%": { opacity: 1 },
+                      },
+                    }}
+                  >
+                    {scanning
+                      ? "Waiting for card..."
+                      : "Scan Card to Register"}
+                  </Button>
+
+                  {scanStatus && (
+                    <Alert
+                      severity={scanStatus.severity}
+                      onClose={() => setScanStatus(null)}
+                      sx={{ mt: 2 }}
+                    >
+                      {scanStatus.message}
+                    </Alert>
+                  )}
+                </Box>
+              )}
 
               {isAdmin && (
                 <>
@@ -165,8 +273,8 @@ const RfidTab: React.FC<RfidTabProps> = memo(
         </CardContent>
       </Card>
     </TabPanel>
-  )
-);
+  );
+};
 
 RfidTab.displayName = "RfidTab";
 
