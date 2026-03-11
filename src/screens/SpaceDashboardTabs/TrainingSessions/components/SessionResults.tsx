@@ -10,6 +10,7 @@ interface SessionResultsProps {
   sortOrder: SortOrder;
   onSort: (field: SortField) => void;
   onCertifyClick: (session: TrainingSession) => void;
+  onSessionClick: (session: TrainingSession) => void;
 }
 
 const SessionResults = React.memo(
@@ -19,6 +20,7 @@ const SessionResults = React.memo(
     sortOrder,
     onSort,
     onCertifyClick,
+    onSessionClick,
   }: SessionResultsProps) => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -31,6 +33,7 @@ const SessionResults = React.memo(
               key={session.id}
               session={session}
               onCertifyClick={onCertifyClick}
+              onSessionClick={onSessionClick}
             />
           ))}
         </Box>
@@ -44,6 +47,7 @@ const SessionResults = React.memo(
         sortOrder={sortOrder}
         onSort={onSort}
         onCertifyClick={onCertifyClick}
+        onSessionClick={onSessionClick}
       />
     );
   }

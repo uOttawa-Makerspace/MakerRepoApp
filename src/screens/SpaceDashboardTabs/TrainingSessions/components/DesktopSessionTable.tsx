@@ -16,6 +16,7 @@ import {
 import {
   CheckCircle as CheckCircleIcon,
   Schedule as ScheduleIcon,
+  Group as GroupIcon,
 } from "@mui/icons-material";
 import type { TrainingSession, SortField, SortOrder } from "../types";
 import { formatDate, isSessionCompleted } from "../utils/utils";
@@ -26,6 +27,7 @@ interface DesktopSessionTableProps {
   sortOrder: SortOrder;
   onSort: (field: SortField) => void;
   onCertifyClick: (session: TrainingSession) => void;
+  onSessionClick: (session: TrainingSession) => void;
 }
 
 const COLUMNS: { field: SortField; label: string }[] = [
@@ -40,16 +42,23 @@ const SessionRow = React.memo(
   ({
     session,
     onCertifyClick,
+    onSessionClick,
   }: {
     session: TrainingSession;
     onCertifyClick: (session: TrainingSession) => void;
+    onSessionClick: (session: TrainingSession) => void;
   }) => {
     const completed = isSessionCompleted(session);
+    const userCount = session.users?.length ?? 0;
 
     return (
       <TableRow
         hover
-        sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+        onClick={() => onSessionClick(session)}
+        sx={{
+          cursor: "pointer",
+          "&:last-child td, &:last-child th": { border: 0 },
+        }}
       >
         <TableCell>
           <Typography variant="body2">
@@ -67,9 +76,7 @@ const SessionRow = React.memo(
           </Typography>
         </TableCell>
         <TableCell>
-          <Typography variant="body2">
-            {session.course ?? "N/A"}
-          </Typography>
+          <Typography variant="body2">{session.course ?? "N/A"}</Typography>
         </TableCell>
         <TableCell>
           <Chip
@@ -80,13 +87,27 @@ const SessionRow = React.memo(
           />
         </TableCell>
         <TableCell align="right">
+          {userCount > 0 && (
+            <Tooltip title="View users">
+              <Chip
+                icon={<GroupIcon />}
+                label={userCount}
+                size="small"
+                variant="outlined"
+                sx={{ mr: 1 }}
+              />
+            </Tooltip>
+          )}
           {!completed && (
             <Tooltip title="Certify all trainees in this session">
               <Button
                 variant="contained"
                 color="primary"
                 size="small"
-                onClick={() => onCertifyClick(session)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCertifyClick(session);
+                }}
                 startIcon={<CheckCircleIcon />}
               >
                 Certify
@@ -107,6 +128,7 @@ const DesktopSessionTable = React.memo(
     sortOrder,
     onSort,
     onCertifyClick,
+    onSessionClick,
   }: DesktopSessionTableProps) => (
     <TableContainer component={Paper} elevation={1}>
       <Table>
@@ -132,6 +154,7 @@ const DesktopSessionTable = React.memo(
               key={session.id}
               session={session}
               onCertifyClick={onCertifyClick}
+              onSessionClick={onSessionClick}
             />
           ))}
         </TableBody>
