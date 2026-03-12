@@ -131,7 +131,6 @@ const Profile: React.FC = () => {
           tabIndex={tabIndex}
           panelIndex={isAdmin ? 4 : 3}
           user={profileUser}
-          isAdmin={isAdmin}
           rfidList={rfidList}
           inSpaceUsers={inSpaceUsers}
           onLinkRfid={handleLinkRfid}

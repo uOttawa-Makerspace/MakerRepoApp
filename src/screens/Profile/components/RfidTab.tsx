@@ -25,7 +25,6 @@ interface RfidTabProps {
   tabIndex: number;
   panelIndex: number;
   user: User;
-  isAdmin: boolean;
   rfidList: RfidInfo[];
   inSpaceUsers: any;
   onLinkRfid: (cardNumber: string) => Promise<void>;
@@ -35,23 +34,20 @@ interface RfidTabProps {
 
 const LinkedCard: React.FC<{
   cardNumber: string;
-  isAdmin: boolean;
   onUnlink: (cardNumber: string) => void;
-}> = memo(({ cardNumber, isAdmin, onUnlink }) => (
+}> = memo(({ cardNumber, onUnlink }) => (
   <Alert
     severity="success"
     icon={<CheckCircleIcon />}
     action={
-      isAdmin && (
-        <Button
-          color="error"
-          size="small"
-          startIcon={<DeleteIcon />}
-          onClick={() => onUnlink(cardNumber)}
-        >
-          Remove
-        </Button>
-      )
+      <Button
+        color="error"
+        size="small"
+        startIcon={<DeleteIcon />}
+        onClick={() => onUnlink(cardNumber)}
+      >
+        Remove
+      </Button>
     }
   >
     <Typography variant="body2" fontWeight={600}>
@@ -95,7 +91,6 @@ const RfidTab: React.FC<RfidTabProps> = ({
   tabIndex,
   panelIndex,
   user,
-  isAdmin,
   rfidList,
   inSpaceUsers,
   onLinkRfid,
@@ -173,7 +168,6 @@ const RfidTab: React.FC<RfidTabProps> = ({
           {user.rfid ? (
             <LinkedCard
               cardNumber={user.rfid.card_number}
-              isAdmin={isAdmin}
               onUnlink={onOpenUnlinkDialog}
             />
           ) : (
@@ -183,7 +177,7 @@ const RfidTab: React.FC<RfidTabProps> = ({
               </Alert>
 
               {/* NFC Scan Button */}
-              {isAdmin && isNfcSupported && (
+              { isNfcSupported && (
                 <Box sx={{ mb: 3 }}>
                   <Button
                     variant="contained"
@@ -229,45 +223,42 @@ const RfidTab: React.FC<RfidTabProps> = ({
                   )}
                 </Box>
               )}
+              <>
+                <Box sx={{ mb: 3 }}>
+                  <ChangeSpace
+                    inSpaceUsers={inSpaceUsers}
+                    handleReloadCurrentUsers={onReloadCurrentUsers}
+                  />
+                </Box>
 
-              {isAdmin && (
-                <>
-                  <Box sx={{ mb: 3 }}>
-                    <ChangeSpace
-                      inSpaceUsers={inSpaceUsers}
-                      handleReloadCurrentUsers={onReloadCurrentUsers}
-                    />
-                  </Box>
+                <Typography variant="body2" fontWeight={600} gutterBottom>
+                  Available RFID Cards
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  paragraph
+                >
+                  Tap a card in the selected space, then link it below
+                </Typography>
 
-                  <Typography variant="body2" fontWeight={600} gutterBottom>
-                    Available RFID Cards
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    paragraph
-                  >
-                    Tap a card in the selected space, then link it below
-                  </Typography>
-
-                  {rfidList.length === 0 ? (
-                    <Alert severity="warning">
-                      No unlinked cards detected. Please tap a card or select a
-                      different space.
-                    </Alert>
-                  ) : (
-                    <Stack spacing={1}>
-                      {rfidList.map((rfid, index) => (
-                        <AvailableCardItem
-                          key={index}
-                          rfid={rfid}
-                          onLink={onLinkRfid}
-                        />
-                      ))}
-                    </Stack>
-                  )}
-                </>
-              )}
+                {rfidList.length === 0 ? (
+                  <Alert severity="warning">
+                    No unlinked cards detected. Please tap a card or select a
+                    different space.
+                  </Alert>
+                ) : (
+                  <Stack spacing={1}>
+                    {rfidList.map((rfid, index) => (
+                      <AvailableCardItem
+                        key={index}
+                        rfid={rfid}
+                        onLink={onLinkRfid}
+                      />
+                    ))}
+                  </Stack>
+                )}
+              </>
             </Box>
           )}
         </CardContent>
