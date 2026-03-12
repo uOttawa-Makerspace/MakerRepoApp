@@ -28,7 +28,7 @@ export function getUserCompliance(
 
   const missingItems: string[] = [];
   if (!hasMembership) missingItems.push("Active Membership");
-  if (!hasConsentForm) missingItems.push("Consent Form");
+  if (isBrunsfield && !hasConsentForm) missingItems.push("Consent Form");
   if (isBrunsfield && !hasShopFundamentals)
     missingItems.push("Shop Fundamentals");
 

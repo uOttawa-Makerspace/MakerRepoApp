@@ -17,6 +17,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = memo(({ user }) => {
         background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
         color: "white",
         p: 3,
+        borderRadius: "0 0 16px 16px", // flat top, rounded bottom
       }}
     >
       <Stack direction="row" spacing={2} alignItems="center">

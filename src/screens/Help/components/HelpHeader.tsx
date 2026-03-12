@@ -15,7 +15,7 @@ const HelpHeader: React.FC = memo(() => {
         textAlign: "center",
         background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
         color: "white",
-        borderRadius: 2,
+        borderRadius: "0 0 16px 16px", // flat top, rounded bottom
       }}
     >
       <HelpIcon sx={{ fontSize: 48, mb: 1 }} />
