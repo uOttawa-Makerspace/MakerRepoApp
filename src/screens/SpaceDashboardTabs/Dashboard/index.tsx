@@ -63,13 +63,19 @@ const Dashboard: React.FC<DashboardProps> = ({
     confirmSignOut,
   } = useSignOut(handleReloadCurrentUsers);
 
+  // Wrap the reload callback to also clear search after sign-in
+  const handleReloadAfterSignIn = useCallback(() => {
+    handleReloadCurrentUsers();
+    clearSearch();
+  }, [handleReloadCurrentUsers, clearSearch]);
+
   const {
     signInDialog,
     signingIn,
     openSignInDialog,
     closeSignInDialog,
     confirmSignIn,
-  } = useSignIn(handleReloadCurrentUsers);
+  } = useSignIn(handleReloadAfterSignIn);
 
   const navigateToProfile = useCallback(
     (username: string) => {

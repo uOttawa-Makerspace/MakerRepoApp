@@ -65,28 +65,26 @@ const GlobalSearchResults: React.FC<GlobalSearchResultsProps> = memo(
                     sx={{
                       cursor: "pointer",
                       "&:hover": { bgcolor: "action.hover" },
-                      pr: isMobile ? 1 : 2,
+                      pr: isMobile ? "130px" : "140px",
                     }}
                     onClick={() => onNavigate(user.username)}
                     secondaryAction={
                       <Button
                         variant="contained"
                         size="small"
-                        startIcon={<LoginIcon />}
+                        startIcon={isMobile ? undefined : <LoginIcon />}
                         onClick={(e) => {
                           e.stopPropagation();
                           onSignIn(user);
                         }}
+                        sx={{ whiteSpace: "nowrap" }}
                       >
                         Sign In
                       </Button>
                     }
                   >
                     <ListItemAvatar>
-                      <Avatar
-                        src={user.avatar_url}
-                        alt={user.name}
-                      >
+                      <Avatar src={user.avatar_url} alt={user.name}>
                         {user.name.charAt(0).toUpperCase()}
                       </Avatar>
                     </ListItemAvatar>
@@ -103,7 +101,14 @@ const GlobalSearchResults: React.FC<GlobalSearchResultsProps> = memo(
                           )}
                         </>
                       }
-                      primaryTypographyProps={{ fontWeight: 500 }}
+                      primaryTypographyProps={{
+                        fontWeight: 500,
+                        noWrap: true,
+                      }}
+                      secondaryTypographyProps={{
+                        noWrap: true,
+                      }}
+                      sx={{ minWidth: 0 }}
                     />
                   </ListItem>
                 </React.Fragment>
