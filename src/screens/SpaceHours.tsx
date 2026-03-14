@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { SpaceHourCard } from "../components/SpaceHourCard";
 import * as HTTPRequest from "../utils/HTTPRequests";
 
