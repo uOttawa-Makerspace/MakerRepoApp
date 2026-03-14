@@ -1,4 +1,3 @@
-import React from "react";
 import { Skeleton } from "@mui/material";
 
 export const replaceNoneWithNotAvailable = (inputString: string | undefined | null): string => {
