@@ -1,7 +1,5 @@
-import React from "react";
 import {
   Dashboard as DashboardIcon,
-  Search as SearchIcon,
   Add as AddIcon,
   School as SchoolIcon,
   Schedule as ScheduleIcon,
@@ -11,7 +9,6 @@ import { TabConfig } from "./types";
 
 export const TAB_CONFIG: TabConfig[] = [
   { label: "Dashboard", icon: <DashboardIcon />, color: "primary" },
-  { label: "Search", icon: <SearchIcon />, color: "secondary" },
   { label: "New Session", icon: <AddIcon />, color: "success" },
   { label: "Sessions", icon: <SchoolIcon />, color: "info" },
   { label: "Shifts", icon: <ScheduleIcon />, color: "warning" },
@@ -40,9 +37,8 @@ export const TOASTER_OPTIONS = {
 
 export enum TabIndex {
   Dashboard = 0,
-  Search = 1,
-  NewSession = 2,
-  Sessions = 3,
-  Shifts = 4,
-  Printers = 5,
+  NewSession = 1,
+  Sessions = 2,
+  Shifts = 3,
+  Printers = 4,
 }

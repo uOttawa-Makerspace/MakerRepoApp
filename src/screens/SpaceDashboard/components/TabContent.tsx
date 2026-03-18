@@ -8,7 +8,6 @@ import {
 } from "@mui/material";
 import { TabPanel } from "../../../components/TabPanel";
 import Dashboard from "../../SpaceDashboardTabs/Dashboard/index";
-import Search from "../../SpaceDashboardTabs/Search/index";
 import NewTrainingSession from "../../SpaceDashboardTabs/NewTrainingSession/index";
 import TrainingSessions from "../../SpaceDashboardTabs/TrainingSessions/index";
 import Shifts from "../../SpaceDashboardTabs/Shifts/index";
@@ -66,15 +65,8 @@ const TabContent: React.FC<TabContentProps> = memo(
             </Box>
           </TabPanel>
 
-          {/* Search */}
-          <TabPanel value={tabIndex} index={1}>
-            <Box sx={{ px: tabPadding }}>
-              <Search handleReloadCurrentUsers={onReloadUsers} />
-            </Box>
-          </TabPanel>
-
           {/* New Training Session */}
-          <TabPanel value={tabIndex} index={2}>
+          <TabPanel value={tabIndex} index={1}>
             <Box sx={{ px: tabPadding }}>
               {errors.sessions && (
                 <Alert severity="error" sx={{ mb: 2 }}>
@@ -89,7 +81,7 @@ const TabContent: React.FC<TabContentProps> = memo(
           </TabPanel>
 
           {/* Training Sessions */}
-          <TabPanel value={tabIndex} index={3}>
+          <TabPanel value={tabIndex} index={2}>
             <Box sx={{ px: tabPadding }}>
               <LoadingErrorWrapper
                 loading={loading.sessions}
@@ -105,7 +97,7 @@ const TabContent: React.FC<TabContentProps> = memo(
           </TabPanel>
 
           {/* Shifts */}
-          <TabPanel value={tabIndex} index={4}>
+          <TabPanel value={tabIndex} index={3}>
             <Box sx={{ px: tabPadding }}>
               <Shifts
                 reloadShifts={shiftsReloadTrigger}
@@ -118,7 +110,7 @@ const TabContent: React.FC<TabContentProps> = memo(
           </TabPanel>
 
           {/* Printers */}
-          <TabPanel value={tabIndex} index={5}>
+          <TabPanel value={tabIndex} index={4}>
             <Box sx={{ px: tabPadding }}>
               <LoadingErrorWrapper
                 loading={loading.printers}

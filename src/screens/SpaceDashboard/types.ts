@@ -23,6 +23,8 @@ export interface SpaceUser {
   active: boolean;
   read_and_accepted_waiver_form: boolean;
   certifications?: { id: number; name: string }[];
+  signed_safety_sheet: boolean;
+  membership_status: boolean;
   [key: string]: any;
 }
 
