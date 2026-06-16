@@ -86,12 +86,14 @@ const LoginForm: React.FC<LoginFormProps> = memo(
               disabled={loading}
               autoComplete="username"
               autoFocus
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <EmailIcon color="action" />
-                  </InputAdornment>
-                ),
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <EmailIcon color="action" />
+                    </InputAdornment>
+                  ),
+                },
               }}
             />
 
@@ -103,7 +105,7 @@ const LoginForm: React.FC<LoginFormProps> = memo(
               disabled={loading}
             />
 
-            <Box textAlign="right">
+            <Box sx={{ textAlign: "right" }}>
               <Link
                 href={EXTERNAL_LINKS.forgotPassword}
                 target="_blank"
