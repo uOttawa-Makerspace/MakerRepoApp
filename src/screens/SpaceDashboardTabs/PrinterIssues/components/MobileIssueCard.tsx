@@ -73,21 +73,22 @@ const MobileIssueCard = memo<MobileIssueCardProps>(
           <Stack spacing={2}>
             {/* Header */}
             <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="start"
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "start"
+              }}
             >
               <Box sx={{ flexGrow: 1, minWidth: 0 }}>
                 <Stack
                   direction="row"
                   spacing={1}
-                  alignItems="center"
-                  sx={{ mb: 0.5 }}
+                  sx={{ alignItems: "center", mb: 0.5 }}
                 >
                   <PrinterChip name={issue.printer_name} />
                   <StatusChip resolved={!issue.active} />
                 </Stack>
-                <Typography variant="subtitle1" fontWeight={600}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                   {issue.summary}
                 </Typography>
               </Box>
@@ -100,13 +101,13 @@ const MobileIssueCard = memo<MobileIssueCardProps>(
 
             {/* Meta */}
             <Stack spacing={1}>
-              <Box display="flex" alignItems="center" gap={1}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <PersonIcon fontSize="small" color="action" />
                 <Typography variant="body2" color="text.secondary">
                   {issue.reporter}
                 </Typography>
               </Box>
-              <Box display="flex" alignItems="center" gap={1}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <CalendarIcon fontSize="small" color="action" />
                 <Typography variant="body2" color="text.secondary">
                   {formatDate(issue.created_at)}

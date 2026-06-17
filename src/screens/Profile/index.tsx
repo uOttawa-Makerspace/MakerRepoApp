@@ -70,10 +70,12 @@ const Profile: React.FC = () => {
   if (loading || !profileUser || !currentUser) {
     return (
       <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="60vh"
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "60vh"
+        }}
       >
         <CircularProgress />
       </Box>

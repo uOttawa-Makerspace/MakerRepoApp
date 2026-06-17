@@ -114,7 +114,7 @@ const MobileUserListItem: React.FC<MobileUserListItemProps> = memo(
                     gap: 1,
                   }}
                 >
-                  <Typography variant="body1" fontWeight={600}>
+                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
                     {user.name}
                   </Typography>
                   {user.flagged && (

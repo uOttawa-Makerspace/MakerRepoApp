@@ -20,15 +20,15 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = memo(({ user }) => {
         borderRadius: "0 0 16px 16px", // flat top, rounded bottom
       }}
     >
-      <Stack direction="row" spacing={2} alignItems="center">
+      <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
         <Avatar
           src={user.avatar_url}
           sx={{ width: 80, height: 80, border: "4px solid white" }}
         >
           {user.name?.charAt(0).toUpperCase()}
         </Avatar>
-        <Box flexGrow={1}>
-          <Typography variant="h4" fontWeight={700}>
+        <Box sx={{ flexGrow: 1 }}>
+          <Typography variant="h4" sx={{ fontWeight: 700 }}>
             {user.name}
           </Typography>
           <Typography variant="body1" sx={{ opacity: 0.9 }}>

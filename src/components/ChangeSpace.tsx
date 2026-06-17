@@ -1,4 +1,3 @@
-import React from "react";
 import * as HTTPRequest from "../utils/HTTPRequests";
 
 type ChangeSpaceProps = {

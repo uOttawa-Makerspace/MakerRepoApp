@@ -1,5 +1,4 @@
 import parse from 'html-react-parser';
-import { Skeleton } from "@mui/material";
 import { valueOrSkeleton } from "../helpers";
 
 export function SpaceHourCard(props: { hour: any }) {

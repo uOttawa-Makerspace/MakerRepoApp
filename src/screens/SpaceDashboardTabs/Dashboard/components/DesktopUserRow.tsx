@@ -59,7 +59,7 @@ const DesktopUserRow: React.FC<DesktopUserRowProps> = memo(
         }}
       >
         <TableCell onClick={handleNavigate}>
-          <Stack direction="row" spacing={2} alignItems="center">
+          <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
             <Avatar
               src={user.avatar_url}
               alt={user.name}
@@ -70,8 +70,8 @@ const DesktopUserRow: React.FC<DesktopUserRowProps> = memo(
             <Box>
               <Typography
                 variant="body1"
-                fontWeight={500}
                 sx={{
+                  fontWeight: 500,
                   color: "primary.main",
                   "&:hover": { textDecoration: "underline" },
                 }}

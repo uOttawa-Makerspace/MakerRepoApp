@@ -1,4 +1,4 @@
-import React, { memo, useState, useCallback } from "react";
+import React, { memo } from "react";
 import {
   Card,
   CardContent,
@@ -12,18 +12,13 @@ import { FAQS } from "../constants";
 import FAQItem from "./FAQItem";
 
 const FAQSection: React.FC = memo(() => {
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-
-  const handleToggle = useCallback((index: number) => {
-    setExpandedIndex((prev) => (prev === index ? null : index));
-  }, []);
 
   return (
     <Card sx={{ mb: 3 }}>
       <CardContent>
-        <Box display="flex" alignItems="center" gap={1} mb={2}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
           <InfoIcon color="primary" />
-          <Typography variant="h6" fontWeight={600}>
+          <Typography variant="h6" sx={{ fontWeight: 600 }}>
             Frequently Asked Questions
           </Typography>
         </Box>
@@ -34,9 +29,6 @@ const FAQSection: React.FC = memo(() => {
             <FAQItem
               key={index}
               faq={faq}
-              index={index}
-              expanded={expandedIndex === index}
-              onToggle={handleToggle}
             />
           ))}
         </Stack>

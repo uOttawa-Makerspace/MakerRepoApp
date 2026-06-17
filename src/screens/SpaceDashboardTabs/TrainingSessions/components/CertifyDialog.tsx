@@ -51,7 +51,7 @@ const CertifyDialog = React.memo(
               borderColor: "divider",
             }}
           >
-            <Typography variant="h6" fontWeight={600}>
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
               Certify Trainees
             </Typography>
             <IconButton onClick={onCancel} aria-label="Close">

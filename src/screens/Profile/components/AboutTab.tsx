@@ -25,7 +25,7 @@ const AboutTab: React.FC<AboutTabProps> = memo(({ tabIndex, user }) => (
   <TabPanel value={tabIndex} index={0}>
     <Card>
       <CardContent>
-        <Typography variant="h6" fontWeight={600} gutterBottom>
+        <Typography variant="h6" sx={{ fontWeight: 600 }} gutterBottom>
           Personal Information
         </Typography>
         <Divider sx={{ mb: 2 }} />

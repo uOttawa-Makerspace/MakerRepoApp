@@ -50,12 +50,14 @@ const ProgramsTab: React.FC<ProgramsTabProps> = memo(
       <Card>
         <CardContent>
           <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            mb={2}
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 2,
+            }}
           >
-            <Typography variant="h6" fontWeight={600}>
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
               Program Enrollment
             </Typography>
             {isAdmin && (
@@ -107,7 +109,7 @@ const ProgramsTab: React.FC<ProgramsTabProps> = memo(
               }
               label={
                 <Box>
-                  <Typography variant="body1" fontWeight={500}>
+                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
                     Development Program
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
@@ -126,7 +128,7 @@ const ProgramsTab: React.FC<ProgramsTabProps> = memo(
               }
               label={
                 <Box>
-                  <Typography variant="body1" fontWeight={500}>
+                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
                     Volunteer Program
                   </Typography>
                   <Typography variant="caption" color="text.secondary">

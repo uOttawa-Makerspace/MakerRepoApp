@@ -34,7 +34,7 @@ const DetailRow = memo<{
     <Typography variant="caption" color="text.secondary">
       {label}
     </Typography>
-    <Typography variant="body2" fontWeight={600}>
+    <Typography variant="body2" sx={{ fontWeight: 600 }}>
       {value}
     </Typography>
   </Box>
@@ -72,7 +72,7 @@ const ConfirmationDialog = memo<ConfirmationDialogProps>(
             borderColor: "divider",
           }}
         >
-          <Typography variant="h6" fontWeight={600}>
+          <Typography variant="h6" sx={{ fontWeight: 600 }}>
             Confirm Training Session
           </Typography>
           <IconButton onClick={onClose}>

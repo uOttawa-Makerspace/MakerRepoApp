@@ -81,12 +81,14 @@ const RoleManagerTab: React.FC<RoleManagerTabProps> = memo(
       <Card>
         <CardContent>
           <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            mb={2}
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 2,
+            }}
           >
-            <Typography variant="h6" fontWeight={600}>
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
               User Role
             </Typography>
             {!editing ? (
@@ -139,10 +141,10 @@ const RoleManagerTab: React.FC<RoleManagerTabProps> = memo(
                   value={option.value}
                   control={<Radio />}
                   label={
-                    <Box display="flex" alignItems="center" gap={1}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       {option.icon}
                       <Box>
-                        <Typography variant="body1" fontWeight={500}>
+                        <Typography variant="body1" sx={{ fontWeight: 500 }}>
                           {option.label}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">

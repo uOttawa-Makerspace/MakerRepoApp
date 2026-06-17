@@ -9,8 +9,10 @@ interface FAQItemProps {
 const FAQItem: React.FC<FAQItemProps> = memo(({ faq }) => {
   return (
     <Paper variant="outlined" sx={{ borderRadius: 2, overflow: "hidden" }}>
-      <Box sx={{ p: 2 }}>
-        <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>
+      <Box 
+        sx={{ p: 2 }} 
+      >
+        <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
           {faq.question}
         </Typography>
         <Typography variant="body2" color="text.secondary">

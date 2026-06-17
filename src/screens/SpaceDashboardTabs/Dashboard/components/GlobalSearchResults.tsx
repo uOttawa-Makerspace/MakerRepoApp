@@ -38,12 +38,12 @@ const GlobalSearchResults: React.FC<GlobalSearchResultsProps> = memo(
     return (
       <Box sx={{ mt: 3, px: isMobile ? 2 : 0 }}>
         <Divider sx={{ mb: 2 }} />
-        <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 1.5 }}>
+        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1.5 }}>
           Not currently signed in
         </Typography>
 
         {loading ? (
-          <Box display="flex" justifyContent="center" py={3}>
+          <Box sx={{ display: "flex", justifyContent: "center", py: 3 }}>
             <CircularProgress size={28} />
           </Box>
         ) : results.length === 0 ? (
@@ -101,12 +101,14 @@ const GlobalSearchResults: React.FC<GlobalSearchResultsProps> = memo(
                           )}
                         </>
                       }
-                      primaryTypographyProps={{
-                        fontWeight: 500,
-                        noWrap: true,
-                      }}
-                      secondaryTypographyProps={{
-                        noWrap: true,
+                      slotProps={{
+                        primary: {
+                          sx: { fontWeight: 500 },
+                          noWrap: true,
+                        },
+                        secondary: {
+                          noWrap: true,
+                        },
                       }}
                       sx={{ minWidth: 0 }}
                     />

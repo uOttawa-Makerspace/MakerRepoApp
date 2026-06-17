@@ -46,7 +46,7 @@ const SignOutDialog: React.FC<SignOutDialogProps> = memo(
               borderColor: "divider",
             }}
           >
-            <Typography variant="h6" fontWeight={600}>
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
               Confirm Sign Out
             </Typography>
             <IconButton onClick={onClose}>

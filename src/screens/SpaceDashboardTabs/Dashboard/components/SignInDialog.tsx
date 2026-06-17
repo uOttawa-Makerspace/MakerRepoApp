@@ -50,7 +50,7 @@ const SignInDialog: React.FC<SignInDialogProps> = memo(
               borderColor: "divider",
             }}
           >
-            <Typography variant="h6" fontWeight={600}>
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
               Confirm Sign In
             </Typography>
             <IconButton onClick={onClose}>

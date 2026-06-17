@@ -39,10 +39,12 @@ const SpaceDrawer: React.FC<SpaceDrawerProps> = memo(
         anchor="right"
         open={open}
         onClose={onClose}
-        PaperProps={{
-          sx: {
-            width: { xs: "100%", sm: 400 },
-            maxWidth: "100vw",
+        slotProps={{
+          paper: {
+            sx: {
+              width: { xs: "100%", sm: 400 },
+              maxWidth: "100vw",
+            },
           },
         }}
       >
@@ -57,7 +59,7 @@ const SpaceDrawer: React.FC<SpaceDrawerProps> = memo(
               color: "primary.contrastText",
             }}
           >
-            <Typography variant="h6" fontWeight={600}>
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
               Change Space
             </Typography>
             <IconButton onClick={onClose} sx={{ color: "inherit" }}>
@@ -67,7 +69,7 @@ const SpaceDrawer: React.FC<SpaceDrawerProps> = memo(
 
           <Box sx={{ p: 2 }}>
             {isInitialLoading ? (
-              <Box display="flex" justifyContent="center" py={4}>
+              <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
                 <CircularProgress />
               </Box>
             ) : usersError ? (

@@ -35,7 +35,7 @@ const Printers: React.FC<PrintersProps> = ({
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" py={8}>
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", py: 8 }}>
         <CircularProgress />
       </Box>
     );
@@ -44,7 +44,7 @@ const Printers: React.FC<PrintersProps> = ({
   return (
     <Box>
       {!isMobile && (
-        <Typography variant="h5" fontWeight={600} gutterBottom sx={{ mb: 3 }}>
+        <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
           Printer Management
         </Typography>
       )}

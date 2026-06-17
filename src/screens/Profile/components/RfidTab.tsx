@@ -50,7 +50,7 @@ const LinkedCard: React.FC<{
       </Button>
     }
   >
-    <Typography variant="body2" fontWeight={600}>
+    <Typography variant="body2" sx={{ fontWeight: 600 }}>
       RFID Card Linked
     </Typography>
     <Typography variant="caption">Card Number: {cardNumber}</Typography>
@@ -64,9 +64,9 @@ const AvailableCardItem: React.FC<{
   onLink: (cardNumber: string) => void;
 }> = memo(({ rfid, onLink }) => (
   <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
-    <Stack direction="row" alignItems="center" justifyContent="space-between">
+    <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between" }}>
       <Box>
-        <Typography variant="body2" fontWeight={600}>
+        <Typography variant="body2" sx={{ fontWeight: 600 }}>
           Card: {rfid.cardNumber}
         </Typography>
         <Typography variant="caption" color="text.secondary">
@@ -160,7 +160,7 @@ const RfidTab: React.FC<RfidTabProps> = ({
     <TabPanel value={tabIndex} index={panelIndex}>
       <Card>
         <CardContent>
-          <Typography variant="h6" fontWeight={600} gutterBottom>
+          <Typography variant="h6" sx={{ fontWeight: 600 }} gutterBottom>
             RFID Card
           </Typography>
           <Divider sx={{ mb: 2 }} />
@@ -231,13 +231,13 @@ const RfidTab: React.FC<RfidTabProps> = ({
                   />
                 </Box>
 
-                <Typography variant="body2" fontWeight={600} gutterBottom>
+                <Typography variant="body2" sx={{ fontWeight: 600 }} gutterBottom>
                   Available RFID Cards
                 </Typography>
                 <Typography
                   variant="caption"
                   color="text.secondary"
-                  paragraph
+                  sx={{ display: "block", mb: 2 }}
                 >
                   Tap a card in the selected space, then link it below
                 </Typography>

@@ -56,13 +56,10 @@ const TraineesCard = memo<TraineesCardProps>(
       <Card>
         <CardContent>
           <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            sx={{ mb: 2 }}
+            sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}
           >
-            <Box display="flex" alignItems="center" gap={1}>
-              <Typography variant="h6" fontWeight={600}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Typography variant="h6" sx={{ fontWeight: 600 }}>
                 Trainees
               </Typography>
               <Chip

@@ -21,7 +21,7 @@ const SelectedUsersSummary = memo<SelectedUsersSummaryProps>(
         <Typography variant="body2" color="text.secondary" gutterBottom>
           Selected trainees:
         </Typography>
-        <Stack direction="row" spacing={1} flexWrap="wrap" gap={0.5}>
+        <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap", gap: 0.5 }}>
           {visibleUsers.map((user) => (
             <Chip
               key={user[0]}

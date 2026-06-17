@@ -141,8 +141,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             <Box sx={{ mt: 3 }}>
               <Typography
                 variant="subtitle1"
-                fontWeight={600}
-                sx={{ mb: 1.5, px: isMobile ? 2 : 0 }}
+                sx={{ fontWeight: 600, mb: 1.5, px: isMobile ? 2 : 0 }}
               >
                 Currently signed in
               </Typography>

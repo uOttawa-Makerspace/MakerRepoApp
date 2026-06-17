@@ -10,7 +10,7 @@ interface StatItemProps {
 
 const StatItem = memo<StatItemProps>(({ value, label, color }) => (
   <Paper sx={{ p: 2, textAlign: "center" }}>
-    <Typography variant="h4" fontWeight={700} color={color}>
+    <Typography variant="h4" sx={{ fontWeight: 700 }} color={color}>
       {value}
     </Typography>
     <Typography variant="body2" color="text.secondary">

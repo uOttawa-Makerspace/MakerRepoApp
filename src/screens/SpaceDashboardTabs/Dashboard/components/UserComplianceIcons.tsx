@@ -22,7 +22,7 @@ const UserComplianceIcons: React.FC<UserComplianceIconsProps> = memo(
     } = compliance;
 
     return (
-      <Stack direction="row" spacing={0.5} alignItems="center">
+      <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
         <Tooltip
           title={
             hasMembership

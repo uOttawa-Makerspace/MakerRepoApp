@@ -91,7 +91,7 @@ const UserRow = React.memo(
 
         <ListItemText
           primary={
-            <Typography variant="body1" fontWeight={500}>
+            <Typography variant="body1" sx={{ fontWeight: 500 }}>
               {user.name}
             </Typography>
           }
@@ -158,7 +158,7 @@ const UsersDialog: React.FC<UsersDialogProps> = ({
       onClose={onClose}
       maxWidth="sm"
       fullWidth
-      PaperProps={{ sx: { borderRadius: 3 } }}
+      slotProps={{ paper: { sx: { borderRadius: 3 } } }}
     >
       {/* Header */}
       <DialogTitle
@@ -170,7 +170,7 @@ const UsersDialog: React.FC<UsersDialogProps> = ({
         }}
       >
         <Box sx={{ minWidth: 0, flex: 1 }}>
-          <Typography variant="h6" fontWeight={600} noWrap>
+          <Typography variant="h6" sx={{ fontWeight: 600 }} noWrap>
             {session.training.name_en}
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -225,7 +225,7 @@ const UsersDialog: React.FC<UsersDialogProps> = ({
       {/* User list */}
       <DialogContent sx={{ px: 1, py: 0 }}>
         {users.length === 0 ? (
-          <Box textAlign="center" py={4}>
+          <Box sx={{ textAlign: "center", py: 4 }}>
             <PersonIcon sx={{ fontSize: 48, color: "text.disabled", mb: 1 }} />
             <Typography color="text.secondary">
               No users in this session
