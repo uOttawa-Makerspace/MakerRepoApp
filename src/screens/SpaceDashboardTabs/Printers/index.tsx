@@ -16,8 +16,6 @@ import type { PrintersProps } from "./types";
 
 const Printers: React.FC<PrintersProps> = ({
   inSpaceUsers,
-  handleReloadCurrentUsers,
-  reloadPrinters,
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));

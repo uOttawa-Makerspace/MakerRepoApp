@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import { memo } from "react";
 import { Stack, Paper, Typography } from "@mui/material";
 import type { IssueStats } from "../types";
 
@@ -10,7 +10,7 @@ interface StatCardProps {
 
 const StatCard = memo<StatCardProps>(({ value, label, color }) => (
   <Paper sx={{ p: 2, textAlign: "center", flex: 1 }}>
-    <Typography variant="h4" sx={{ fontWeight: 700 }} color={color}>
+    <Typography variant="h4" sx={{ fontWeight: 700, color }}>
       {value}
     </Typography>
     <Typography variant="body2" color="text.secondary">
