@@ -50,23 +50,25 @@ const SearchAndFilters = React.memo(
           onChange={handleInputChange}
           size={isMobile ? "medium" : "small"}
           fullWidth
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-            endAdornment: searchQuery ? (
-              <InputAdornment position="end">
-                <IconButton
-                  size="small"
-                  onClick={onClearSearch}
-                  aria-label="Clear search"
-                >
-                  <ClearIcon />
-                </IconButton>
-              </InputAdornment>
-            ) : null,
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+              endAdornment: searchQuery ? (
+                <InputAdornment position="end">
+                  <IconButton
+                    size="small"
+                    onClick={onClearSearch}
+                    aria-label="Clear search"
+                  >
+                    <ClearIcon />
+                  </IconButton>
+                </InputAdornment>
+              ) : null,
+            },
           }}
         />
 

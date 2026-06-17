@@ -19,7 +19,7 @@ const HelpHeader: React.FC = memo(() => {
       }}
     >
       <HelpIcon sx={{ fontSize: 48, mb: 1 }} />
-      <Typography variant="h4" fontWeight={700} gutterBottom>
+      <Typography variant="h4" sx={{ fontWeight: 700 }} gutterBottom>
         Help & Support
       </Typography>
       <Typography variant="body2" sx={{ opacity: 0.9 }}>

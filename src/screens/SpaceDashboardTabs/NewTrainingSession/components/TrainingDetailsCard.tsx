@@ -94,7 +94,7 @@ const TrainingDetailsCard = memo<TrainingDetailsCardProps>(
     return (
       <Card>
         <CardContent>
-          <Typography variant="h6" fontWeight={600} gutterBottom>
+          <Typography variant="h6" sx={{ fontWeight: 600 }} gutterBottom>
             Training Details
           </Typography>
           <Divider sx={{ mb: 2 }} />

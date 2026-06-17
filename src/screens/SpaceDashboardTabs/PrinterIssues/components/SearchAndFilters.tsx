@@ -37,19 +37,21 @@ const SearchAndFilters = memo<SearchAndFiltersProps>(
         onChange={(e) => onSearchChange(e.target.value)}
         size={isMobile ? "medium" : "small"}
         fullWidth
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon />
-            </InputAdornment>
-          ),
-          endAdornment: searchQuery ? (
-            <InputAdornment position="end">
-              <IconButton size="small" onClick={() => onSearchChange("")}>
-                <ClearIcon />
-              </IconButton>
-            </InputAdornment>
-          ) : null,
+        slotProps={{
+          input: {
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+            endAdornment: searchQuery ? (
+              <InputAdornment position="end">
+                <IconButton size="small" onClick={() => onSearchChange("")}>
+                  <ClearIcon />
+                </IconButton>
+              </InputAdornment>
+            ) : null,
+          },
         }}
       />
       <Stack direction="row" spacing={1}>

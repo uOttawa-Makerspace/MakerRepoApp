@@ -10,9 +10,9 @@ const UnavailablePrinterCard = memo<UnavailablePrinterCardProps>(
   ({ name }) => (
     <Card sx={{ mb: 2, opacity: 0.6 }}>
       <CardContent>
-        <Box display="flex" alignItems="center" gap={2}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <PrintIcon color="disabled" />
-          <Box flexGrow={1}>
+          <Box sx={{ flexGrow: 1 }}>
             <Typography variant="h6" color="text.secondary">
               {name}
             </Typography>

@@ -42,7 +42,7 @@ const ResolveDialog = memo<ResolveDialogProps>(
             borderColor: "divider",
           }}
         >
-          <Typography variant="h6" fontWeight={600}>
+          <Typography variant="h6" sx={{ fontWeight: 600 }}>
             Resolve Issue
           </Typography>
           <IconButton onClick={onClose}>

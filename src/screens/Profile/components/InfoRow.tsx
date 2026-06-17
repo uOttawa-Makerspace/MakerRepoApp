@@ -4,7 +4,7 @@ import { replaceNoneWithNotAvailable } from "../../../helpers";
 import { InfoRowProps } from "../types";
 
 const InfoRow: React.FC<InfoRowProps> = memo(({ icon, label, value }) => (
-  <Box display="flex" alignItems="center" gap={2}>
+  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
     <Box sx={{ color: "action.active", display: "flex" }}>{icon}</Box>
     <Box>
       <Typography variant="caption" color="text.secondary">

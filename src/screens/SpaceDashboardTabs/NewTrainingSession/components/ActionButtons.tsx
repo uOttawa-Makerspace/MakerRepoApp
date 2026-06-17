@@ -14,7 +14,7 @@ const ActionButtons = memo<ActionButtonsProps>(
     <Stack
       direction={{ xs: "column-reverse", sm: "row" }}
       spacing={2}
-      justifyContent="flex-end"
+      sx={{ justifyContent: "flex-end" }}
     >
       <Button
         variant="outlined"

@@ -26,7 +26,7 @@ const NewTrainingSession = ({
 
   if (form.loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" py={8}>
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", py: 8 }}>
         <CircularProgress />
       </Box>
     );
@@ -43,7 +43,7 @@ const NewTrainingSession = ({
   return (
     <Box>
       {!isMobile && (
-        <Typography variant="h5" fontWeight={600} gutterBottom sx={{ mb: 3 }}>
+        <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
           Create New Training Session
         </Typography>
       )}

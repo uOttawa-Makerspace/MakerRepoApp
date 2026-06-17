@@ -49,7 +49,7 @@ const TrainingSessions = ({
 
   if (!trainingSessions) {
     return (
-      <Box display="flex" justifyContent="center" py={8}>
+      <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
         <CircularProgress />
       </Box>
     );
@@ -63,7 +63,7 @@ const TrainingSessions = ({
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         {!isMobile && (
-          <Typography variant="h5" fontWeight={600} gutterBottom>
+          <Typography variant="h5" sx={{ fontWeight: 600 }} gutterBottom>
             My Training Sessions
           </Typography>
         )}

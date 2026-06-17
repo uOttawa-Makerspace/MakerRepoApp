@@ -29,15 +29,17 @@ const CertificationItem: React.FC<{ cert: Certification }> = memo(
       <Stack
         direction={{ xs: "column", sm: "row" }}
         spacing={2}
-        alignItems={{ xs: "start", sm: "center" }}
-        justifyContent="space-between"
+        sx={{
+          alignItems: { xs: "flex-start", sm: "center" },
+          justifyContent: "space-between",
+        }}
       >
-        <Box display="flex" alignItems="center" gap={2}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Avatar sx={{ bgcolor: "success.main" }}>
             <CheckCircleIcon />
           </Avatar>
           <Box>
-            <Typography variant="body1" fontWeight={600}>
+            <Typography variant="body1" sx={{ fontWeight: 600 }}>
               {cert.training.name_en}
             </Typography>
             <Typography variant="caption" color="text.secondary">
@@ -59,7 +61,7 @@ const CertificationItem: React.FC<{ cert: Certification }> = memo(
 CertificationItem.displayName = "CertificationItem";
 
 const EmptyState: React.FC = memo(() => (
-  <Box textAlign="center" py={4}>
+  <Box sx={{ textAlign: "center", py: 4 }}>
     <BadgeIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
     <Typography color="text.secondary">No certifications yet</Typography>
   </Box>
@@ -72,7 +74,7 @@ const CertificationsTab: React.FC<CertificationsTabProps> = memo(
     <TabPanel value={tabIndex} index={2}>
       <Card>
         <CardContent>
-          <Typography variant="h6" fontWeight={600} gutterBottom>
+          <Typography variant="h6" sx={{ fontWeight: 600 }} gutterBottom>
             Certifications
           </Typography>
           <Divider sx={{ mb: 2 }} />

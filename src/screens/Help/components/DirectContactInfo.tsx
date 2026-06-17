@@ -12,7 +12,11 @@ const DirectContactInfo: React.FC = memo(() => (
       bgcolor: "background.default",
     }}
   >
-    <Typography variant="body2" color="text.secondary" textAlign="center">
+    <Typography 
+      variant="body2" 
+      color="text.secondary" 
+      sx={{ textAlign: "center" }}
+    >
       Or email us directly at{" "}
       <Typography
         component="a"

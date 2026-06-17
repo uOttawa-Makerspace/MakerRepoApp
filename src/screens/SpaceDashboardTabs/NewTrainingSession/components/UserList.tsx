@@ -37,8 +37,10 @@ const UserListItem = memo<{
         />
         <ListItemText
           primary={name}
-          primaryTypographyProps={{
-            fontWeight: isSelected ? 600 : 400,
+          slotProps={{
+            primary: {
+              sx: { fontWeight: isSelected ? 600 : 400 },
+            },
           }}
         />
       </ListItemButton>
@@ -50,7 +52,7 @@ const UserListItem = memo<{
 UserListItem.displayName = "UserListItem";
 
 const EmptyState = memo<{ searchQuery: string }>(({ searchQuery }) => (
-  <Box p={4} textAlign="center">
+  <Box sx={{ p: 4, textAlign: "center" }}>
     <PersonIcon sx={{ fontSize: 48, color: "text.secondary", mb: 1 }} />
     <Typography color="text.secondary">
       {searchQuery ? "No users match your search" : "No users available"}

@@ -12,7 +12,7 @@ const LoadingErrorWrapper: React.FC<LoadingErrorWrapperProps> = memo(
   ({ loading, error, onRetry, children }) => {
     if (loading) {
       return (
-        <Box display="flex" justifyContent="center" py={8}>
+        <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
           <CircularProgress />
         </Box>
       );

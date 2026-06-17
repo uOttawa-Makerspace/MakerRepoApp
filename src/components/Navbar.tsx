@@ -3,9 +3,9 @@ import { NavLink } from "react-router-dom";
 import { 
     Home, 
     Person, 
-    HelpOutline,
+    HelpOutlined,
     HomeOutlined,
-    PersonOutline
+    PersonOutlined
 } from '@mui/icons-material';
 import './Navbar.scss';
 
@@ -37,7 +37,7 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
         >
           {({ isActive }) => (
             <>
-              {isActive ? <Person className="nav-icon" /> : <PersonOutline className="nav-icon" />}
+              {isActive ? <Person className="nav-icon" /> : <PersonOutlined className="nav-icon" />}
               <span className="nav-label">Profile</span>
             </>
           )}
@@ -48,7 +48,7 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
           className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
           aria-label="Help"
         >
-          <HelpOutline className="nav-icon" />
+          <HelpOutlined className="nav-icon" />
           <span className="nav-label">Help</span>
         </NavLink>
       </div>

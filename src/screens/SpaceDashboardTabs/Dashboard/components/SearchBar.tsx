@@ -38,19 +38,21 @@ const SearchBar: React.FC<SearchBarProps> = memo(
           onChange={handleChange}
           size={isMobile ? "medium" : "small"}
           fullWidth
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-            endAdornment: value ? (
-              <InputAdornment position="end">
-                <IconButton size="small" onClick={onClear}>
-                  <ClearIcon />
-                </IconButton>
-              </InputAdornment>
-            ) : null,
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+              endAdornment: value ? (
+                <InputAdornment position="end">
+                  <IconButton size="small" onClick={onClear}>
+                    <ClearIcon />
+                  </IconButton>
+                </InputAdornment>
+              ) : null,
+            },
           }}
         />
       </Box>

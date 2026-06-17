@@ -46,11 +46,10 @@ const MobileHeader: React.FC<MobileHeaderProps> = memo(
         <Stack
           direction="row"
           spacing={1}
-          alignItems="center"
-          sx={{ mb: 1 }}
+          sx={{ alignItems: "center", mb: 1 }}
         >
           <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-            <Typography variant="h6" fontWeight={700} noWrap>
+            <Typography variant="h6" sx={{ fontWeight: 700 }} noWrap>
               {spaceName}
             </Typography>
           </Box>

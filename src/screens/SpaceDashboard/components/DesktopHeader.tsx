@@ -54,7 +54,7 @@ const DesktopHeader: React.FC<DesktopHeaderProps> = memo(
       >
         <Container maxWidth="xl" sx={{ py: 2 }}>
           {isInitialLoading ? (
-            <Box display="flex" alignItems="center" gap={2}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
               <CircularProgress size={24} />
               <Typography>Loading space data...</Typography>
             </Box>

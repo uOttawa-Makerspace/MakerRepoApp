@@ -45,24 +45,26 @@ const PasswordField: React.FC<PasswordFieldProps> = memo(
         helperText={error}
         disabled={disabled}
         autoComplete="current-password"
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <LockIcon color="action" />
-            </InputAdornment>
-          ),
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton
-                onClick={toggleVisibility}
-                edge="end"
-                disabled={disabled}
-                aria-label="toggle password visibility"
-              >
-                {showPassword ? <VisibilityOff /> : <Visibility />}
-              </IconButton>
-            </InputAdornment>
-          ),
+        slotProps={{
+          input: {
+            startAdornment: (
+              <InputAdornment position="start">
+                <LockIcon color="action" />
+              </InputAdornment>
+            ),
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  onClick={toggleVisibility}
+                  edge="end"
+                  disabled={disabled}
+                  aria-label="toggle password visibility"
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          },
         }}
       />
     );

@@ -39,7 +39,7 @@ const SuccessAlert: React.FC<{ onClose: () => void }> = memo(
       onClose={onClose}
       sx={{ mb: 3 }}
     >
-      <Typography variant="body2" fontWeight={600}>
+      <Typography variant="body2" sx={{ fontWeight: 600 }}>
         Message sent successfully!
       </Typography>
       <Typography variant="body2">
@@ -80,9 +80,9 @@ const ContactForm: React.FC<ContactFormProps> = memo(
 
         <Card>
           <CardContent>
-            <Box display="flex" alignItems="center" gap={1} mb={2}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
               <EmailIcon color="primary" />
-              <Typography variant="h6" fontWeight={600}>
+              <Typography variant="h6" sx={{ fontWeight: 600 }}>
                 Contact Support
               </Typography>
             </Box>
@@ -112,13 +112,13 @@ const ContactForm: React.FC<ContactFormProps> = memo(
                     error={!!formErrors[field.key]}
                     helperText={getHelperText(field.key, field.helperText)}
                     required
-                    inputProps={
-                      field.maxLength
-                        ? { maxLength: field.maxLength }
-                        : undefined
-                    }
-                    InputProps={{
-                      startAdornment: field.icon,
+                    slotProps={{
+                      input: {
+                        startAdornment: field.icon,
+                      },
+                      ...(field.maxLength && {
+                        htmlInput: { maxLength: field.maxLength },
+                      }),
                     }}
                   />
                 ))}

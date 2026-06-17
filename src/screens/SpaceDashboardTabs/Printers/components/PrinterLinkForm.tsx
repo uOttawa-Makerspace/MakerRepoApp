@@ -33,10 +33,12 @@ const renderPrinterOption = (
 ) => (
   <li {...props} key={option.id}>
     <Box
-      display="flex"
-      alignItems="center"
-      justifyContent="space-between"
-      width="100%"
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        width: "100%",
+      }}
     >
       <Typography variant="body2">{option.name}</Typography>
       <PrinterStatusChip printer={option.printer} />
@@ -49,7 +51,7 @@ const renderUserOption = (
   option: UserOption
 ) => (
   <li {...props} key={String(option.id)}>
-    <Box display="flex" alignItems="center" gap={1.5}>
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
       <Avatar sx={{ width: 32, height: 32 }}>
         {option.name.charAt(0).toUpperCase()}
       </Avatar>
@@ -143,9 +145,9 @@ const PrinterLinkForm = memo<PrinterLinkFormProps>(
         <Card sx={{ mb: 2 }}>
           <CardContent>
             {/* Header */}
-            <Box display="flex" alignItems="center" gap={2} mb={2}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
               <PrintIcon color="primary" />
-              <Typography variant="h6" fontWeight={600} flexGrow={1}>
+              <Typography variant="h6" sx={{ fontWeight: 600, flexGrow: 1 }}>
                 {printerType.name}
               </Typography>
               <Chip

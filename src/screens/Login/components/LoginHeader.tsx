@@ -14,9 +14,13 @@ const logoStyles = {
 } as const;
 
 const LoginHeader: React.FC = memo(() => (
-  <Box textAlign="center" mb={4}>
+  <Box sx={{ textAlign: "center", mb: 4 }}>
     <Box component="img" src={logo} alt="MakeRepo Logo" sx={logoStyles} />
-    <Typography variant="h4" fontWeight={700} gutterBottom>
+    <Typography 
+      variant="h4" 
+      gutterBottom
+      sx={{ fontWeight: 700 }}
+    >
       Welcome Back
     </Typography>
     <Typography variant="body2" color="text.secondary">

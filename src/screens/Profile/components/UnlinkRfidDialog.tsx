@@ -46,7 +46,7 @@ const UnlinkRfidDialog: React.FC<UnlinkRfidDialogProps> = memo(
               borderColor: "divider",
             }}
           >
-            <Typography variant="h6" fontWeight={600}>
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
               Confirm Unlink
             </Typography>
             <IconButton onClick={onClose}>

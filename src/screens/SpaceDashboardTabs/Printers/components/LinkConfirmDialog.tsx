@@ -41,7 +41,7 @@ const LinkConfirmDialog = memo<LinkConfirmDialogProps>(
             borderColor: "divider",
           }}
         >
-          <Typography variant="h6" fontWeight={600}>
+          <Typography variant="h6" sx={{ fontWeight: 600 }}>
             Confirm Link
           </Typography>
           <IconButton onClick={onClose}>

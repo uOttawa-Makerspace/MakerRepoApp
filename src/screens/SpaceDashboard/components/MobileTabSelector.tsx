@@ -73,8 +73,10 @@ const MobileTabSelector: React.FC<MobileTabSelectorProps> = memo(
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
           onClose={handleClose}
-          PaperProps={{
-            sx: { width: "90vw", maxWidth: 400 },
+          slotProps={{
+            paper: {
+              sx: { width: "90vw", maxWidth: 400 },
+            },
           }}
         >
           {TAB_CONFIG.map((tab, index) => (
@@ -87,8 +89,10 @@ const MobileTabSelector: React.FC<MobileTabSelectorProps> = memo(
               <ListItemIcon>{tab.icon}</ListItemIcon>
               <ListItemText
                 primary={tab.label}
-                primaryTypographyProps={{
-                  fontWeight: tabIndex === index ? 600 : 400,
+                slotProps={{
+                  primary: {
+                    sx: { fontWeight: tabIndex === index ? 600 : 400 },
+                  },
                 }}
               />
             </MenuItem>

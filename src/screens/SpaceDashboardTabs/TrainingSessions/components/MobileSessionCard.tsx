@@ -28,7 +28,7 @@ interface MobileSessionCardProps {
 
 const DetailRow = React.memo(
   ({ icon, text }: { icon: React.ReactNode; text: string }) => (
-    <Box display="flex" alignItems="center" gap={1}>
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
       {icon}
       <Typography variant="body2" color="text.secondary">
         {text}
@@ -66,15 +66,17 @@ const MobileSessionCard = React.memo(
           <Stack spacing={2}>
             {/* Header */}
             <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="start"
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "start",
+              }}
             >
               <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                <Typography variant="h6" fontWeight={600} gutterBottom noWrap>
+                <Typography variant="h6" sx={{ fontWeight: 600 }} gutterBottom noWrap>
                   {session.training.name_en}
                 </Typography>
-                <Box display="flex" gap={1} flexWrap="wrap">
+                <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
                   <Chip
                     label={completed ? "Completed" : "Pending"}
                     color={completed ? "success" : "warning"}

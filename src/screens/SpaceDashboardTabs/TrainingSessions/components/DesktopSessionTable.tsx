@@ -66,7 +66,7 @@ const SessionRow = React.memo(
           </Typography>
         </TableCell>
         <TableCell>
-          <Typography variant="body2" fontWeight={500}>
+          <Typography variant="body2" sx={{ fontWeight: 500 }}>
             {session.training?.name_en ?? "N/A"}
           </Typography>
         </TableCell>

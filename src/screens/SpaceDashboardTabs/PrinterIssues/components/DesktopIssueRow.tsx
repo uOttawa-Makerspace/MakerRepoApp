@@ -54,7 +54,7 @@ const DesktopIssueRow = memo<DesktopIssueRowProps>(
           </TableCell>
           <TableCell>
             {issue.printer_name ? (
-              <Stack direction="row" spacing={1} alignItems="center">
+              <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
                 <PrintIcon fontSize="small" color="action" />
                 <Typography variant="body2">{issue.printer_name}</Typography>
               </Stack>
@@ -63,12 +63,12 @@ const DesktopIssueRow = memo<DesktopIssueRowProps>(
             )}
           </TableCell>
           <TableCell>
-            <Typography variant="body2" fontWeight={500}>
+            <Typography variant="body2" sx={{ fontWeight: 500 }}>
               {issue.summary}
             </Typography>
           </TableCell>
           <TableCell>
-            <Stack direction="row" spacing={1} alignItems="center">
+            <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
               <Avatar sx={{ width: 28, height: 28, fontSize: "0.875rem" }}>
                 {issue.reporter.charAt(0).toUpperCase()}
               </Avatar>
@@ -104,7 +104,7 @@ const DesktopIssueRow = memo<DesktopIssueRowProps>(
                   <Typography
                     variant="body2"
                     color="text.secondary"
-                    fontWeight={600}
+                    sx={{ fontWeight: 600 }}
                   >
                     Description:
                   </Typography>
