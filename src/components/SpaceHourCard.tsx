@@ -35,21 +35,15 @@ export function SpaceHourCard(props: { hour: Partial<ContactInfo> }) {
     <div className="card">
       <div className="card-body">
         <h4 className="card-title">{valueOrSkeleton(props.hour, "name")}</h4>
-        <h6 className="card-subtitle mb-2">
-          {valueOrSkeleton(props.hour, "email")}
-        </h6>
-        <h6 className="card-subtitle mb-2">
-          {valueOrSkeleton(props.hour, "address")}
-        </h6>
+        <h6 className="card-subtitle mb-2">{valueOrSkeleton(props.hour, "email")}</h6>
+        <h6 className="card-subtitle mb-2">{valueOrSkeleton(props.hour, "address")}</h6>
         <h6 className="card-subtitle mb-2">
           {valueOrSkeleton(props.hour, "phone_number")}
         </h6>
         <ul className="list-group">
           {periods?.map((period, index) => (
             <div key={index}>
-              <div className="card-header">
-                {period.target_en ?? period.target_fr}
-              </div>
+              <div className="card-header">{period.target_en ?? period.target_fr}</div>
               <div className="card-body">
                 {period.closed_all_week ? (
                   <div>Closed all week</div>
@@ -59,13 +53,11 @@ export function SpaceHourCard(props: { hour: Partial<ContactInfo> }) {
                       <div key={key}>
                         {label}: {describeDay(period.days[key])}
                       </div>
-                    )
+                    ),
                   )
                 )}
                 {(period.notes_en ?? period.notes_fr) && (
-                  <div className="mt-2">
-                    {period.notes_en ?? period.notes_fr}
-                  </div>
+                  <div className="mt-2">{period.notes_en ?? period.notes_fr}</div>
                 )}
               </div>
             </div>

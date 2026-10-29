@@ -69,13 +69,9 @@
 
 ### Utils
 
-#### Common
-- **Description:** This utility file contains functions for managing user sessions.
-- **Key Functions:**
-  - `getUser`: Retrieves the user details from local storage.
-  - `getToken`: Retrieves the authentication token from local storage.
-  - `removeUserSession`: Removes the user details and token from local storage.
-  - `setUserSession`: Stores the user details and token in local storage.
+#### api/tokens
+- **Description:** Session storage. The access token (15 min) lives in memory; the rotating refresh token and a minimal user (`id`, `username`, `name`, `role`) live in localStorage.
+- **Key Functions:** `storeSession`, `clearSession`, `getRefreshToken`, `getStoredUser`.
 
 #### Contexts
 - **Description:** This utility file contains context for managing the logged-in state across the application.
@@ -89,11 +85,7 @@
   - `app_release_type`: The release type of the application (e.g., Production).
   - `app_version`: The version of the application.
 
-#### HTTPRequests
-- **Description:** This utility file contains functions for making HTTP requests with error handling.
-- **Key Functions:**
-  - `get`: Makes a GET request to the specified route.
-  - `patch`: Makes a PATCH request to the specified route.
-  - `put`: Makes a PUT request to the specified route.
-  - `post`: Makes a POST request to the specified route.
-  - `notifyAndReturn`: Notifies an error to an error tracking service and returns the error.
+#### api/client and api/endpoints
+- **Description:** The `/api/v1` axios client (Bearer access token, no cookies) and typed wrappers for every endpoint (contracts in the backend repo, `doc/api/v1/`).
+- **Behaviour:** A 401 triggers one token refresh (shared by concurrent requests, serialised across tabs with a Web Lock) and one retry; a failed refresh ends the session and returns to login. Failures reject with `ApiError` (`status`, `code`, `message`, `fields`); `errorMessage` turns one into toast text.
+- **Rules:** build path segments from user data with `seg()` (`encodeURIComponent`). Tokens are never logged; `utils/airbrake.ts` redacts them from every Airbrake notice.
