@@ -10,45 +10,62 @@ import Navbar from "./components/Navbar";
 import Profile from "./screens/Profile/index";
 import "bootstrap/dist/js/bootstrap";
 import PrivateRoute from "./utils/PrivateRoute";
-import { getToken, removeUserSession, setUserSession } from "./utils/Common";
 import Help from "./screens/Help/index";
-import * as HTTPRequest from "./utils/HTTPRequests";
+import { getSession } from "./api/endpoints";
+import { endSession, onSessionEnded } from "./api/client";
+import {
+  REFRESH_TOKEN_STORAGE_KEY,
+  getRefreshToken,
+  removeLegacyStorage,
+} from "./api/tokens";
+import type { SessionUser } from "./api/types";
+import { airbrake as getAirbrake } from "./utils/airbrake";
 import { LoggedInContext } from "./utils/Contexts";
 import theme from "./theme";
 
 function App() {
   const [authLoading, setAuthLoading] = useState(true);
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
-  const [user, setUser] = useState<Record<string, any> | null>(null);
+  const [user, setUser] = useState<SessionUser | null>(null);
 
-  const airbrake = HTTPRequest.airbrake();
+  const airbrake = getAirbrake();
 
   useEffect(() => {
-    const token = getToken();
-    if (!token) {
+    // The session is over (refresh failed, logout, signed out in another tab): drop to the login screen.
+    const unsubscribe = onSessionEnded(() => {
+      setLoggedIn(false);
+      setUser(null);
+    });
+
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === REFRESH_TOKEN_STORAGE_KEY && event.newValue === null) {
+        endSession("logout");
+      }
+    };
+    window.addEventListener("storage", onStorage);
+
+    removeLegacyStorage();
+    if (!getRefreshToken()) {
       setAuthLoading(false);
-      return;
+    } else {
+      // GET /api/v1/session (refreshes the access token first, since it only lives in memory).
+      getSession()
+        .then((sessionUser) => {
+          setUser(sessionUser);
+          setLoggedIn(true);
+        })
+        .catch(() => {
+          // A 401 has already cleared the session; a network/5xx failure keeps the stored refresh
+          // token so a reload can try again.
+          setLoggedIn(false);
+        })
+        .finally(() => setAuthLoading(false));
     }
 
-    HTTPRequest.get("check_signed_in")
-      .then((response) => {
-        if (response.signed_in === "true") {
-          setUserSession(response.token, response.user);
-          setLoggedIn(true);
-          setAuthLoading(false);
-          setUser(response.user);
-        } else {
-          setLoggedIn(false);
-          setAuthLoading(false);
-          removeUserSession();
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        setLoggedIn(false);
-        setAuthLoading(false);
-        removeUserSession();
-      });
+    return () => {
+      unsubscribe();
+      window.removeEventListener("storage", onStorage);
+    };
   }, []);
 
   const { ErrorBoundary } = useErrorBoundary({

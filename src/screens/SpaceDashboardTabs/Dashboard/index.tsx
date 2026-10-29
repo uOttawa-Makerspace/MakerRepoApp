@@ -79,7 +79,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 
   const navigateToProfile = useCallback(
     (username: string) => {
-      navigate(`/profile/${username}`);
+      navigate(`/profile/${encodeURIComponent(username)}`);
     },
     [navigate]
   );

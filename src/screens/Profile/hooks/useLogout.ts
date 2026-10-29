@@ -1,8 +1,7 @@
 import { useState, useCallback, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import * as HTTPRequest from "../../../utils/HTTPRequests";
-import { removeUserSession } from "../../../utils/Common";
+import { logout } from "../../../api/endpoints";
 import { LoggedInContext } from "../../../utils/Contexts";
 
 export const useLogout = () => {
@@ -19,18 +18,13 @@ export const useLogout = () => {
     setLoggingOut(true);
 
     try {
-      await HTTPRequest.get("logout");
+      // DELETE /api/v1/session, then the stored tokens are cleared whatever the answer.
+      await logout();
       setLoggedIn(false);
-      removeUserSession();
       toast.success("Logged out successfully", {
         position: "bottom-center",
       });
       navigate("/login");
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to logout. Please try again.", {
-        position: "bottom-center",
-      });
     } finally {
       setLoggingOut(false);
       setLogoutDialogOpen(false);
