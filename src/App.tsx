@@ -17,7 +17,7 @@ import {
   REFRESH_TOKEN_STORAGE_KEY,
   USER_STORAGE_KEY,
   getRefreshToken,
-  getStoredUser,
+  readPersistedUser,
   removeLegacyStorage,
 } from "./api/tokens";
 import type { SessionUser } from "./api/types";
@@ -57,7 +57,7 @@ function App() {
         (event.key === REFRESH_TOKEN_STORAGE_KEY && event.newValue !== null)
       ) {
         const current = userRef.current;
-        const stored = getStoredUser();
+        const stored = readPersistedUser();
         if (current && stored && stored.id !== current.id) endTabSession();
       }
     };
