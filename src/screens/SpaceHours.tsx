@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { SpaceHourCard } from "../components/SpaceHourCard";
-import * as HTTPRequest from "../utils/HTTPRequests";
+import { listContactInfos } from "../api/endpoints";
+import type { ContactInfo } from "../api/types";
 
 const SpaceHours = () => {
-  const [hours, setHours] = useState<any>(null);
+  const [hours, setHours] = useState<ContactInfo[] | null>(null);
   const [errors, setErrors] = useState(false);
 
   const getHours = () => {
-    HTTPRequest.get("hours")
+    listContactInfos()
       .then((response) => {
         setHours(response);
       })
@@ -26,7 +27,7 @@ const SpaceHours = () => {
       Space Hours
       {!errors && hours ? (
         <div>
-          {hours.map((hour: any, index: number | null) => (
+          {hours.map((hour, index) => (
             <SpaceHourCard hour={hour} key={index} />
           ))}
         </div>
