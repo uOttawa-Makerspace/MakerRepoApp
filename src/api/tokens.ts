@@ -168,9 +168,24 @@ const writeSession = (session: SessionResponse) => {
   // Memory first, then best-effort persistence. A failed write keeps the session working in this
   // tab (it just will not survive a reload or reach other tabs).
   memRefreshToken = session.refresh_token;
-  persistFailed = !storage.set(REFRESH_KEY, session.refresh_token);
   memUser = pickUser(session.user);
-  storage.set(USER_KEY, JSON.stringify(memUser));
+  const persisted =
+    storage.set(REFRESH_KEY, session.refresh_token) &&
+    storage.set(USER_KEY, JSON.stringify(memUser));
+  persistFailed = !persisted;
+  if (persistFailed) {
+    // Race: the server just rotated the refresh token, so whatever storage still holds is the OLD,
+    // already revoked one. Another tab or a reload would replay it, and once the 30 s grace has
+    // passed the server treats that as theft and revokes the whole token family (logout
+    // everywhere). A stale USER_KEY would likewise show the wrong identity. So remove both: other
+    // tabs see the removal and fall back to a clean login, a reload lands on the login screen.
+    // This tab keeps working from memory (persistFailed). Storage events never fire in the tab that made the change, so this tab
+    // does not log itself out through App's storage listener (only OTHER tabs do, which is intended).
+    // If remove() fails as well there is
+    // nothing more we can do.
+    storage.remove(REFRESH_KEY);
+    storage.remove(USER_KEY);
+  }
 };
 
 /** Store the pair returned by a LOGIN. Starts a new session generation (invalidates stale refreshes). */
