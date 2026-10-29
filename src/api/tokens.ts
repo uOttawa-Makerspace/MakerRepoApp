@@ -179,10 +179,9 @@ const writeSession = (session: SessionResponse) => {
     // passed the server treats that as theft and revokes the whole token family (logout
     // everywhere). A stale USER_KEY would likewise show the wrong identity. So remove both: other
     // tabs see the removal and fall back to a clean login, a reload lands on the login screen.
-    // This tab keeps working from memory (persistFailed). Storage events never fire in the tab that made the change, so this tab
-    // does not log itself out through App's storage listener (only OTHER tabs do, which is intended).
-    // If remove() fails as well there is
-    // nothing more we can do.
+    // This tab keeps working from memory (persistFailed). Storage events never fire in the tab
+    // that made the change, so this tab does not log itself out through App's storage listener
+    // (only OTHER tabs do, which is intended). If remove() fails too, nothing more can be done.
     storage.remove(REFRESH_KEY);
     storage.remove(USER_KEY);
   }
