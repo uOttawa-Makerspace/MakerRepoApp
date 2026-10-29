@@ -1,32 +1,11 @@
 import { ReactElement } from "react";
 
-export interface SpaceData {
-  space_users: SpaceUser[];
-  space: {
-    id: string | number;
-    name?: string;
-  };
-  current_user?: {
-    id: number;
-    name?: string;
-  };
-}
+import type { PresenceUser, SpaceDashboardData } from "../../api/types";
 
-export interface SpaceUser {
-  id: number;
-  username: string;
-  name: string;
-  email: string;
-  flagged: boolean | null;
-  flag_message?: string;
-  avatar_url?: string;
-  active: boolean;
-  read_and_accepted_waiver_form: boolean;
-  certifications?: { id: number; name: string }[];
-  signed_safety_sheet: boolean;
-  membership_status: boolean;
-  [key: string]: any;
-}
+/** The caller's space, who is in it, and every space (for the picker). */
+export type SpaceData = SpaceDashboardData;
+
+export type SpaceUser = PresenceUser;
 
 export interface LoadingState {
   users: boolean;

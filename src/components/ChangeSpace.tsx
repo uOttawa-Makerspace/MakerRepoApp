@@ -1,37 +1,39 @@
-import * as HTTPRequest from "../utils/HTTPRequests";
+import toast from "react-hot-toast";
+import { setMySpace } from "../api/endpoints";
+import { errorMessage } from "../api/client";
+import type { SpaceDashboardData } from "../api/types";
 
 type ChangeSpaceProps = {
-  inSpaceUsers: any;
+  inSpaceUsers: SpaceDashboardData | null;
   handleReloadCurrentUsers: () => void;
 };
 
-const ChangeSpace = ({
-  inSpaceUsers,
-  handleReloadCurrentUsers,
-}: ChangeSpaceProps) => {
+const ChangeSpace = ({ inSpaceUsers, handleReloadCurrentUsers }: ChangeSpaceProps) => {
   const changeSpace = (spaceId: number | string) => {
-    HTTPRequest.put(`staff_dashboard/change_space?space_id=${spaceId}`, {})
+    setMySpace(Number(spaceId))
       .then(() => {
         handleReloadCurrentUsers();
       })
       .catch((error) => {
-        console.log(error);
+        console.error(error);
+        toast.error(errorMessage(error, "Failed to change space. Please try again."), {
+          position: "bottom-center",
+        });
       });
   };
 
   return (
     <>
       <select
-        value={inSpaceUsers !== null && inSpaceUsers?.space?.id}
+        value={inSpaceUsers?.space?.id ?? ""}
         onChange={(e) => changeSpace(e.target.value)}
         className="form-select mb-2"
       >
-        {inSpaceUsers !== null &&
-          inSpaceUsers?.space_list?.map((space: any) => (
-            <option key={space[1]} value={space[1]}>
-              {space[0]}
-            </option>
-          ))}
+        {inSpaceUsers?.spaces?.map((space) => (
+          <option key={space.id} value={space.id}>
+            {space.name}
+          </option>
+        ))}
       </select>
       <div className="d-grid gap-2">
         <button

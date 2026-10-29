@@ -5,7 +5,6 @@ import type {
   ContactInfo,
   CreateTrainingSessionRequest,
   PresenceResponse,
-  PresenceUser,
   PrinterIssueRecord,
   PrinterType,
   ProfileResponse,
@@ -13,6 +12,7 @@ import type {
   RfidTapResponse,
   SessionResponse,
   SessionUser,
+  SpaceDashboardData,
   ShiftEvent,
   Space,
   SupportRequest,
@@ -95,14 +95,6 @@ export const signInUser = (spaceId: number | string, username: string) =>
 
 export const signOutUser = (spaceId: number | string, username: string) =>
   request<void>("delete", `spaces/${seg(spaceId)}/presence/${seg(username)}`);
-
-/** What the staff dashboard shows: the caller's space, who is in it, and all spaces for the picker. */
-export interface SpaceDashboardData {
-  space: Space;
-  users: PresenceUser[];
-  spaces: Space[];
-  current_user: { id: number };
-}
 
 export const loadSpaceDashboard = async (): Promise<SpaceDashboardData> => {
   const [mySpace, spaces] = await Promise.all([getMySpace(), listSpaces()]);

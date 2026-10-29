@@ -1,5 +1,9 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import * as HTTPRequest from "../../../utils/HTTPRequests";
+import {
+  listPrinterTypes,
+  listTrainingSessions,
+  loadSpaceDashboard,
+} from "../../../api/endpoints";
 import { SpaceData, LoadingState, ErrorState } from "../types";
 import { TabIndex } from "../constants";
 
@@ -33,7 +37,7 @@ export const useSpaceDashboard = () => {
     setErrors((prev) => ({ ...prev, users: null }));
 
     try {
-      const response = await HTTPRequest.get("staff_dashboard");
+      const response = await loadSpaceDashboard();
       setInSpaceUsers(response);
       if (response.current_user?.id) {
         setCurrentUserId(response.current_user.id);
@@ -51,7 +55,7 @@ export const useSpaceDashboard = () => {
     setErrors((prev) => ({ ...prev, sessions: null }));
 
     try {
-      const response = await HTTPRequest.get("staff/training_sessions");
+      const response = await listTrainingSessions();
       setTrainingSessions(response);
     } catch (error) {
       console.error(error);
@@ -69,7 +73,7 @@ export const useSpaceDashboard = () => {
     setErrors((prev) => ({ ...prev, printers: null }));
 
     try {
-      const response = await HTTPRequest.get("printers/printer_data");
+      const response = await listPrinterTypes();
       setPrinters(response);
     } catch (error) {
       console.error(error);
@@ -134,14 +138,14 @@ export const useSpaceDashboard = () => {
   const isInitialLoading = loading.users && !inSpaceUsers;
 
   const userCount = useMemo(
-    () => inSpaceUsers?.space_users?.length || 0,
-    [inSpaceUsers?.space_users?.length]
+    () => inSpaceUsers?.users?.length || 0,
+    [inSpaceUsers?.users?.length]
   );
 
   const flaggedCount = useMemo(
     () =>
-      inSpaceUsers?.space_users?.filter((u) => u.flagged)?.length || 0,
-    [inSpaceUsers?.space_users]
+      inSpaceUsers?.users?.filter((u) => u.flagged)?.length || 0,
+    [inSpaceUsers?.users]
   );
 
   const spaceId = inSpaceUsers?.space?.id ?? null;

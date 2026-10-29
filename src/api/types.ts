@@ -90,6 +90,14 @@ export interface PresenceResponse {
   current_user: { id: number };
 }
 
+/** What the staff dashboard shows: the caller's space, who is in it, and every space (for the picker). */
+export interface SpaceDashboardData {
+  space: Space;
+  users: PresenceUser[];
+  spaces: Space[];
+  current_user: { id: number };
+}
+
 // --- rfid ---
 
 export interface UnlinkedCard {

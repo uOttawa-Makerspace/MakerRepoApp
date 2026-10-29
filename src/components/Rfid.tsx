@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Alert, Button } from "@mui/material";
 import NfcIcon from "@mui/icons-material/Nfc";
-import * as HTTPRequest from "../utils/HTTPRequests";
+import { tapRfid } from "../api/endpoints";
 
 interface RfidStatus {
   status: "error" | "warning" | "success";
@@ -26,23 +26,19 @@ const Rfid = ({ spaceId, onSignIn }: RfidProps) => {
   };
 
   const handleRfidCardTap = (rfidCardNumber: string) => {
-    HTTPRequest.post("/rfid/card_number", {
-      rfid: rfidCardNumber,
-      space_id: spaceId,
-    })
+    if (spaceId === undefined || spaceId === "") {
+      setErrorStatus();
+      return;
+    }
+
+    tapRfid(rfidCardNumber, Number(spaceId))
       .then((response) => {
-        if (response.status === 200) {
-          if (response.data.success) {
-            if (response.data.success === "RFID sign out") {
-              setStatus({ status: "warning", message: "Signed Out!" });
-              onSignIn?.();
-            } else {
-              setStatus({ status: "success", message: "Signed In!" });
-              onSignIn?.();
-            }
-          } else {
-            setErrorStatus();
-          }
+        if (response.success === "RFID sign out") {
+          setStatus({ status: "warning", message: "Signed Out!" });
+          onSignIn?.();
+        } else if (response.success === "RFID sign in") {
+          setStatus({ status: "success", message: "Signed In!" });
+          onSignIn?.();
         } else {
           setErrorStatus();
         }

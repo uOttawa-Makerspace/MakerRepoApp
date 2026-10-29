@@ -103,8 +103,8 @@ export function usePrinters(inSpaceUsers: any) {
   }, [fetchPrinters, refreshTrigger]);
 
   const users = useMemo<UserOption[]>(() => {
-    if (!inSpaceUsers?.space_users) return [];
-    return inSpaceUsers.space_users.map((u: any) => ({
+    if (!inSpaceUsers?.users) return [];
+    return inSpaceUsers.users.map((u: any) => ({
       id: u.id,
       name: u.name,
     }));
