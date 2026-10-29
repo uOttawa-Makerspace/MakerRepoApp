@@ -16,6 +16,7 @@ import RfidTab from "./components/RfidTab";
 import UnlinkRfidDialog from "./components/UnlinkRfidDialog";
 import LogoutSection from "./components/LogoutSection";
 import LogoutDialog from "./components/LogoutDialog";
+import DashboardToaster from "../SpaceDashboard/components/DashboardToaster";
 
 const Profile: React.FC = () => {
   const { username } = useParams<ProfileParams>();
@@ -84,6 +85,7 @@ const Profile: React.FC = () => {
 
   return (
     <Box sx={{ pb: 8 }}>
+      <DashboardToaster />
       <ProfileHeader user={profileUser} />
 
       <ProfileTabs

@@ -7,6 +7,7 @@ import HelpHeader from "./components/HelpHeader";
 import FAQSection from "./components/FAQSection";
 import ContactForm from "./components/ContactForm";
 import DirectContactInfo from "./components/DirectContactInfo";
+import DashboardToaster from "../SpaceDashboard/components/DashboardToaster";
 
 const Help: React.FC = () => {
   const {
@@ -36,6 +37,7 @@ const Help: React.FC = () => {
       />
 
       <DirectContactInfo />
+      <DashboardToaster />
     </Box>
   );
 };
