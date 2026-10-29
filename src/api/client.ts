@@ -10,7 +10,8 @@ import {
   clearSession,
   getAccessToken,
   getRefreshToken,
-  storeSession,
+  getSessionGeneration,
+  storeRefreshedSession,
 } from "./tokens";
 import type { SessionResponse } from "./types";
 
@@ -129,6 +130,8 @@ export const onSessionEnded = (listener: SessionEndListener) => {
 /** Clear stored tokens and tell the UI. */
 export const endSession = (reason: SessionEndReason) => {
   clearSession();
+  // A refresh still in flight belongs to the session that just ended; nobody may join it.
+  inflightRefresh = null;
   sessionEndListeners.forEach((listener) => listener(reason));
 };
 
@@ -152,10 +155,21 @@ const withCrossTabLock = <T>(fn: () => Promise<T>): Promise<T> => {
   return locks ? locks.request(REFRESH_LOCK, fn) : fn();
 };
 
+const staleSession = () =>
+  new ApiError(
+    401,
+    "session_changed",
+    "The session changed while it was being refreshed. Please retry.",
+  );
+
 const doRefresh = async (): Promise<SessionResponse> => {
   let lastConflict: ApiError | null = null;
+  // Taken after the cross-tab lock is acquired. If a logout/expiry/login happens while the request
+  // is in flight, the generation moves on and this refresh must not store or end anything.
+  const generation = getSessionGeneration();
 
   for (let attempt = 0; attempt < MAX_REFRESH_ATTEMPTS; attempt += 1) {
+    if (getSessionGeneration() !== generation) throw staleSession();
     // Re-read every time: another tab may have rotated the token while we waited.
     const refreshToken = getRefreshToken();
     if (!refreshToken) {
@@ -173,10 +187,11 @@ const doRefresh = async (): Promise<SessionResponse> => {
         { refresh_token: refreshToken },
         { authMode: "none" },
       );
-      storeSession(data);
+      if (!storeRefreshedSession(data, generation)) throw staleSession();
       return data;
     } catch (caught) {
       const error = toApiError(caught);
+      if (getSessionGeneration() !== generation) throw staleSession();
       if (error.status === 409 && error.code === "refresh_in_progress") {
         lastConflict = error;
         await sleep(200 + Math.random() * 300);
@@ -200,14 +215,19 @@ const doRefresh = async (): Promise<SessionResponse> => {
   );
 };
 
+/** The shared refresh and the session generation it was started in. */
 let inflightRefresh: Promise<SessionResponse> | null = null;
+let inflightGeneration = -1;
 
-/** Refresh the token pair. Concurrent callers share one request. */
+/** Refresh the token pair. Concurrent callers share one request (of the current session only). */
 export const refreshSession = (): Promise<SessionResponse> => {
-  if (!inflightRefresh) {
-    inflightRefresh = withCrossTabLock(doRefresh).finally(() => {
-      inflightRefresh = null;
+  if (!inflightRefresh || inflightGeneration !== getSessionGeneration()) {
+    inflightGeneration = getSessionGeneration();
+    const promise: Promise<SessionResponse> = withCrossTabLock(doRefresh).finally(() => {
+      // Only clear our own entry: a newer session may have started its own refresh meanwhile.
+      if (inflightRefresh === promise) inflightRefresh = null;
     });
+    inflightRefresh = promise;
   }
   return inflightRefresh;
 };

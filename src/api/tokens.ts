@@ -18,6 +18,15 @@ const LEGACY_TOKEN_KEY = "token";
 let accessToken: string | null = null;
 let accessTokenExpiresAt = 0;
 
+/**
+ * Session generation. Bumped whenever the session is cleared or a new one is started by a login.
+ * A refresh remembers the generation it started in and may only store its result if that is still
+ * the current one, so a slow refresh can neither undo a logout nor overwrite a newer login.
+ */
+let sessionGeneration = 0;
+
+export const getSessionGeneration = () => sessionGeneration;
+
 const storage = {
   get(key: string): string | null {
     try {
@@ -75,8 +84,7 @@ export const getStoredUser = (): SessionUser | null => {
   return null;
 };
 
-/** Store the pair returned by login/refresh. The old refresh token is replaced at once. */
-export const storeSession = (session: SessionResponse) => {
+const writeSession = (session: SessionResponse) => {
   accessToken = session.access_token;
   const expires = Date.parse(session.access_token_expires_at);
   accessTokenExpiresAt = Number.isNaN(expires) ? Date.now() + 14 * 60_000 : expires;
@@ -84,7 +92,27 @@ export const storeSession = (session: SessionResponse) => {
   storage.set(USER_KEY, JSON.stringify(pickUser(session.user)));
 };
 
+/** Store the pair returned by a LOGIN. Starts a new session generation (invalidates stale refreshes). */
+export const storeSession = (session: SessionResponse) => {
+  sessionGeneration += 1;
+  writeSession(session);
+};
+
+/**
+ * Store the pair returned by a REFRESH that started in `generation`. Returns false, storing
+ * nothing, when the session was cleared or replaced meanwhile (the result is stale).
+ */
+export const storeRefreshedSession = (
+  session: SessionResponse,
+  generation: number,
+): boolean => {
+  if (generation !== sessionGeneration) return false;
+  writeSession(session);
+  return true;
+};
+
 export const clearSession = () => {
+  sessionGeneration += 1;
   accessToken = null;
   accessTokenExpiresAt = 0;
   storage.remove(REFRESH_KEY);
