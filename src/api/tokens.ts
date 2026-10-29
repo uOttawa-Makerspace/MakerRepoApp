@@ -52,6 +52,7 @@ const storage = {
 };
 
 export const REFRESH_TOKEN_STORAGE_KEY = REFRESH_KEY;
+export const USER_STORAGE_KEY = USER_KEY;
 
 export const removeLegacyStorage = () => storage.remove(LEGACY_TOKEN_KEY);
 
@@ -61,7 +62,14 @@ export const getAccessToken = () => accessToken;
 export const accessTokenNeedsRefresh = (marginMs = 30_000) =>
   !accessToken || accessTokenExpiresAt - Date.now() < marginMs;
 
-export const getRefreshToken = () => storage.get(REFRESH_KEY);
+/**
+ * Set when another tab signed in as a different user and this tab stepped aside (detachSession).
+ * While set, this tab must not use the refresh token in storage (it now belongs to the other user).
+ * A login in this tab clears it.
+ */
+let detached = false;
+
+export const getRefreshToken = () => (detached ? null : storage.get(REFRESH_KEY));
 
 const pickUser = (user: SessionUser): SessionUser => ({
   id: user.id,
@@ -95,6 +103,7 @@ const writeSession = (session: SessionResponse) => {
 /** Store the pair returned by a LOGIN. Starts a new session generation (invalidates stale refreshes). */
 export const storeSession = (session: SessionResponse) => {
   sessionGeneration += 1;
+  detached = false;
   writeSession(session);
 };
 
@@ -111,7 +120,19 @@ export const storeRefreshedSession = (
   return true;
 };
 
+/**
+ * Forget this tab's session WITHOUT touching storage. Used when another tab replaced the stored
+ * session with another user's: clearing storage here would sign that other user out.
+ */
+export const detachSession = () => {
+  sessionGeneration += 1;
+  accessToken = null;
+  accessTokenExpiresAt = 0;
+  detached = true;
+};
+
 export const clearSession = () => {
+  detached = false;
   sessionGeneration += 1;
   accessToken = null;
   accessTokenExpiresAt = 0;

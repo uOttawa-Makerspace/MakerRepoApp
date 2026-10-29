@@ -8,6 +8,7 @@ import { airbrake } from "../utils/airbrake";
 import {
   accessTokenNeedsRefresh,
   clearSession,
+  detachSession,
   getAccessToken,
   getRefreshToken,
   getSessionGeneration,
@@ -120,7 +121,7 @@ const toApiError = (error: unknown): ApiError => {
 
 // --- session end notifications ---
 
-export type SessionEndReason = "expired" | "logout";
+export type SessionEndReason = "expired" | "logout" | "replaced";
 type SessionEndListener = (reason: SessionEndReason) => void;
 const sessionEndListeners = new Set<SessionEndListener>();
 
@@ -138,6 +139,16 @@ export const endSession = (reason: SessionEndReason) => {
   // A refresh still in flight belongs to the session that just ended; nobody may join it.
   inflightRefresh = null;
   sessionEndListeners.forEach((listener) => listener(reason));
+};
+
+/**
+ * End only THIS tab's session because another tab signed in as someone else. Storage is left alone
+ * (it holds the other user's session now); this tab just stops using it and goes to login.
+ */
+export const endTabSession = () => {
+  detachSession();
+  inflightRefresh = null;
+  sessionEndListeners.forEach((listener) => listener("replaced"));
 };
 
 // --- instance ---
