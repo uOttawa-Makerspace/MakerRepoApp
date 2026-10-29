@@ -23,6 +23,8 @@ import type { SessionResponse } from "./types";
  *   concurrent proactive refreshes) share a single in-flight refresh, and a Web Lock serialises
  *   refreshes across tabs so the single-use refresh token is not replayed.
  * - 409 refresh_in_progress: wait 200-500 ms, re-read the stored refresh token, retry (max 5).
+ * - Timeouts: 15 s per request, 10 s for session/refresh. A timed-out refresh is transient (status 0):
+ *   no logout, the lock and the shared promise are released, waiting callers get the error.
  * - Failed refresh (401 / nothing stored): session cleared, listeners told, caller gets the error.
  * - Every rejection is an ApiError. Raw axios errors (which carry request headers) are never
  *   logged or sent to Airbrake.
@@ -100,6 +102,9 @@ const toApiError = (error: unknown): ApiError => {
         details,
       );
     }
+    if (status === 0 && (error.code === "ECONNABORTED" || error.code === "ETIMEDOUT")) {
+      return new ApiError(0, "timeout", "The request timed out");
+    }
     return new ApiError(
       status,
       status === 0 ? "network_error" : "unknown_error",
@@ -137,9 +142,16 @@ export const endSession = (reason: SessionEndReason) => {
 
 // --- instance ---
 
+const REQUEST_TIMEOUT_MS = 15_000;
+/** Shorter: it runs under the cross-tab lock, with up to MAX_REFRESH_ATTEMPTS tries. */
+const REFRESH_TIMEOUT_MS = 10_000;
+
 export const api: AxiosInstance = axios.create({
   baseURL: `${EnvVariables.api_url}/api/v1`,
   withCredentials: false,
+  // Without a timeout a stalled connection never settles. For session/refresh that would hold the
+  // cross-tab lock and the single-flight promise, hanging every request in every tab.
+  timeout: REQUEST_TIMEOUT_MS,
   headers: { Accept: "application/json", "Content-Type": "application/json" },
 });
 
@@ -185,7 +197,7 @@ const doRefresh = async (): Promise<SessionResponse> => {
       const { data } = await api.post<SessionResponse>(
         "session/refresh",
         { refresh_token: refreshToken },
-        { authMode: "none" },
+        { authMode: "none", timeout: REFRESH_TIMEOUT_MS },
       );
       if (!storeRefreshedSession(data, generation)) throw staleSession();
       return data;
@@ -204,7 +216,8 @@ const doRefresh = async (): Promise<SessionResponse> => {
         }
         endSession("expired");
       }
-      // Network errors, 429 and 5xx are transient: keep the session, let the caller fail.
+      // Network errors, timeouts (status 0), 429 and 5xx are transient: keep the session, release
+      // the lock (we leave withCrossTabLock) and reject every waiting caller.
       throw error;
     }
   }
