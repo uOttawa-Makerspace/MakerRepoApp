@@ -207,14 +207,23 @@ export const detachSession = () => {
   detached = true;
 };
 
+/**
+ * Clear this tab's session and, normally, the stored one.
+ *
+ * In a DETACHED tab storage belongs to the user who signed in in another tab, so only memory is
+ * cleared there. Race: a request issued after the detach gets a 401 and ends the session as
+ * "expired"; removing REFRESH_KEY/USER_KEY then deleted the other user's valid session and
+ * logged them out in their tab. The tab stays detached (a login clears that, storeSession).
+ */
 export const clearSession = () => {
-  detached = false;
+  const touchStorage = !detached;
   sessionGeneration += 1;
   accessToken = null;
   accessTokenExpiresAt = 0;
   memRefreshToken = null;
   memUser = null;
   persistFailed = false;
+  if (!touchStorage) return;
   storage.remove(REFRESH_KEY);
   storage.remove(USER_KEY);
   storage.remove(LEGACY_TOKEN_KEY);

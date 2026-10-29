@@ -133,8 +133,19 @@ export const onSessionEnded = (listener: SessionEndListener) => {
   };
 };
 
-/** Clear stored tokens and tell the UI. */
-export const endSession = (reason: SessionEndReason) => {
+/**
+ * Clear stored tokens and tell the UI.
+ *
+ * `generation` is the session generation the caller was working in. If it is no longer current,
+ * the session the caller meant to end is already gone (logged out, expired, replaced by a login,
+ * or detached) and whatever is current now is not the caller's to end: do nothing. Race this
+ * closes: tab A detaches because tab B logged in as someone else; a refresh queued on the
+ * cross-tab lock in A then wakes up, finds no token and used to call endSession("expired"),
+ * wiping B's new session from shared storage. (clearSession also refuses to touch storage in a
+ * detached tab, as a second line of defence.)
+ */
+export const endSession = (reason: SessionEndReason, generation?: number) => {
+  if (generation !== undefined && generation !== getSessionGeneration()) return;
   clearSession();
   // A refresh still in flight belongs to the session that just ended; nobody may join it.
   inflightRefresh = null;
@@ -185,18 +196,21 @@ const staleSession = () =>
     "The session changed while it was being refreshed. Please retry.",
   );
 
-const doRefresh = async (): Promise<SessionResponse> => {
+const doRefresh = async (generation: number): Promise<SessionResponse> => {
   let lastConflict: ApiError | null = null;
-  // Taken after the cross-tab lock is acquired. If a logout/expiry/login happens while the request
-  // is in flight, the generation moves on and this refresh must not store or end anything.
-  const generation = getSessionGeneration();
+  // `generation` was captured by refreshSession BEFORE waiting for the cross-tab lock. Capturing
+  // it here (after the wait) was the bug: a refresh queued behind the lock while this tab was
+  // detached / logged out / replaced by a login read the already-new generation, passed the
+  // staleness check below, found no token and ended (and wiped from storage) the NEWER session.
+  // If a logout/expiry/login happens while queued or in flight, the generation moves on and this
+  // refresh must not store or end anything.
 
   for (let attempt = 0; attempt < MAX_REFRESH_ATTEMPTS; attempt += 1) {
     if (getSessionGeneration() !== generation) throw staleSession();
     // Re-read every time: another tab may have rotated the token while we waited.
     const refreshToken = getRefreshToken();
     if (!refreshToken) {
-      endSession("expired");
+      endSession("expired", generation);
       throw new ApiError(
         401,
         "invalid_refresh_token",
@@ -225,7 +239,7 @@ const doRefresh = async (): Promise<SessionResponse> => {
           // Someone stored a newer token meanwhile; use it instead of giving up.
           continue;
         }
-        endSession("expired");
+        endSession("expired", generation);
       }
       // Network errors, timeouts (status 0), 429 and 5xx are transient: keep the session, release
       // the lock (we leave withCrossTabLock) and reject every waiting caller.
@@ -246,8 +260,12 @@ let inflightGeneration = -1;
 /** Refresh the token pair. Concurrent callers share one request (of the current session only). */
 export const refreshSession = (): Promise<SessionResponse> => {
   if (!inflightRefresh || inflightGeneration !== getSessionGeneration()) {
-    inflightGeneration = getSessionGeneration();
-    const promise: Promise<SessionResponse> = withCrossTabLock(doRefresh).finally(() => {
+    // Captured before queueing on the lock, see doRefresh.
+    const generation = getSessionGeneration();
+    inflightGeneration = generation;
+    const promise: Promise<SessionResponse> = withCrossTabLock(() =>
+      doRefresh(generation),
+    ).finally(() => {
       // Only clear our own entry: a newer session may have started its own refresh meanwhile.
       if (inflightRefresh === promise) inflightRefresh = null;
     });
