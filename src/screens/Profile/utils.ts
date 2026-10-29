@@ -36,3 +36,19 @@ export const getRoleIcon = (role: string): React.ReactElement => {
       return React.createElement(PersonIcon);
   }
 };
+/** "5 minutes ago" from the ISO timestamp GET /rfid_cards sends (the API no longer sends a sentence). */
+export const formatTappedAt = (tappedAt: string): string => {
+  const time = Date.parse(tappedAt);
+  if (Number.isNaN(time)) return tappedAt;
+  const seconds = Math.round((time - Date.now()) / 1000);
+  const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+  const units: [Intl.RelativeTimeFormatUnit, number][] = [
+    ["day", 86400],
+    ["hour", 3600],
+    ["minute", 60],
+  ];
+  for (const [unit, size] of units) {
+    if (Math.abs(seconds) >= size) return rtf.format(Math.round(seconds / size), unit);
+  }
+  return rtf.format(seconds, "second");
+};

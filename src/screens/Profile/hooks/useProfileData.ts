@@ -1,22 +1,33 @@
 import { useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
-import { getUser } from "../../../utils/Common";
-import * as HTTPRequest from "../../../utils/HTTPRequests";
+import { getStoredUser } from "../../../api/tokens";
+import {
+  getProfile as fetchProfile,
+  linkRfid,
+  listUnlinkedCards,
+  loadSpaceDashboard,
+  setUserPrograms,
+  setUserRole,
+  unlinkRfid,
+} from "../../../api/endpoints";
+import { errorMessage } from "../../../api/client";
+import type { AssignableRole, SessionUser, SpaceDashboardData } from "../../../api/types";
 import {
   User,
   RfidInfo,
   Certification,
   UnlinkDialogState,
+  RemainingTraining,
 } from "../types";
 
 export const useProfileData = (username?: string) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [currentUser, setCurrentUser] = useState<SessionUser | null>(null);
   const [profileUser, setProfileUser] = useState<User | null>(null);
   const [rfidList, setRfidList] = useState<RfidInfo[]>([]);
   const [programs, setPrograms] = useState<string[]>([]);
   const [certifications, setCertifications] = useState<Certification[]>([]);
-  const [remainingTrainings, setRemainingTrainings] = useState<any[]>([]);
-  const [inSpaceUsers, setInSpaceUsers] = useState<any>(null);
+  const [remainingTrainings, setRemainingTrainings] = useState<RemainingTraining[]>([]);
+  const [inSpaceUsers, setInSpaceUsers] = useState<SpaceDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Form state
@@ -33,8 +44,7 @@ export const useProfileData = (username?: string) => {
 
   const getUnsetRfids = useCallback(async () => {
     try {
-      const response = await HTTPRequest.get("rfid/get_unset_rfids");
-      setRfidList(response);
+      setRfidList(await listUnlinkedCards());
     } catch (error) {
       console.error(error);
     }
@@ -44,7 +54,7 @@ export const useProfileData = (username?: string) => {
   const getProfile = useCallback(async () => {
     if (!username) return;
     try {
-      const response = await HTTPRequest.get(username);
+      const response = await fetchProfile(username);
       setProfileUser(response.user);
       setPrograms(response.programs || []);
       setCertifications(response.certifications || []);
@@ -58,14 +68,13 @@ export const useProfileData = (username?: string) => {
       );
     } catch (error) {
       console.error(error);
-      toast.error("Failed to load profile", { position: "bottom-center" });
+      toast.error(errorMessage(error, "Failed to load profile"), { position: "bottom-center" });
     }
   }, [username]);
 
   const getCurrentUsers = useCallback(async () => {
     try {
-      const response = await HTTPRequest.get("staff_dashboard");
-      setInSpaceUsers(response);
+      setInSpaceUsers(await loadSpaceDashboard());
       await getUnsetRfids();
     } catch (error) {
       console.error(error);
@@ -76,8 +85,11 @@ export const useProfileData = (username?: string) => {
   useEffect(() => {
     const init = async () => {
       setLoading(true);
-      setCurrentUser(getUser());
-      await Promise.all([getProfile(), getCurrentUsers()]);
+      const me = getStoredUser();
+      setCurrentUser(me);
+      // Space and card data are staff-only endpoints (403 for anyone else).
+      const isStaff = me?.role === "staff" || me?.role === "admin";
+      await Promise.all([getProfile(), isStaff ? getCurrentUsers() : null]);
       setLoading(false);
     };
     init();
@@ -87,10 +99,7 @@ export const useProfileData = (username?: string) => {
     async (cardNumber: string) => {
       if (!profileUser) return;
       try {
-        await HTTPRequest.put("staff_dashboard/link_rfid", {
-          card_number: cardNumber,
-          user_id: profileUser.id,
-        });
+        await linkRfid(profileUser.id, cardNumber);
         toast.success("RFID card linked successfully!", {
           position: "bottom-center",
           icon: "🎫",
@@ -100,7 +109,7 @@ export const useProfileData = (username?: string) => {
         await getUnsetRfids();
       } catch (error) {
         console.error(error);
-        toast.error("Failed to link RFID card. Please try again.", {
+        toast.error(errorMessage(error, "Failed to link RFID card. Please try again."), {
           position: "bottom-center",
         });
         throw error; // Re-throw so NFC scan UI can show error status
@@ -110,11 +119,9 @@ export const useProfileData = (username?: string) => {
   );
 
   const handleUnlinkRfid = useCallback(async () => {
-    if (!unlinkDialog.cardNumber) return;
+    if (!unlinkDialog.cardNumber || !profileUser) return;
     try {
-      await HTTPRequest.put("staff_dashboard/unlink_rfid", {
-        card_number: unlinkDialog.cardNumber,
-      });
+      await unlinkRfid(profileUser.id);
       toast.success("RFID card unlinked successfully!", {
         position: "bottom-center",
       });
@@ -123,23 +130,20 @@ export const useProfileData = (username?: string) => {
       await getUnsetRfids();
     } catch (error) {
       console.error(error);
-      toast.error("Failed to unlink RFID card. Please try again.", {
+      toast.error(errorMessage(error, "Failed to unlink RFID card. Please try again."), {
         position: "bottom-center",
       });
     } finally {
       // ALWAYS close the dialog, even if something went wrong
       setUnlinkDialog({ open: false, cardNumber: null });
     }
-  }, [unlinkDialog.cardNumber, getProfile, getUnsetRfids]);
+  }, [unlinkDialog.cardNumber, profileUser, getProfile, getUnsetRfids]);
 
   const handleSaveRole = useCallback(async () => {
     if (!profileUser) return;
     setSaving(true);
     try {
-      await HTTPRequest.patch("admin/users/set_role", {
-        user_ids: [profileUser.id],
-        role,
-      });
+      await setUserRole(profileUser.id, role as AssignableRole);
       toast.success("Role updated successfully!", {
         position: "bottom-center",
       });
@@ -147,7 +151,7 @@ export const useProfileData = (username?: string) => {
       await getProfile();
     } catch (error) {
       console.error(error);
-      toast.error("Failed to update role. Please try again.", {
+      toast.error(errorMessage(error, "Failed to update role. Please try again."), {
         position: "bottom-center",
       });
     } finally {
@@ -159,9 +163,8 @@ export const useProfileData = (username?: string) => {
     if (!profileUser) return;
     setSaving(true);
     try {
-      await HTTPRequest.patch("change_programs", {
-        user_id: profileUser.id,
-        dev_program: devProgram,
+      await setUserPrograms(profileUser.id, {
+        development: devProgram,
         volunteer: volunteerProgram,
       });
       toast.success("Programs updated successfully!", {
@@ -171,7 +174,7 @@ export const useProfileData = (username?: string) => {
       await getProfile();
     } catch (error) {
       console.error(error);
-      toast.error("Failed to update programs. Please try again.", {
+      toast.error(errorMessage(error, "Failed to update programs. Please try again."), {
         position: "bottom-center",
       });
     } finally {

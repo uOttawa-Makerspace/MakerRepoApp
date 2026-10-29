@@ -20,13 +20,15 @@ import {
 import { TabPanel } from "../../../components/TabPanel";
 import ChangeSpace from "../../../components/ChangeSpace";
 import { User, RfidInfo } from "../types";
+import type { SpaceDashboardData } from "../../../api/types";
+import { formatTappedAt } from "../utils";
 
 interface RfidTabProps {
   tabIndex: number;
   panelIndex: number;
   user: User;
   rfidList: RfidInfo[];
-  inSpaceUsers: any;
+  inSpaceUsers: SpaceDashboardData | null;
   onLinkRfid: (cardNumber: string) => Promise<void>;
   onOpenUnlinkDialog: (cardNumber: string) => void;
   onReloadCurrentUsers: () => void;
@@ -67,17 +69,17 @@ const AvailableCardItem: React.FC<{
     <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between" }}>
       <Box>
         <Typography variant="body2" sx={{ fontWeight: 600 }}>
-          Card: {rfid.cardNumber}
+          Card: {rfid.card_number}
         </Typography>
         <Typography variant="caption" color="text.secondary">
-          Tapped: {rfid.tappedAt}
+          Tapped: {formatTappedAt(rfid.tapped_at)}
         </Typography>
       </Box>
       <Button
         variant="contained"
         size="small"
         startIcon={<AddIcon />}
-        onClick={() => onLink(rfid.cardNumber)}
+        onClick={() => onLink(rfid.card_number)}
       >
         Link Card
       </Button>
