@@ -45,6 +45,8 @@ declare module "axios" {
     _retried?: boolean;
     /** @internal the access token this request was sent with */
     _sentToken?: string | null;
+    /** @internal the session generation this request was sent under */
+    _generation?: number;
   }
 }
 
@@ -293,6 +295,8 @@ api.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
 
   const token = getAccessToken();
   config._sentToken = token;
+  // Read in the same synchronous step as the token, so the pair always matches.
+  config._generation = getSessionGeneration();
   if (token) config.headers.set("Authorization", `Bearer ${token}`);
   else config.headers.delete("Authorization");
   return config;
@@ -305,7 +309,16 @@ api.interceptors.response.use(
       const config = error.config as InternalAxiosRequestConfig | undefined;
       const authed = config && config.authMode !== "none";
 
-      if (error.response?.status === 401 && config && authed) {
+      // Race: a request sent under an old session can have its 401 arrive after the user logged
+      // out and a new session started (login bumps the generation). That 401 says nothing about
+      // the new session: ending it here (or refreshing and retrying the request as the new user)
+      // would log the new user out or replay the old user's action under the new identity. Only
+      // act on a 401 if the session it was sent under is still the current one.
+      const sentGeneration = config?._generation;
+      const stale =
+        sentGeneration !== undefined && sentGeneration !== getSessionGeneration();
+
+      if (error.response?.status === 401 && config && authed && !stale) {
         if (!config._retried) {
           config._retried = true;
           if (getRefreshToken()) {
