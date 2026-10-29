@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import toast from "react-hot-toast";
-import { get } from "../../../../utils/HTTPRequests";
+import { listShifts } from "../../../../api/endpoints";
+import { errorMessage } from "../../../../api/client";
+import type { ShiftEvent } from "../../../../api/types";
 import type { Shift, MobileView, DayShifts } from "../types";
 import { extractColorFromBackground, isSameDay, getWeekStart } from "../utils/utils";
 
@@ -22,32 +24,28 @@ export const useShifts = (
     setError(null);
 
     try {
-      const startDate = new Date();
-      startDate.setMonth(startDate.getMonth() - 3);
-      const endDate = new Date();
-      endDate.setMonth(endDate.getMonth() + 3);
+      // The API caps a request at 100 days, so the old +-3 months window is fetched as two
+      // requests that overlap by two days (a one-off shift is only listed when it lies fully inside
+      // the window). Results are merged by id.
+      const DAY = 24 * 60 * 60 * 1000;
+      const now = Date.now();
+      const windows = [
+        { start: new Date(now - 92 * DAY), end: new Date(now + 1 * DAY) },
+        { start: new Date(now - 1 * DAY), end: new Date(now + 92 * DAY) },
+      ];
 
-      const params = new URLSearchParams({
-        event_type: "shift",
-        start: startDate.toISOString(),
-        end: endDate.toISOString(),
-      });
-
-      if (currentUserId) {
-        params.append("user_id", currentUserId.toString());
-      }
-
-      const data = await get(
-        `staff/my_calendar/json/${spaceId}?${params.toString()}`
+      const results = await Promise.all(
+        windows.map((range) => listShifts(spaceId, range, currentUserId))
+      );
+      const byId = new Map<string, ShiftEvent>();
+      results.flat().forEach((event) => byId.set(event.id, event));
+      const data = Array.from(byId.values()).sort(
+        (a, b) => Date.parse(a.start) - Date.parse(b.start)
       );
 
-      if (!Array.isArray(data)) {
-        throw new Error("Invalid response format from server");
-      }
-
       const formattedShifts: Shift[] = data
-        .filter((event: any) => event.extendedProps?.eventType === "shift")
-        .map((event: any) => ({
+        .filter((event) => event.extendedProps?.eventType === "shift")
+        .map((event) => ({
           id: event.id,
           title: event.title,
           start: event.start,
@@ -55,18 +53,15 @@ export const useShifts = (
           color: extractColorFromBackground(event.extendedProps?.background),
           allDay: event.allDay,
           extendedProps: {
-            reason: event.extendedProps?.description,
-            training: event.extendedProps?.training,
-            course: event.extendedProps?.course,
-            language: event.extendedProps?.language,
+            reason: event.extendedProps?.description ?? undefined,
             ...event.extendedProps,
           },
         }));
 
       setShifts(formattedShifts);
-    } catch {
+    } catch (caught) {
       setError("Failed to load shifts. Please try again.");
-      toast.error("Failed to load shifts.");
+      toast.error(errorMessage(caught, "Failed to load shifts."));
     } finally {
       setLoading(false);
     }
