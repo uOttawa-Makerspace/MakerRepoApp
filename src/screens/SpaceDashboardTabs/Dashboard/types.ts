@@ -9,7 +9,6 @@ export interface User {
   name: string;
   email: string;
   flagged: boolean | null;
-  flag_message?: string;
   avatar_url?: string;
   signed_safety_sheet: boolean;
   membership_status: boolean;
