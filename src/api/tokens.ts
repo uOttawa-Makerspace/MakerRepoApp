@@ -16,7 +16,42 @@ const USER_KEY = "user";
 const LEGACY_TOKEN_KEY = "token";
 
 let accessToken: string | null = null;
+/** performance.now() reading at which the access token counts as expired (see tokenLifetimeMs). */
 let accessTokenExpiresAt = 0;
+
+/** Monotonic local clock: immune to the device wall clock being wrong or being changed. */
+const monotonicNow = () => performance.now();
+
+/** Access token lifetime when the response gives nothing usable (session.md: 15 minutes). */
+const DEFAULT_LIFETIME_MS = 15 * 60_000;
+const MAX_LIFETIME_MS = 60 * 60_000;
+
+/**
+ * How long the access token lives, measured on the SERVER clock only: the JWT's `exp - iat`, or
+ * failing that `access_token_expires_at` minus `iat`. Neither is compared with the device clock,
+ * so a device that is hours ahead or behind cannot make every request look "expiring" (a refresh
+ * per request) or never expiring. The expiry is then anchored at the moment we received the token.
+ */
+const tokenLifetimeMs = (session: SessionResponse): number => {
+  try {
+    const payload = session.access_token.split(".")[1];
+    const claims = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/"))) as {
+      iat?: unknown;
+      exp?: unknown;
+    };
+    if (typeof claims.iat === "number" && typeof claims.exp === "number") {
+      const ms = (claims.exp - claims.iat) * 1000;
+      if (ms > 0 && ms <= MAX_LIFETIME_MS) return ms;
+    }
+    if (typeof claims.iat === "number") {
+      const ms = Date.parse(session.access_token_expires_at) - claims.iat * 1000;
+      if (ms > 0 && ms <= MAX_LIFETIME_MS) return ms;
+    }
+  } catch {
+    /* not a decodable JWT: use the documented default */
+  }
+  return DEFAULT_LIFETIME_MS;
+};
 
 /**
  * Session generation. Bumped whenever the session is cleared or a new one is started by a login.
@@ -60,7 +95,7 @@ export const getAccessToken = () => accessToken;
 
 /** True when there is no access token, or it expires within `marginMs`. */
 export const accessTokenNeedsRefresh = (marginMs = 30_000) =>
-  !accessToken || accessTokenExpiresAt - Date.now() < marginMs;
+  !accessToken || accessTokenExpiresAt - monotonicNow() < marginMs;
 
 /**
  * Set when another tab signed in as a different user and this tab stepped aside (detachSession).
@@ -94,8 +129,9 @@ export const getStoredUser = (): SessionUser | null => {
 
 const writeSession = (session: SessionResponse) => {
   accessToken = session.access_token;
-  const expires = Date.parse(session.access_token_expires_at);
-  accessTokenExpiresAt = Number.isNaN(expires) ? Date.now() + 14 * 60_000 : expires;
+  // Anchored at receipt on the monotonic clock. Latency makes this slightly late; the 30 s margin
+  // and the 401 -> refresh -> retry path cover that.
+  accessTokenExpiresAt = monotonicNow() + tokenLifetimeMs(session);
   storage.set(REFRESH_KEY, session.refresh_token);
   storage.set(USER_KEY, JSON.stringify(pickUser(session.user)));
 };
