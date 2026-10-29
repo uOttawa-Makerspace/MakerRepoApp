@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { HashRouter as Router, Route, Routes } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
+import Button from "@mui/material/Button";
 import useErrorBoundary from "use-error-boundary";
 import Login from "./screens/Login/index";
 import Home from "./screens/Home";
@@ -12,7 +13,7 @@ import "bootstrap/dist/js/bootstrap";
 import PrivateRoute from "./utils/PrivateRoute";
 import Help from "./screens/Help/index";
 import { getSession } from "./api/endpoints";
-import { endSession, endTabSession, onSessionEnded } from "./api/client";
+import { ApiError, endSession, endTabSession, onSessionEnded } from "./api/client";
 import {
   REFRESH_TOKEN_STORAGE_KEY,
   USER_STORAGE_KEY,
@@ -29,6 +30,9 @@ function App() {
   const [authLoading, setAuthLoading] = useState(true);
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [user, setUser] = useState<SessionUser | null>(null);
+  const [startupError, setStartupError] = useState(false);
+  const [retrying, setRetrying] = useState(false);
+  const retryNowRef = useRef<() => void>(() => {});
 
   const airbrake = getAirbrake();
 
@@ -64,26 +68,69 @@ function App() {
     window.addEventListener("storage", onStorage);
 
     removeLegacyStorage();
-    if (!getRefreshToken()) {
-      setAuthLoading(false);
-    } else {
-      // GET /api/v1/session (refreshes the access token first, since it only lives in memory).
-      getSession()
-        .then((sessionUser) => {
-          setUser(sessionUser);
-          setLoggedIn(true);
-        })
-        .catch(() => {
-          // A 401 has already cleared the session; a network/5xx failure keeps the stored refresh
-          // token so a reload can try again.
-          setLoggedIn(false);
-        })
-        .finally(() => setAuthLoading(false));
-    }
-
     return () => {
       unsubscribe();
       window.removeEventListener("storage", onStorage);
+    };
+  }, []);
+
+  // Restore the session on start. GET /api/v1/session refreshes the access token first (it only
+  // lives in memory). Only a real 401 / no stored session goes to login; network errors, timeouts,
+  // 429 and 5xx keep the stored refresh token and show a retry state instead of looking like a logout.
+  useEffect(() => {
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let attempt = 0;
+
+    const restore = () => {
+      if (cancelled) return;
+      if (!getRefreshToken()) {
+        setStartupError(false);
+        setAuthLoading(false);
+        return;
+      }
+      setRetrying(true);
+      getSession()
+        .then((sessionUser) => {
+          if (cancelled) return;
+          setUser(sessionUser);
+          setLoggedIn(true);
+          setStartupError(false);
+          setAuthLoading(false);
+        })
+        .catch((error: unknown) => {
+          if (cancelled) return;
+          const sessionGone =
+            (error instanceof ApiError && error.status === 401) || !getRefreshToken();
+          if (sessionGone) {
+            // The client has already cleared the session.
+            setLoggedIn(false);
+            setStartupError(false);
+            setAuthLoading(false);
+            return;
+          }
+          setStartupError(true);
+          setAuthLoading(false);
+          // Exponential backoff with jitter: 2 s, 4 s, ... capped at 30 s.
+          const delay =
+            Math.min(30_000, 2_000 * 2 ** attempt) * (0.75 + Math.random() * 0.5);
+          attempt += 1;
+          timer = setTimeout(restore, delay);
+        })
+        .finally(() => {
+          if (!cancelled) setRetrying(false);
+        });
+    };
+
+    retryNowRef.current = () => {
+      if (timer) clearTimeout(timer);
+      restore();
+    };
+    restore();
+
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
     };
   }, []);
 
@@ -95,6 +142,24 @@ function App() {
       });
     },
   });
+
+  if (startupError) {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <div className="content" role="alert">
+          <p>Can&apos;t reach MakerRepo, retrying…</p>
+          <Button
+            variant="contained"
+            disabled={retrying}
+            onClick={() => retryNowRef.current()}
+          >
+            Retry now
+          </Button>
+        </div>
+      </ThemeProvider>
+    );
+  }
 
   if (authLoading) {
     return (
