@@ -1,4 +1,11 @@
-import { api, endSession, request, requestWithHeaders, seg } from "./client";
+import {
+  api,
+  endSession,
+  REFRESH_TIMEOUT_MS,
+  request,
+  requestWithHeaders,
+  seg,
+} from "./client";
 import { getRefreshToken, storeSession } from "./tokens";
 import type {
   AssignableRole,
@@ -52,6 +59,7 @@ export const logout = async (): Promise<void> => {
       await api.delete("session", {
         headers: { "X-Refresh-Token": refreshToken },
         authMode: "none",
+        timeout: REFRESH_TIMEOUT_MS,
       });
     }
   } catch {

@@ -168,7 +168,7 @@ export const endTabSession = () => {
 
 const REQUEST_TIMEOUT_MS = 15_000;
 /** Shorter: it runs under the cross-tab lock, with up to MAX_REFRESH_ATTEMPTS tries. */
-const REFRESH_TIMEOUT_MS = 10_000;
+export const REFRESH_TIMEOUT_MS = 10_000;
 
 export const api: AxiosInstance = axios.create({
   baseURL: `${EnvVariables.api_url}/api/v1`,
