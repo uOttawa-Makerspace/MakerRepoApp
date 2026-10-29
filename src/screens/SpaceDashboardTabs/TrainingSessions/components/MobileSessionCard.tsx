@@ -74,7 +74,7 @@ const MobileSessionCard = React.memo(
             >
               <Box sx={{ flexGrow: 1, minWidth: 0 }}>
                 <Typography variant="h6" sx={{ fontWeight: 600 }} gutterBottom noWrap>
-                  {session.training.name_en}
+                  {session.training?.name_en}
                 </Typography>
                 <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
                   <Chip
