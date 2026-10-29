@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import toast from "react-hot-toast";
-import * as HTTPRequest from "../../../../utils/HTTPRequests";
+import { assignPrinter } from "../../../../api/endpoints";
+import { errorMessage } from "../../../../api/client";
 import type { PrinterType, PrinterOption, UserOption } from "../types";
 
 export function usePrinterLinkForm(
@@ -55,12 +56,7 @@ export function usePrinterLinkForm(
     closeConfirm();
 
     try {
-      await HTTPRequest.patch("printers/link_printer_to_user", {
-        printer: {
-          user_id: selectedUser.id,
-          printer_id: selectedPrinter.id,
-        },
-      });
+      await assignPrinter(selectedPrinter.id, Number(selectedUser.id));
 
       toast.success(
         `${selectedUser.name} linked to ${selectedPrinter.name}`,
@@ -72,7 +68,7 @@ export function usePrinterLinkForm(
       onLink();
     } catch (error) {
       console.error(error);
-      toast.error("Failed to link printer. Please try again.", {
+      toast.error(errorMessage(error, "Failed to link printer. Please try again."), {
         position: "bottom-center",
       });
     } finally {
