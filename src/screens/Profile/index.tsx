@@ -26,6 +26,7 @@ const Profile: React.FC = () => {
     currentUser,
     profileUser,
     rfidList,
+    rfidListError,
     certifications,
     inSpaceUsers,
     loading,
@@ -75,7 +76,7 @@ const Profile: React.FC = () => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          minHeight: "60vh"
+          minHeight: "60vh",
         }}
       >
         <CircularProgress />
@@ -112,10 +113,7 @@ const Profile: React.FC = () => {
           onVolunteerProgramChange={setVolunteerProgram}
         />
 
-        <CertificationsTab
-          tabIndex={tabIndex}
-          certifications={certifications}
-        />
+        <CertificationsTab tabIndex={tabIndex} certifications={certifications} />
 
         {isAdmin && (
           <RoleManagerTab
@@ -136,6 +134,7 @@ const Profile: React.FC = () => {
           panelIndex={isAdmin ? 4 : 3}
           user={profileUser}
           rfidList={rfidList}
+          rfidListError={rfidListError}
           inSpaceUsers={inSpaceUsers}
           onLinkRfid={handleLinkRfid}
           onOpenUnlinkDialog={openUnlinkDialog}

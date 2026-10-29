@@ -28,6 +28,8 @@ interface RfidTabProps {
   panelIndex: number;
   user: User;
   rfidList: RfidInfo[];
+  /** Set when loading the unlinked cards failed (so an empty list is not shown as "none"). */
+  rfidListError?: string | null;
   inSpaceUsers: SpaceDashboardData | null;
   onLinkRfid: (cardNumber: string) => Promise<void>;
   onOpenUnlinkDialog: (cardNumber: string) => void;
@@ -94,6 +96,7 @@ const RfidTab: React.FC<RfidTabProps> = ({
   panelIndex,
   user,
   rfidList,
+  rfidListError,
   inSpaceUsers,
   onLinkRfid,
   onOpenUnlinkDialog,
@@ -179,7 +182,7 @@ const RfidTab: React.FC<RfidTabProps> = ({
               </Alert>
 
               {/* NFC Scan Button */}
-              { isNfcSupported && (
+              {isNfcSupported && (
                 <Box sx={{ mb: 3 }}>
                   <Button
                     variant="contained"
@@ -193,15 +196,11 @@ const RfidTab: React.FC<RfidTabProps> = ({
                       fontSize: "1.1rem",
                       fontWeight: "bold",
                       letterSpacing: 1,
-                      backgroundColor: scanning
-                        ? "grey.500"
-                        : "success.main",
+                      backgroundColor: scanning ? "grey.500" : "success.main",
                       "&:hover": {
                         backgroundColor: "success.dark",
                       },
-                      animation: scanning
-                        ? "pulse 1.5s ease-in-out infinite"
-                        : "none",
+                      animation: scanning ? "pulse 1.5s ease-in-out infinite" : "none",
                       "@keyframes pulse": {
                         "0%": { opacity: 1 },
                         "50%": { opacity: 0.6 },
@@ -209,9 +208,7 @@ const RfidTab: React.FC<RfidTabProps> = ({
                       },
                     }}
                   >
-                    {scanning
-                      ? "Waiting for card..."
-                      : "Scan Card to Register"}
+                    {scanning ? "Waiting for card..." : "Scan Card to Register"}
                   </Button>
 
                   {scanStatus && (
@@ -244,19 +241,26 @@ const RfidTab: React.FC<RfidTabProps> = ({
                   Tap a card in the selected space, then link it below
                 </Typography>
 
-                {rfidList.length === 0 ? (
+                {rfidListError ? (
+                  <Alert
+                    severity="error"
+                    action={
+                      <Button color="inherit" size="small" onClick={onReloadCurrentUsers}>
+                        Retry
+                      </Button>
+                    }
+                  >
+                    {rfidListError}
+                  </Alert>
+                ) : rfidList.length === 0 ? (
                   <Alert severity="warning">
-                    No unlinked cards detected. Please tap a card or select a
-                    different space.
+                    No unlinked cards detected. Please tap a card or select a different
+                    space.
                   </Alert>
                 ) : (
                   <Stack spacing={1}>
                     {rfidList.map((rfid, index) => (
-                      <AvailableCardItem
-                        key={index}
-                        rfid={rfid}
-                        onLink={onLinkRfid}
-                      />
+                      <AvailableCardItem key={index} rfid={rfid} onLink={onLinkRfid} />
                     ))}
                   </Stack>
                 )}

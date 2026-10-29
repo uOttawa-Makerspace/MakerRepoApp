@@ -28,6 +28,7 @@ export const useProfileData = (username?: string) => {
   const [certifications, setCertifications] = useState<Certification[]>([]);
   const [remainingTrainings, setRemainingTrainings] = useState<RemainingTraining[]>([]);
   const [inSpaceUsers, setInSpaceUsers] = useState<SpaceDashboardData | null>(null);
+  const [rfidListError, setRfidListError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Form state
@@ -45,8 +46,13 @@ export const useProfileData = (username?: string) => {
   const getUnsetRfids = useCallback(async () => {
     try {
       setRfidList(await listUnlinkedCards());
+      setRfidListError(null);
     } catch (error) {
+      // Keep the last list but say so: an empty list would read as "no unlinked cards".
       console.error(error);
+      const message = errorMessage(error, "Failed to load unlinked RFID cards");
+      setRfidListError(message);
+      toast.error(message, { position: "bottom-center", id: "profile-unset-rfids" });
     }
   }, []);
 
@@ -60,15 +66,13 @@ export const useProfileData = (username?: string) => {
       setCertifications(response.certifications || []);
       setRemainingTrainings(response.remaining_trainings || []);
       setRole(response.user.role);
-      setVolunteerProgram(
-        (response.programs || []).includes("Volunteer Program")
-      );
-      setDevProgram(
-        (response.programs || []).includes("Development Program")
-      );
+      setVolunteerProgram((response.programs || []).includes("Volunteer Program"));
+      setDevProgram((response.programs || []).includes("Development Program"));
     } catch (error) {
       console.error(error);
-      toast.error(errorMessage(error, "Failed to load profile"), { position: "bottom-center" });
+      toast.error(errorMessage(error, "Failed to load profile"), {
+        position: "bottom-center",
+      });
     }
   }, [username]);
 
@@ -78,6 +82,10 @@ export const useProfileData = (username?: string) => {
       await getUnsetRfids();
     } catch (error) {
       console.error(error);
+      toast.error(errorMessage(error, "Failed to load who is in the space"), {
+        position: "bottom-center",
+        id: "profile-current-users",
+      });
     }
   }, [getUnsetRfids]);
 
@@ -115,7 +123,7 @@ export const useProfileData = (username?: string) => {
         throw error; // Re-throw so NFC scan UI can show error status
       }
     },
-    [profileUser, getProfile, getUnsetRfids]
+    [profileUser, getProfile, getUnsetRfids],
   );
 
   const handleUnlinkRfid = useCallback(async () => {
@@ -208,6 +216,7 @@ export const useProfileData = (username?: string) => {
     currentUser,
     profileUser,
     rfidList,
+    rfidListError,
     programs,
     certifications,
     remainingTrainings,

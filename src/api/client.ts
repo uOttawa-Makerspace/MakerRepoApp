@@ -323,21 +323,38 @@ const reportUnexpected = (error: ApiError, method: string, path: string) => {
   });
 };
 
-/** Typed request: resolves with the body, rejects with ApiError. */
-export const request = async <T>(
-  method: "get" | "post" | "put" | "patch" | "delete",
+type Method = "get" | "post" | "put" | "patch" | "delete";
+
+/** Typed request: resolves with the body and the (lower-cased) response headers. */
+export const requestWithHeaders = async <T>(
+  method: Method,
   path: string,
   options: AxiosRequestConfig = {},
-): Promise<T> => {
+): Promise<{ data: T; headers: Record<string, string | undefined> }> => {
   try {
     const response = await api.request<T>({ method, url: path, ...options });
-    return response.data;
+    return {
+      data: response.data,
+      headers: Object.fromEntries(
+        Object.entries(response.headers).map(([key, value]) => [
+          key.toLowerCase(),
+          typeof value === "string" ? value : undefined,
+        ]),
+      ),
+    };
   } catch (caught) {
     const error = toApiError(caught);
     reportUnexpected(error, method, path);
     throw error;
   }
 };
+
+/** Typed request: resolves with the body, rejects with ApiError. */
+export const request = async <T>(
+  method: Method,
+  path: string,
+  options: AxiosRequestConfig = {},
+): Promise<T> => (await requestWithHeaders<T>(method, path, options)).data;
 
 /** Message for a toast: the API's message (plus field errors) for 4xx, `fallback` otherwise. */
 export const errorMessage = (error: unknown, fallback: string): string => {

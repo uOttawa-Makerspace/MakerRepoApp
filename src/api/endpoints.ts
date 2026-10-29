@@ -1,4 +1,4 @@
-import { api, endSession, request, seg } from "./client";
+import { api, endSession, request, requestWithHeaders, seg } from "./client";
 import { getRefreshToken, storeSession } from "./tokens";
 import type {
   AssignableRole,
@@ -162,18 +162,28 @@ export const resolvePrinterIssue = (issueId: number) =>
 
 // --- shifts ---
 
-export const listShifts = (
+/**
+ * `truncated` is the `X-Truncated: true` header (shifts.md): the server cut the list at its cap.
+ * Browsers only expose it cross-origin when the API sends Access-Control-Expose-Headers.
+ */
+export const listShifts = async (
   spaceId: number | string,
   range: { start: Date; end: Date },
   userId?: number,
-) =>
-  request<ShiftEvent[]>("get", `spaces/${seg(spaceId)}/shifts`, {
-    params: {
-      start: range.start.toISOString(),
-      end: range.end.toISOString(),
-      ...(userId ? { user_id: userId } : {}),
+): Promise<{ events: ShiftEvent[]; truncated: boolean }> => {
+  const { data, headers } = await requestWithHeaders<ShiftEvent[]>(
+    "get",
+    `spaces/${seg(spaceId)}/shifts`,
+    {
+      params: {
+        start: range.start.toISOString(),
+        end: range.end.toISOString(),
+        ...(userId ? { user_id: userId } : {}),
+      },
     },
-  });
+  );
+  return { events: data, truncated: headers["x-truncated"] === "true" };
+};
 
 // --- public ---
 

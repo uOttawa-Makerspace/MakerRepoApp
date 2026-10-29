@@ -9,11 +9,12 @@ import { extractColorFromBackground, isSameDay, getWeekStart } from "../utils/ut
 export const useShifts = (
   reloadShifts: number,
   spaceId?: number,
-  currentUserId?: number
+  currentUserId?: number,
 ) => {
   const [shifts, setShifts] = useState<Shift[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [truncated, setTruncated] = useState(false);
   const [mobileView, setMobileView] = useState<MobileView>("day");
   const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -22,6 +23,7 @@ export const useShifts = (
 
     setLoading(true);
     setError(null);
+    setTruncated(false);
 
     try {
       // The API caps a request at 100 days, so the old +-3 months window is fetched as two
@@ -35,12 +37,16 @@ export const useShifts = (
       ];
 
       const results = await Promise.all(
-        windows.map((range) => listShifts(spaceId, range, currentUserId))
+        windows.map((range) => listShifts(spaceId, range, currentUserId)),
       );
       const byId = new Map<string, ShiftEvent>();
-      results.flat().forEach((event) => byId.set(event.id, event));
+      // If either window was cut off by the server, say so rather than show a partial list as whole.
+      setTruncated(results.some((result) => result.truncated));
+      results
+        .flatMap((result) => result.events)
+        .forEach((event) => byId.set(event.id, event));
       const data = Array.from(byId.values()).sort(
-        (a, b) => Date.parse(a.start) - Date.parse(b.start)
+        (a, b) => Date.parse(a.start) - Date.parse(b.start),
       );
 
       const formattedShifts: Shift[] = data
@@ -104,11 +110,8 @@ export const useShifts = (
 
   // Derived data
   const dayShifts = useMemo(
-    () =>
-      shifts.filter((shift) =>
-        isSameDay(new Date(shift.start), currentDate)
-      ),
-    [shifts, currentDate]
+    () => shifts.filter((shift) => isSameDay(new Date(shift.start), currentDate)),
+    [shifts, currentDate],
   );
 
   const weekShifts: DayShifts[] = useMemo(() => {
@@ -118,17 +121,12 @@ export const useShifts = (
       day.setDate(weekStart.getDate() + i);
       return {
         date: day,
-        shifts: shifts.filter((shift) =>
-          isSameDay(new Date(shift.start), day)
-        ),
+        shifts: shifts.filter((shift) => isSameDay(new Date(shift.start), day)),
       };
     });
   }, [shifts, currentDate]);
 
-  const isToday = useMemo(
-    () => isSameDay(currentDate, new Date()),
-    [currentDate]
-  );
+  const isToday = useMemo(() => isSameDay(currentDate, new Date()), [currentDate]);
 
   // Statistics
   const stats = useMemo(() => {
@@ -152,6 +150,7 @@ export const useShifts = (
     shifts,
     loading,
     error,
+    truncated,
     mobileView,
     setMobileView,
     currentDate,
