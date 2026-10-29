@@ -5,7 +5,9 @@ import DOMPurify from "dompurify";
  * quotes, code, line breaks, headings). Nothing else is needed, so only those formatting tags
  * survive. Deliberately absent: <style> (CSS injection / UI redressing), <a> (links are not
  * needed to read an issue, and would need rel/target handling), <img>, <form>, <svg>, etc.
- * No attributes at all are kept (no style, class, href, on*). Disallowed tags are unwrapped, so
+ * No attributes at all are kept (no style, class, href, on*): ALLOWED_ATTR is empty and
+ * DOMPurify's data-* and aria-* allowances (both on by default, and not governed by ALLOWED_ATTR)
+ * are switched off explicitly. Disallowed tags are unwrapped, so
  * their text stays; <style> and <script> are dropped with their content.
  */
 const ALLOWED_TAGS = [
@@ -29,4 +31,9 @@ const ALLOWED_TAGS = [
 ];
 
 export const sanitizeIssueHtml = (html: string): string =>
-  DOMPurify.sanitize(html ?? "", { ALLOWED_TAGS, ALLOWED_ATTR: [] });
+  DOMPurify.sanitize(html ?? "", {
+    ALLOWED_TAGS,
+    ALLOWED_ATTR: [],
+    ALLOW_DATA_ATTR: false,
+    ALLOW_ARIA_ATTR: false,
+  });
