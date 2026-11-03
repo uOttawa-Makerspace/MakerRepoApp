@@ -1,4 +1,5 @@
 import React from "react";
+import { ApiError } from "../../api/client";
 import {
   AdminPanelSettings as AdminIcon,
   Work as WorkIcon,
@@ -51,4 +52,15 @@ export const formatTappedAt = (tappedAt: string): string => {
     if (Math.abs(seconds) >= size) return rtf.format(Math.round(seconds / size), unit);
   }
   return rtf.format(seconds, "second");
+};
+
+export const LINK_CARD_FALLBACK = "Failed to link card. Please try again.";
+
+/** The server's card_number message when present (422 validation_failed), else the generic text. */
+export const linkCardErrorMessage = (error: unknown): string => {
+  if (error instanceof ApiError) {
+    const reason = error.fields?.card_number?.[0];
+    if (reason) return `Failed to link card: ${reason}`;
+  }
+  return LINK_CARD_FALLBACK;
 };

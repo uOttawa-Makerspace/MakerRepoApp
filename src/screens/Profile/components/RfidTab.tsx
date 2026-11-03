@@ -21,7 +21,7 @@ import { TabPanel } from "../../../components/TabPanel";
 import ChangeSpace from "../../../components/ChangeSpace";
 import { User, RfidInfo } from "../types";
 import type { SpaceDashboardData } from "../../../api/types";
-import { formatTappedAt } from "../utils";
+import { formatTappedAt, linkCardErrorMessage } from "../utils";
 
 interface RfidTabProps {
   tabIndex: number;
@@ -144,10 +144,10 @@ const RfidTab: React.FC<RfidTabProps> = ({
               severity: "success",
               message: `Card ${cardNumber} successfully linked!`,
             });
-          } catch {
+          } catch (error) {
             setScanStatus({
               severity: "error",
-              message: "Failed to link card. Please try again.",
+              message: linkCardErrorMessage(error),
             });
           }
         }
