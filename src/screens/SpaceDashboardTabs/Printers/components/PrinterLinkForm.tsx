@@ -8,6 +8,7 @@ import {
   Divider,
   Stack,
   Autocomplete,
+  type AutocompleteRenderInputParams,
   TextField,
   Button,
   CircularProgress,
@@ -66,36 +67,42 @@ const getUserOptionLabel = (option: UserOption) => option.name;
 
 const adornmentSx = { ml: 1, mr: -0.5, color: "action.active" } as const;
 
-const renderPrinterInput = (params: any) => (
+export const renderPrinterInput = (params: AutocompleteRenderInputParams) => (
   <TextField
     {...params}
     label="Select Printer"
     placeholder="Choose a printer..."
-    InputProps={{
-      ...params.InputProps,
-      startAdornment: (
-        <>
-          <PrintIcon sx={adornmentSx} />
-          {params.InputProps.startAdornment}
-        </>
-      ),
+    slotProps={{
+      ...params.slotProps,
+      input: {
+        ...params.slotProps.input,
+        startAdornment: (
+          <>
+            <PrintIcon sx={adornmentSx} />
+            {params.slotProps.input.startAdornment}
+          </>
+        ),
+      },
     }}
   />
 );
 
-const renderUserInput = (params: any) => (
+export const renderUserInput = (params: AutocompleteRenderInputParams) => (
   <TextField
     {...params}
     label="Select User"
     placeholder="Choose a user..."
-    InputProps={{
-      ...params.InputProps,
-      startAdornment: (
-        <>
-          <PersonIcon sx={adornmentSx} />
-          {params.InputProps.startAdornment}
-        </>
-      ),
+    slotProps={{
+      ...params.slotProps,
+      input: {
+        ...params.slotProps.input,
+        startAdornment: (
+          <>
+            <PersonIcon sx={adornmentSx} />
+            {params.slotProps.input.startAdornment}
+          </>
+        ),
+      },
     }}
   />
 );
