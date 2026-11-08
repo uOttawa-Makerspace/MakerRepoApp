@@ -1,14 +1,19 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import toast from "react-hot-toast";
-import * as HTTPRequest from "../../../../utils/HTTPRequests";
-import { getUser } from "../../../../utils/Common";
+import {
+  createTrainingSession,
+  getTrainingSessionOptions,
+} from "../../../../api/endpoints";
+import { errorMessage } from "../../../../api/client";
+import { getStoredUser } from "../../../../api/tokens";
 import type { NewTrainingSessionData, FormErrors } from "../types";
 
 export function useTrainingSessionForm(
   spaceId: number | string | null,
   reloadTrainingSessions: () => void
 ) {
-  const currentUser = getUser();
+  const currentUser = getStoredUser();
+  const isAdmin = currentUser?.role === "admin";
 
   // Form state
   const [data, setData] = useState<NewTrainingSessionData | null>(null);
@@ -45,27 +50,27 @@ export function useTrainingSessionForm(
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const response: NewTrainingSessionData = await HTTPRequest.get(
-        "staff/training_sessions/new"
-      );
+      // Trainings on offer depend on the space, so ask for the one on screen.
+      const response: NewTrainingSessionData =
+        await getTrainingSessionOptions(spaceId);
       setData(response);
 
       if (response.trainings?.length > 0)
         setTrainingId(String(response.trainings[0][0]));
-      if (response.level?.length > 0) setTrainingLevel(response.level[0]);
+      if (response.levels?.length > 0) setTrainingLevel(response.levels[0]);
       if (response.course_names?.length > 0)
         setTrainingCourse(response.course_names[0]);
 
-      setTrainingInstructor(resolveDefaultInstructor(response.admins));
+      setTrainingInstructor(resolveDefaultInstructor(response.instructors));
     } catch (error) {
       console.error(error);
-      toast.error("Failed to load training session data", {
+      toast.error(errorMessage(error, "Failed to load training session data"), {
         position: "bottom-center",
       });
     } finally {
       setLoading(false);
     }
-  }, [resolveDefaultInstructor]);
+  }, [resolveDefaultInstructor, spaceId]);
 
   useEffect(() => {
     fetchData();
@@ -94,14 +99,14 @@ export function useTrainingSessionForm(
   }, []);
 
   const handleSelectAll = useCallback(() => {
-    if (!data?.users) return;
-    setTrainingUsers(data.users.map((u) => String(u[0])));
+    if (!data?.trainees) return;
+    setTrainingUsers(data.trainees.map((u) => String(u[0])));
     setErrors((prev) => {
       if (!prev.users) return prev;
       const { users, ...rest } = prev;
       return rest;
     });
-  }, [data?.users]);
+  }, [data?.trainees]);
 
   const handleDeselectAll = useCallback(() => {
     setTrainingUsers([]);
@@ -130,9 +135,9 @@ export function useTrainingSessionForm(
       setTrainingId(
         data.trainings[0]?.[0] ? String(data.trainings[0][0]) : ""
       );
-      setTrainingLevel(data.level[0] || "");
+      setTrainingLevel(data.levels[0] || "");
       setTrainingCourse(data.course_names[0] || "");
-      setTrainingInstructor(resolveDefaultInstructor(data.admins));
+      setTrainingInstructor(resolveDefaultInstructor(data.instructors));
     }
   }, [data, resolveDefaultInstructor]);
 
@@ -156,32 +161,29 @@ export function useTrainingSessionForm(
     setConfirmDialog(false);
 
     try {
-      const response = await HTTPRequest.post("staff/training_sessions", {
-        training_session: { space_id: spaceId },
-        training_id: trainingId,
+      await createTrainingSession({
+        space_id: Number(spaceId),
+        training_id: Number(trainingId),
         level: trainingLevel,
         course: trainingCourse,
-        user_id: trainingInstructor,
-        training_session_users: trainingUsers,
+        // Staff are always the instructor of their own sessions; only admins may name someone else.
+        ...(isAdmin && trainingInstructor
+          ? { instructor_id: Number(trainingInstructor) }
+          : {}),
+        user_ids: trainingUsers.map(Number),
       });
 
-      if (response.data.created === true) {
-        toast.success(
-          `Training session created with ${trainingUsers.length} trainee${
-            trainingUsers.length !== 1 ? "s" : ""
-          }!`,
-          { position: "bottom-center", icon: "🎓", duration: 4000 }
-        );
-        reloadTrainingSessions();
-        resetForm();
-      } else {
-        toast.error("Error creating training session!", {
-          position: "bottom-center",
-        });
-      }
+      toast.success(
+        `Training session created with ${trainingUsers.length} trainee${
+          trainingUsers.length !== 1 ? "s" : ""
+        }!`,
+        { position: "bottom-center", icon: "🎓", duration: 4000 }
+      );
+      reloadTrainingSessions();
+      resetForm();
     } catch (error) {
       console.error(error);
-      toast.error("Failed to create training session. Please try again.", {
+      toast.error(errorMessage(error, "Failed to create training session. Please try again."), {
         position: "bottom-center",
       });
     } finally {
@@ -194,23 +196,24 @@ export function useTrainingSessionForm(
     trainingCourse,
     trainingInstructor,
     trainingUsers,
+    isAdmin,
     reloadTrainingSessions,
     resetForm,
   ]);
 
   // Derived data
   const filteredUsers = useMemo(() => {
-    if (!data?.users) return [];
-    if (!searchQuery) return data.users;
+    if (!data?.trainees) return [];
+    if (!searchQuery) return data.trainees;
     const q = searchQuery.toLowerCase();
-    return data.users.filter((user) => user[1].toLowerCase().includes(q));
-  }, [data?.users, searchQuery]);
+    return data.trainees.filter((user) => user[1].toLowerCase().includes(q));
+  }, [data?.trainees, searchQuery]);
 
   const selectedUsersData = useMemo(() => {
-    if (!data?.users || trainingUsers.length === 0) return [];
+    if (!data?.trainees || trainingUsers.length === 0) return [];
     const selectedSet = new Set(trainingUsers);
-    return data.users.filter((user) => selectedSet.has(String(user[0])));
-  }, [data?.users, trainingUsers]);
+    return data.trainees.filter((user) => selectedSet.has(String(user[0])));
+  }, [data?.trainees, trainingUsers]);
 
   const trainingName = useMemo(
     () => data?.trainings.find((t) => String(t[0]) === trainingId)?.[1] ?? "",
@@ -219,8 +222,8 @@ export function useTrainingSessionForm(
 
   const instructorName = useMemo(
     () =>
-      data?.admins.find((a) => String(a[0]) === trainingInstructor)?.[1] ?? "",
-    [data?.admins, trainingInstructor]
+      data?.instructors.find((a) => String(a[0]) === trainingInstructor)?.[1] ?? "",
+    [data?.instructors, trainingInstructor]
   );
 
   return {
@@ -229,6 +232,7 @@ export function useTrainingSessionForm(
     loading,
     submitting,
     errors,
+    isAdmin,
 
     // form values
     trainingId,

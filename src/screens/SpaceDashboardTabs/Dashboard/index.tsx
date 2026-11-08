@@ -61,7 +61,7 @@ const Dashboard: React.FC<DashboardProps> = ({
     openSignOutDialog,
     closeSignOutDialog,
     confirmSignOut,
-  } = useSignOut(handleReloadCurrentUsers);
+  } = useSignOut(spaceId, handleReloadCurrentUsers);
 
   // Wrap the reload callback to also clear search after sign-in
   const handleReloadAfterSignIn = useCallback(() => {
@@ -75,11 +75,11 @@ const Dashboard: React.FC<DashboardProps> = ({
     openSignInDialog,
     closeSignInDialog,
     confirmSignIn,
-  } = useSignIn(handleReloadAfterSignIn);
+  } = useSignIn(spaceId, handleReloadAfterSignIn);
 
   const navigateToProfile = useCallback(
     (username: string) => {
-      navigate(`/profile/${username}`);
+      navigate(`/profile/${encodeURIComponent(username)}`);
     },
     [navigate]
   );

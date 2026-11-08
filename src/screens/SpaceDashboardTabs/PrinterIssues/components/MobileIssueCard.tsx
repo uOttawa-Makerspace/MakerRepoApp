@@ -1,5 +1,5 @@
 import React, { memo, useCallback } from "react";
-import DOMPurify from "dompurify";
+import { sanitizeIssueHtml } from "../../../../utils/sanitizeIssueHtml";
 import {
   Card,
   CardContent,
@@ -38,7 +38,7 @@ const PrinterChip = memo<{ name?: string }>(({ name }) =>
     <Chip icon={<PrintIcon />} label={name} size="small" variant="outlined" />
   ) : (
     <Chip label="Unknown Printer" size="small" color="warning" variant="outlined" />
-  )
+  ),
 );
 
 PrinterChip.displayName = "PrinterChip";
@@ -47,18 +47,15 @@ const MobileIssueCard = memo<MobileIssueCardProps>(
   ({ issue, isExpanded, onToggleExpand, onMenuOpen, onResolve }) => {
     const handleToggle = useCallback(
       () => onToggleExpand(issue.id),
-      [issue.id, onToggleExpand]
+      [issue.id, onToggleExpand],
     );
 
     const handleMenu = useCallback(
       (e: React.MouseEvent<HTMLElement>) => onMenuOpen(e, issue),
-      [issue, onMenuOpen]
+      [issue, onMenuOpen],
     );
 
-    const handleResolve = useCallback(
-      () => onResolve(issue),
-      [issue, onResolve]
-    );
+    const handleResolve = useCallback(() => onResolve(issue), [issue, onResolve]);
 
     return (
       <Card
@@ -76,15 +73,11 @@ const MobileIssueCard = memo<MobileIssueCardProps>(
               sx={{
                 display: "flex",
                 justifyContent: "space-between",
-                alignItems: "start"
+                alignItems: "start",
               }}
             >
               <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                <Stack
-                  direction="row"
-                  spacing={1}
-                  sx={{ alignItems: "center", mb: 0.5 }}
-                >
+                <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 0.5 }}>
                   <PrinterChip name={issue.printer_name} />
                   <StatusChip resolved={!issue.active} />
                 </Stack>
@@ -121,22 +114,19 @@ const MobileIssueCard = memo<MobileIssueCardProps>(
                 <Button
                   size="small"
                   onClick={handleToggle}
-                  endIcon={
-                    isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />
-                  }
+                  endIcon={isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                   sx={{ alignSelf: "flex-start" }}
                 >
                   {isExpanded ? "Hide Details" : "Show Details"}
                 </Button>
                 <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-                  <Paper
-                    variant="outlined"
-                    sx={{ p: 2, bgcolor: "background.default" }}
-                  >
+                  <Paper variant="outlined" sx={{ p: 2, bgcolor: "background.default" }}>
                     <Typography
                       variant="body2"
                       color="text.secondary"
-                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(issue.description) }}
+                      dangerouslySetInnerHTML={{
+                        __html: sanitizeIssueHtml(issue.description),
+                      }}
                     />
                   </Paper>
                 </Collapse>
@@ -159,7 +149,7 @@ const MobileIssueCard = memo<MobileIssueCardProps>(
         </CardContent>
       </Card>
     );
-  }
+  },
 );
 
 MobileIssueCard.displayName = "MobileIssueCard";

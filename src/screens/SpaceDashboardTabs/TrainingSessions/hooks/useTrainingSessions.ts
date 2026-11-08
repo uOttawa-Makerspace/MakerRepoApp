@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import toast from "react-hot-toast";
-import * as HTTPRequest from "../../../../utils/HTTPRequests";
+import { certifyTrainingSession } from "../../../../api/endpoints";
+import { errorMessage } from "../../../../api/client";
 import type {
   TrainingSession,
   SortField,
@@ -63,14 +64,11 @@ export const useTrainingSessions = (
     setCertifying(true);
 
     try {
-      const response = await HTTPRequest.post(
-        `staff/training_sessions/${certifyDialog.session.id}/certify_trainees`,
-        {}
-      );
+      const response = await certifyTrainingSession(certifyDialog.session.id);
 
-      if (response.data.certified === true) {
+      if (response.certified === true) {
         toast.success(
-          `Successfully certified trainees for ${certifyDialog.session.training.name_en}!`,
+          `Successfully certified trainees for ${certifyDialog.session.training?.name_en ?? "this session"}!`,
           {
             position: "bottom-center",
             icon: "🎓",
@@ -87,7 +85,7 @@ export const useTrainingSessions = (
       }
     } catch (error) {
       console.error(error);
-      toast.error("Failed to certify users. Please try again.", {
+      toast.error(errorMessage(error, "Failed to certify users. Please try again."), {
         position: "bottom-center",
       });
     } finally {

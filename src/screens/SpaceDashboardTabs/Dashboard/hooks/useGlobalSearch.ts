@@ -1,23 +1,21 @@
 import { useState, useEffect, useMemo } from "react";
 import { debounce } from "@mui/material/utils";
-import * as HTTPRequest from "../../../../utils/HTTPRequests";
-import type { User } from "../types";
+import { searchUsers } from "../../../../api/endpoints";
+import type { UserSearchResult } from "../../../../api/types";
 
 export const useGlobalSearch = (
   searchQuery: string,
   signedInUsernames: Set<string>
 ) => {
-  const [allResults, setAllResults] = useState<User[]>([]);
+  const [allResults, setAllResults] = useState<UserSearchResult[]>([]);
   const [loading, setLoading] = useState(false);
 
   const debouncedSearch = useMemo(
     () =>
       debounce(async (query: string) => {
         try {
-          const response = await HTTPRequest.get(
-            `staff_dashboard/search?query=${encodeURIComponent(query)}`
-          );
-          setAllResults(response);
+          const response = await searchUsers(query);
+          setAllResults(response.users);
         } catch (error) {
           console.error("Global search failed:", error);
           setAllResults([]);

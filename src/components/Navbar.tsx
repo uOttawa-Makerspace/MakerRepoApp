@@ -31,7 +31,7 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
         </NavLink>
 
         <NavLink 
-          to={`/profile/${user?.username || ''}`}
+          to={`/profile/${encodeURIComponent(user?.username || '')}`}
           className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
           aria-label="Profile"
         >

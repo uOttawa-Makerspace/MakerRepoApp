@@ -1,9 +1,13 @@
 import { useState, useCallback } from "react";
 import toast from "react-hot-toast";
-import * as HTTPRequest from "../../../../utils/HTTPRequests";
+import { signOutUser } from "../../../../api/endpoints";
+import { errorMessage } from "../../../../api/client";
 import { User, SignOutDialogState } from "../types";
 
-export const useSignOut = (onSuccess: () => void) => {
+export const useSignOut = (
+  spaceId: number | string | undefined,
+  onSuccess: () => void
+) => {
   const [signOutDialog, setSignOutDialog] = useState<SignOutDialogState>({
     open: false,
     user: null,
@@ -20,15 +24,16 @@ export const useSignOut = (onSuccess: () => void) => {
 
   const confirmSignOut = useCallback(async () => {
     if (!signOutDialog.user) return;
+    if (spaceId === undefined) {
+      toast.error("No space selected", { position: "bottom-center" });
+      return;
+    }
 
     setSigningOut(true);
     const { username, name } = signOutDialog.user;
 
     try {
-      await HTTPRequest.put(
-        `staff_dashboard/remove_users?dropped_users[]=${username}`,
-        {}
-      );
+      await signOutUser(spaceId, username);
       onSuccess();
       toast.success(`${name} has been signed out`, {
         position: "bottom-center",
@@ -37,13 +42,13 @@ export const useSignOut = (onSuccess: () => void) => {
       setSignOutDialog({ open: false, user: null });
     } catch (error) {
       console.error(error);
-      toast.error("Failed to sign out user. Please try again.", {
+      toast.error(errorMessage(error, "Failed to sign out user. Please try again."), {
         position: "bottom-center",
       });
     } finally {
       setSigningOut(false);
     }
-  }, [signOutDialog.user, onSuccess]);
+  }, [signOutDialog.user, spaceId, onSuccess]);
 
   return {
     signOutDialog,

@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import toast from "react-hot-toast";
-import * as HTTPRequest from "../../../../utils/HTTPRequests";
+import { resolvePrinterIssue } from "../../../../api/endpoints";
+import { errorMessage } from "../../../../api/client";
 import type { PrinterIssue, SortField, SortOrder, IssueStats } from "../types";
 
 const SORT_COMPARATORS: Record<
@@ -82,10 +83,7 @@ export function usePrinterIssues(
     setResolving(true);
 
     try {
-      await HTTPRequest.post(
-        `printer_issues/${resolveDialog.issue.id}/resolve`,
-        {}
-      );
+      await resolvePrinterIssue(resolveDialog.issue.id);
 
       toast.success("Issue marked as resolved", {
         position: "bottom-center",
@@ -96,7 +94,7 @@ export function usePrinterIssues(
       onIssueResolved?.();
     } catch (error) {
       console.error(error);
-      toast.error("Failed to resolve issue. Please try again.", {
+      toast.error(errorMessage(error, "Failed to resolve issue. Please try again."), {
         position: "bottom-center",
       });
     } finally {

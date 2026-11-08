@@ -55,6 +55,7 @@ const NewTrainingSession = ({
           trainingLevel={form.trainingLevel}
           trainingCourse={form.trainingCourse}
           trainingInstructor={form.trainingInstructor}
+          canChooseInstructor={form.isAdmin}
           errors={form.errors}
           onTrainingChange={form.setTrainingId}
           onLevelChange={form.setTrainingLevel}

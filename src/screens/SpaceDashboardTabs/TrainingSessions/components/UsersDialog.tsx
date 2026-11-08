@@ -171,10 +171,10 @@ const UsersDialog: React.FC<UsersDialogProps> = ({
       >
         <Box sx={{ minWidth: 0, flex: 1 }}>
           <Typography variant="h6" sx={{ fontWeight: 600 }} noWrap>
-            {session.training.name_en}
+            {session.training?.name_en}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {session.course} · {session.space.name}
+            {session.course} · {session.space?.name}
             {session.level ? ` · ${session.level}` : ""}
           </Typography>
         </Box>
