@@ -1,5 +1,5 @@
 import React, { memo, useCallback } from "react";
-import DOMPurify from "dompurify";
+import { sanitizeIssueHtml } from "../../../../utils/sanitizeIssueHtml";
 import {
   TableRow,
   TableCell,
@@ -34,12 +34,12 @@ const DesktopIssueRow = memo<DesktopIssueRowProps>(
   ({ issue, isExpanded, onToggleExpand, onMenuOpen }) => {
     const handleToggle = useCallback(
       () => onToggleExpand(issue.id),
-      [issue.id, onToggleExpand]
+      [issue.id, onToggleExpand],
     );
 
     const handleMenu = useCallback(
       (e: React.MouseEvent<HTMLElement>) => onMenuOpen(e, issue),
-      [issue, onMenuOpen]
+      [issue, onMenuOpen],
     );
 
     return (
@@ -95,10 +95,7 @@ const DesktopIssueRow = memo<DesktopIssueRowProps>(
         </TableRow>
         {issue.description && (
           <TableRow>
-            <TableCell
-              style={{ paddingBottom: 0, paddingTop: 0 }}
-              colSpan={7}
-            >
+            <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
               <Collapse in={isExpanded} timeout="auto" unmountOnExit>
                 <Box sx={{ py: 2, px: 6 }}>
                   <Typography
@@ -115,7 +112,9 @@ const DesktopIssueRow = memo<DesktopIssueRowProps>(
                     <Typography
                       variant="body2"
                       color="text.secondary"
-                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(issue.description) }}
+                      dangerouslySetInnerHTML={{
+                        __html: sanitizeIssueHtml(issue.description),
+                      }}
                     />
                   </Paper>
                 </Box>
@@ -125,7 +124,7 @@ const DesktopIssueRow = memo<DesktopIssueRowProps>(
         )}
       </>
     );
-  }
+  },
 );
 
 DesktopIssueRow.displayName = "DesktopIssueRow";

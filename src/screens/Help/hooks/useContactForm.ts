@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import toast from "react-hot-toast";
-import * as HTTPRequest from "../../../utils/HTTPRequests";
+import { sendSupportRequest } from "../../../api/endpoints";
+import { ApiError, errorMessage } from "../../../api/client";
 import EnvVariables from "../../../utils/EnvVariables";
 import { FormData, FormErrors } from "../types";
 import { INITIAL_FORM_DATA } from "../constants";
@@ -21,8 +22,8 @@ const VALIDATION_RULES: Record<
   subject: {
     required: "Subject is required",
     minLength: {
-      value: 5,
-      message: "Subject must be at least 5 characters",
+      value: 10,
+      message: "Subject must be at least 10 characters",
     },
   },
   comments: {
@@ -87,11 +88,11 @@ export const useContactForm = () => {
       setSubmitting(true);
 
       try {
-        await HTTPRequest.put("send_email", {
-          name: formData.name,
-          email: formData.email,
-          subject: formData.subject,
-          comments: formData.comments,
+        await sendSupportRequest({
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          subject: formData.subject.trim(),
+          comments: formData.comments.trim(),
           app_version: `${EnvVariables.app_version} ${EnvVariables.app_release_type}`,
         });
 
@@ -104,8 +105,20 @@ export const useContactForm = () => {
         setFormData({ ...INITIAL_FORM_DATA });
       } catch (error) {
         console.error(error);
+        // Keep what the user typed. Show the API's per-field problems next to the fields.
+        if (error instanceof ApiError && error.status === 422 && error.fields) {
+          const fieldErrors: FormErrors = {};
+          for (const key of Object.keys(VALIDATION_RULES) as (keyof FormData)[]) {
+            const messages = error.fields[key];
+            if (messages?.length) fieldErrors[key] = `${key === "comments" ? "Message" : key[0].toUpperCase() + key.slice(1)} ${messages.join(", ")}`;
+          }
+          setFormErrors(fieldErrors);
+        }
         toast.error(
-          "Failed to send your message. Please try again or email us directly at uottawa.makerepo@gmail.com",
+          errorMessage(
+            error,
+            "Failed to send your message. Please try again or email us directly at uottawa.makerepo@gmail.com"
+          ),
           { position: "bottom-center", duration: 6000 }
         );
       } finally {

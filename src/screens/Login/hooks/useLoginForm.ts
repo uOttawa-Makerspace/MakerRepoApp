@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { setUserSession } from "../../../utils/Common";
 import { LoggedInContext } from "../../../utils/Contexts";
-import * as HTTPRequest from "../../../utils/HTTPRequests";
+import { login } from "../../../api/endpoints";
+import { ApiError, errorMessage } from "../../../api/client";
+import type { SessionUser } from "../../../api/types";
 import { FormData, FormErrors } from "../types";
 import {
   INITIAL_FORM_DATA,
@@ -10,7 +11,7 @@ import {
   ERROR_MESSAGES,
 } from "../constants";
 
-export const useLoginForm = (setUser: (user: any) => void) => {
+export const useLoginForm = (setUser: (user: SessionUser) => void) => {
   const { setLoggedIn } = useContext(LoggedInContext);
   const navigate = useNavigate();
 
@@ -52,10 +53,19 @@ export const useLoginForm = (setUser: (user: any) => void) => {
     return Object.keys(errors).length === 0;
   }, [formData]);
 
-  const getErrorMessage = useCallback((error: any): string => {
-    const status = error.response?.status;
-    if (status && ERROR_MESSAGES[status]) {
-      return ERROR_MESSAGES[status];
+  const getErrorMessage = useCallback((error: unknown): string => {
+    if (error instanceof ApiError) {
+      // Wrong password and unknown login look the same on purpose.
+      if (error.status === 401) return ERROR_MESSAGES[401];
+      if (error.status === 429) return ERROR_MESSAGES[429];
+      if (error.status > 0 && error.status < 500) {
+        // account_unconfirmed / account_inactive / account_locked / validation: the API says why.
+        const message = errorMessage(error, ERROR_MESSAGES.default);
+        const supportEmail = error.details.support_email;
+        return typeof supportEmail === "string" && !message.includes(supportEmail)
+          ? `${message} Contact ${supportEmail} for help.`
+          : message;
+      }
     }
     if (!navigator.onLine) {
       return ERROR_MESSAGES.offline;
@@ -79,24 +89,13 @@ export const useLoginForm = (setUser: (user: any) => void) => {
       setLoginError(null);
 
       try {
-        const response = await HTTPRequest.post("login_authentication", {
-          username_email: formData.usernameEmail,
-          password: formData.password,
-        });
-
-        if (response.status === 200) {
-          setUserSession(response.data.token, response.data.user);
-          setUser(response.data.user);
-          setLoggedIn(true);
-          navigate("/");
-        } else {
-          setLoggedIn(false);
-          setLoginError(
-            "Invalid username or password. Please try again."
-          );
-        }
-      } catch (error: any) {
-        console.error("Login error:", error);
+        const user = await login(formData.usernameEmail, formData.password);
+        setUser(user);
+        setLoggedIn(true);
+        navigate("/");
+      } catch (error) {
+        // Never log the request: it carries the password.
+        console.error("Login failed:", error instanceof ApiError ? error.code : "network");
         setLoggedIn(false);
         setLoginError(getErrorMessage(error));
       } finally {

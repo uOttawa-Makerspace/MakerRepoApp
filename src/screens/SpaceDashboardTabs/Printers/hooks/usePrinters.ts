@@ -1,12 +1,15 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import toast from "react-hot-toast";
-import * as HTTPRequest from "../../../../utils/HTTPRequests";
+import { listPrinterIssues, listPrinterTypes } from "../../../../api/endpoints";
+import { errorMessage } from "../../../../api/client";
+import type { SpaceDashboardData } from "../../../../api/types";
 import type { PrinterType, UserOption, PrinterStats, Printer } from "../types";
 import type { PrinterIssue } from "../../PrinterIssues/types";
 
-export function usePrinters(inSpaceUsers: any) {
+export function usePrinters(inSpaceUsers: SpaceDashboardData | null) {
   const [printers, setPrinters] = useState<PrinterType[]>([]);
   const [printerIssues, setPrinterIssues] = useState<PrinterIssue[]>([]);
+  const [issuesError, setIssuesError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [tabIndex, setTabIndex] = useState(0);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -15,7 +18,7 @@ export function usePrinters(inSpaceUsers: any) {
     (_event: React.SyntheticEvent, newValue: number) => {
       setTabIndex(newValue);
     },
-    []
+    [],
   );
 
   const handleReload = useCallback(() => {
@@ -24,33 +27,22 @@ export function usePrinters(inSpaceUsers: any) {
 
   const fetchPrinters = useCallback(async () => {
     setLoading(true);
+    setIssuesError(null);
     try {
-      const printerData = await HTTPRequest.get("printers/printer_data");
+      const printerData = await listPrinterTypes();
 
-      if (!printerData || !Array.isArray(printerData)) {
-        console.warn("Invalid or missing printer data");
-        setPrinters([]);
-        setPrinterIssues([]);
-        toast.error("Failed to load printer data", {
-          position: "bottom-center",
-        });
-        return;
-      }
-
-      const formattedPrinters: PrinterType[] = printerData.map(
-        (pt: PrinterType) => ({
-          id: pt.id,
-          name: pt.name,
-          short_form: pt.short_form,
-          available: pt.available,
-          printers: (pt.printers || []).map((p: Printer) => ({
-            id: p.id,
-            number: p.number,
-            maintenance: p.maintenance,
-            has_issues: p.has_issues,
-          })),
-        })
-      );
+      const formattedPrinters: PrinterType[] = printerData.map((pt: PrinterType) => ({
+        id: pt.id,
+        name: pt.name,
+        short_form: pt.short_form,
+        available: pt.available,
+        printers: (pt.printers || []).map((p: Printer) => ({
+          id: p.id,
+          number: p.number,
+          maintenance: p.maintenance,
+          has_issues: p.has_issues,
+        })),
+      }));
 
       setPrinters(formattedPrinters);
 
@@ -63,28 +55,29 @@ export function usePrinters(inSpaceUsers: any) {
       }
 
       try {
-        const issuesData = await HTTPRequest.get("printer_issues");
+        const issuesData = await listPrinterIssues();
+        setIssuesError(null);
 
-        if (issuesData?.issues && Array.isArray(issuesData.issues)) {
-          setPrinterIssues(
-            issuesData.issues.map((i: any) => ({
-              id: i.id,
-              printer_id: i.printer_id,
-              printer_name: printerNameMap.get(i.printer_id),
-              reporter: i.reporter,
-              summary: i.summary,
-              description: i.description,
-              created_at: i.created_at,
-              active: i.active
-            }))
-          );
-        } else {
-          console.warn("Invalid or missing issues data");
-          setPrinterIssues([]);
-        }
+        setPrinterIssues(
+          issuesData.map((i) => ({
+            id: i.id,
+            printer_id: i.printer_id,
+            printer_name: printerNameMap.get(i.printer_id),
+            reporter: i.reporter ?? "Unknown",
+            summary: i.summary,
+            description: i.description,
+            created_at: i.created_at,
+            active: i.active,
+          })),
+        );
       } catch (error) {
+        // Not an empty list: staff would read "no issues" while printers may be broken.
         console.warn("Failed to fetch printer issues:", error);
         setPrinterIssues([]);
+        setIssuesError(errorMessage(error, "Failed to load printer issues"));
+        toast.error(errorMessage(error, "Failed to load printer issues"), {
+          position: "bottom-center",
+        });
       }
     } catch (error) {
       console.error("Fetch error:", error);
@@ -103,8 +96,8 @@ export function usePrinters(inSpaceUsers: any) {
   }, [fetchPrinters, refreshTrigger]);
 
   const users = useMemo<UserOption[]>(() => {
-    if (!inSpaceUsers?.space_users) return [];
-    return inSpaceUsers.space_users.map((u: any) => ({
+    if (!inSpaceUsers?.users) return [];
+    return inSpaceUsers.users.map((u) => ({
       id: u.id,
       name: u.name,
     }));
@@ -134,6 +127,7 @@ export function usePrinters(inSpaceUsers: any) {
   return {
     printers,
     printerIssues,
+    issuesError,
     loading,
     tabIndex,
     users,

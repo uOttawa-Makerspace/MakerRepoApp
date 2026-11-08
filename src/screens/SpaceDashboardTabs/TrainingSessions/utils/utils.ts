@@ -1,10 +1,20 @@
 import type { TrainingSession, SortField, SortOrder } from "../types";
 
-export const formatDate = (dateString: string): string => {
+// Whole calendar days between two instants, in the local time zone. Uses
+// UTC-midnight stamps of the local Y/M/D so DST shifts cannot skew the count.
+const calendarDaysBetween = (from: Date, to: Date): number =>
+  Math.round(
+    (Date.UTC(to.getFullYear(), to.getMonth(), to.getDate()) -
+      Date.UTC(from.getFullYear(), from.getMonth(), from.getDate())) /
+      86_400_000
+  );
+
+export const formatDate = (
+  dateString: string,
+  now: Date = new Date()
+): string => {
   const date = new Date(dateString);
-  const now = new Date();
-  const diffTime = Math.abs(now.getTime() - date.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const diffDays = Math.max(0, calendarDaysBetween(date, now));
 
   if (diffDays === 0) return "Today";
   if (diffDays === 1) return "Yesterday";

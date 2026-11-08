@@ -1,3 +1,5 @@
+import type { SpaceDashboardData } from "../../../api/types";
+
 export interface Printer {
   id: number;
   number: string;
@@ -35,7 +37,7 @@ export interface PrinterStats {
 export type PrinterStatus = "maintenance" | "issues" | "available";
 
 export type PrintersProps = {
-  inSpaceUsers: any;
+  inSpaceUsers: SpaceDashboardData | null;
   handleReloadCurrentUsers: () => void;
   reloadPrinters: () => void;
 };

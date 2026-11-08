@@ -1,6 +1,8 @@
 import React from "react";
 import {
+  Alert,
   Box,
+  Button,
   Typography,
   CircularProgress,
   useMediaQuery,
@@ -14,15 +16,14 @@ import LinkPrintersTab from "./components/LinkPrintersTab";
 import PrinterIssues from "../PrinterIssues/index";
 import type { PrintersProps } from "./types";
 
-const Printers: React.FC<PrintersProps> = ({
-  inSpaceUsers,
-}) => {
+const Printers: React.FC<PrintersProps> = ({ inSpaceUsers }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const {
     printers,
     printerIssues,
+    issuesError,
     loading,
     tabIndex,
     users,
@@ -33,7 +34,9 @@ const Printers: React.FC<PrintersProps> = ({
 
   if (loading) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", py: 8 }}>
+      <Box
+        sx={{ display: "flex", justifyContent: "center", alignItems: "center", py: 8 }}
+      >
         <CircularProgress />
       </Box>
     );
@@ -57,15 +60,24 @@ const Printers: React.FC<PrintersProps> = ({
       />
 
       <TabPanel value={tabIndex} index={0}>
-        <LinkPrintersTab
-          printers={printers}
-          users={users}
-          onLink={handleReload}
-        />
+        <LinkPrintersTab printers={printers} users={users} onLink={handleReload} />
       </TabPanel>
 
       <TabPanel value={tabIndex} index={1}>
-        <PrinterIssues issues={printerIssues} />
+        {issuesError ? (
+          <Alert
+            severity="error"
+            action={
+              <Button color="inherit" size="small" onClick={handleReload}>
+                Retry
+              </Button>
+            }
+          >
+            {issuesError}
+          </Alert>
+        ) : (
+          <PrinterIssues issues={printerIssues} />
+        )}
       </TabPanel>
     </Box>
   );

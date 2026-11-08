@@ -1,11 +1,11 @@
 export type ExtendedProps = {
   reason?: string;
+  // Not sent by /api/v1 (the shift card reads them if they ever are).
   training?: string;
   course?: string;
-  language?: string;
   name?: string;
   draft?: boolean;
-  description?: string;
+  description?: string | null;
   eventType?: string;
   hasCurrentUser?: boolean;
   background?: string;

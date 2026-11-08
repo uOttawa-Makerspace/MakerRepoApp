@@ -18,11 +18,12 @@ interface SelectFieldProps {
   value: string;
   options: [string | number, string][] | string[];
   error?: string;
+  disabled?: boolean;
   onChange: (value: string) => void;
 }
 
 const SelectField = memo<SelectFieldProps>(
-  ({ label, value, options, error, onChange }) => {
+  ({ label, value, options, error, disabled, onChange }) => {
     const isTupleArray =
       options.length > 0 && Array.isArray(options[0]);
 
@@ -31,6 +32,7 @@ const SelectField = memo<SelectFieldProps>(
         <InputLabel>{label} *</InputLabel>
         <Select
           value={value}
+          disabled={disabled}
           onChange={(e) => onChange(e.target.value)}
           label={`${label} *`}
         >
@@ -60,6 +62,8 @@ interface TrainingDetailsCardProps {
   trainingLevel: string;
   trainingCourse: string;
   trainingInstructor: string;
+  /** Only admins may pick another instructor; staff always teach their own sessions. */
+  canChooseInstructor: boolean;
   errors: FormErrors;
   onTrainingChange: (v: string) => void;
   onLevelChange: (v: string) => void;
@@ -75,6 +79,7 @@ const TrainingDetailsCard = memo<TrainingDetailsCardProps>(
     trainingLevel,
     trainingCourse,
     trainingInstructor,
+    canChooseInstructor,
     errors,
     onTrainingChange,
     onLevelChange,
@@ -110,7 +115,7 @@ const TrainingDetailsCard = memo<TrainingDetailsCardProps>(
             <SelectField
               label="Level"
               value={trainingLevel}
-              options={data.level}
+              options={data.levels}
               error={errors.level}
               onChange={handleChange("level", onLevelChange)}
             />
@@ -124,8 +129,9 @@ const TrainingDetailsCard = memo<TrainingDetailsCardProps>(
             <SelectField
               label="Instructor"
               value={trainingInstructor}
-              options={data.admins}
+              options={data.instructors}
               error={errors.instructor}
+              disabled={!canChooseInstructor}
               onChange={handleChange("instructor", onInstructorChange)}
             />
           </Stack>

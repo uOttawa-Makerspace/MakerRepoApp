@@ -1,10 +1,7 @@
-export interface NewTrainingSessionData {
-  trainings: [string | number, string][];
-  level: string[];
-  course_names: string[];
-  admins: [string | number, string][];
-  users: [string | number, string][];
-}
+import type { TrainingSessionOptions } from "../../../api/types";
+
+/** GET /training_session_options: trainings, levels, course_names, instructors, trainees. */
+export type NewTrainingSessionData = TrainingSessionOptions;
 
 export interface FormErrors {
   training?: string;
