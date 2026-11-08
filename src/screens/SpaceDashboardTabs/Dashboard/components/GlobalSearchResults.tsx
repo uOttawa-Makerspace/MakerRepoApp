@@ -18,13 +18,13 @@ import {
   Login as LoginIcon,
   SearchOff as SearchOffIcon,
 } from "@mui/icons-material";
-import { User } from "../types";
+import type { UserSearchResult } from "../../../../api/types";
 
 interface GlobalSearchResultsProps {
-  results: User[];
+  results: UserSearchResult[];
   loading: boolean;
   searchQuery: string;
-  onSignIn: (user: User) => void;
+  onSignIn: (user: UserSearchResult) => void;
   onNavigate: (username: string) => void;
 }
 

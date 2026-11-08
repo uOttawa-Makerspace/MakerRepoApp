@@ -739,3 +739,12 @@ $primary-orange-border: rgba(228, 71, 38, 0.3);
         }
     }
 }
+
+.truncated-notice {
+  margin: 0.75rem 1rem 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background: #fff4e5;
+  color: #663c00;
+  font-size: 0.875rem;
+}

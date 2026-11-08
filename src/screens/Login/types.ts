@@ -1,5 +1,7 @@
+import type { SessionUser } from "../../api/types";
+
 export interface LoginProps {
-  setUser: (user: any) => void;
+  setUser: (user: SessionUser) => void;
 }
 
 export interface FormData {

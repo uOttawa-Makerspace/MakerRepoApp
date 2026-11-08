@@ -9,9 +9,7 @@ export interface User {
   name: string;
   email: string;
   flagged: boolean | null;
-  flag_message?: string;
   avatar_url?: string;
-  active: boolean;
   signed_safety_sheet: boolean;
   membership_status: boolean;
   certifications?: Certification[];
@@ -35,6 +33,7 @@ export interface SignOutDialogState {
 export interface SearchUser {
   name: string;
   username: string;
+  email?: string;
 }
 
 export interface SignInDialogState {

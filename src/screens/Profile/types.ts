@@ -4,36 +4,22 @@ export type ProfileParams = {
   username: string;
 };
 
-export interface User {
-  id: number;
-  username: string;
-  name: string;
-  email: string;
-  faculty?: string;
-  program?: string;
-  year_of_study?: string;
-  identity?: string;
-  role: string;
-  avatar_url?: string;
-  rfid?: {
-    card_number: string;
-  } | null;
-}
+import type {
+  ProfileCertification,
+  ProfileUser,
+  UnlinkedCard,
+} from "../../api/types";
 
-export interface RfidInfo {
-  cardNumber: string;
-  tappedAt: string;
-}
+export type User = ProfileUser;
 
-export interface Certification {
+/** { card_number, tapped_at } as GET /rfid_cards sends it. */
+export type RfidInfo = UnlinkedCard;
+
+export type Certification = ProfileCertification;
+
+export interface RemainingTraining {
   id: number;
-  training: {
-    name_en: ReactNode;
-    id: number;
-    name: string;
-  };
-  updated_at: string;
-  created_at: string;
+  name_en: string;
 }
 
 export interface UnlinkDialogState {
@@ -44,5 +30,5 @@ export interface UnlinkDialogState {
 export interface InfoRowProps {
   icon: ReactNode;
   label: string;
-  value?: string;
+  value?: string | null;
 }

@@ -73,7 +73,7 @@ export const FORM_FIELDS: ContactFormField[] = [
     label: "Message",
     multiline: true,
     rows: 6,
-    maxLength: 1000,
+    maxLength: 5000,
     icon: React.createElement(MessageIcon, {
       sx: { mr: 1, color: "action.active", alignSelf: "flex-start", mt: 1.5 },
     }),

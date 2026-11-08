@@ -57,7 +57,7 @@ const TabContent: React.FC<TabContentProps> = memo(
           <TabPanel value={tabIndex} index={0}>
             <Box sx={{ px: 0 }}>
               <Dashboard
-                inSpaceUsers={inSpaceUsers?.space_users ?? []}
+                inSpaceUsers={inSpaceUsers?.users ?? []}
                 handleReloadCurrentUsers={onReloadUsers}
                 spaceId={spaceId ?? undefined}
                 spaceName={inSpaceUsers?.space?.name}

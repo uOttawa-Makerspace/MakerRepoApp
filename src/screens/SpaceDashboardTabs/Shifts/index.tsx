@@ -9,17 +9,14 @@ import DesktopCalendar from "./components/DesktopCalendar";
 import MobileCalendar from "./MobileCalendar";
 import "./Shifts.scss";
 
-const Shifts: React.FC<ShiftsProps> = ({
-  reloadShifts,
-  spaceId,
-  currentUserId,
-}) => {
+const Shifts: React.FC<ShiftsProps> = ({ reloadShifts, spaceId, currentUserId }) => {
   const isMobile = useMobileDetect();
 
   const {
     shifts,
     loading,
     error,
+    truncated,
     mobileView,
     setMobileView,
     currentDate,
@@ -39,17 +36,17 @@ const Shifts: React.FC<ShiftsProps> = ({
 
   return (
     <div className="shifts-container">
-      <ShiftsHeader
-        loading={loading}
-        isMobile={isMobile}
-        onRefresh={handleRefresh}
-      />
+      <ShiftsHeader loading={loading} isMobile={isMobile} onRefresh={handleRefresh} />
 
       <div className="calendar-card">
         {loading && <LoadingOverlay />}
 
-        {error && !loading && (
-          <ErrorState message={error} onRetry={fetchShifts} />
+        {error && !loading && <ErrorState message={error} onRetry={fetchShifts} />}
+
+        {!loading && !error && truncated && (
+          <div className="truncated-notice" role="status">
+            Not all shifts are displayed: the list was too long and has been cut off.
+          </div>
         )}
 
         {!loading && !error && !hasShifts && <EmptyState />}
