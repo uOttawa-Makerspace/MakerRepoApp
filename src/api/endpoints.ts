@@ -20,6 +20,7 @@ import type {
   SessionResponse,
   SessionUser,
   SpaceDashboardData,
+  MySpaceResponse,
   ShiftEvent,
   Space,
   SupportRequest,
@@ -90,7 +91,7 @@ export const setUserPrograms = (
 
 export const listSpaces = () => request<Space[]>("get", "spaces");
 
-export const getMySpace = () => request<Space>("get", "me/space");
+export const getMySpace = () => request<MySpaceResponse>("get", "me/space");
 
 export const setMySpace = (spaceId: number) =>
   request<Space>("put", "me/space", { data: { space_id: spaceId } });
@@ -106,6 +107,9 @@ export const signOutUser = (spaceId: number | string, username: string) =>
 
 export const loadSpaceDashboard = async (): Promise<SpaceDashboardData> => {
   const [mySpace, spaces] = await Promise.all([getMySpace(), listSpaces()]);
+  if (!("id" in mySpace)) {
+    return { space: null, users: [], spaces, current_user: null };
+  }
   const presence = await getPresence(mySpace.id);
   return {
     space: presence.space,

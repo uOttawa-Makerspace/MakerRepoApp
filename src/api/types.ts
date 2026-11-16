@@ -92,11 +92,16 @@ export interface PresenceResponse {
 
 /** What the staff dashboard shows: the caller's space, who is in it, and every space (for the picker). */
 export interface SpaceDashboardData {
-  space: Space;
+  /** null when the caller is assigned to no space (and holds none). */
+  space: Space | null;
   users: PresenceUser[];
   spaces: Space[];
-  current_user: { id: number };
+  /** null when there is no space, as the presence call that carries it is not made. */
+  current_user: { id: number } | null;
 }
+
+/** GET me/space: the caller's space, or { space: null } when they may work in none. */
+export type MySpaceResponse = Space | { space: null };
 
 // --- rfid ---
 
