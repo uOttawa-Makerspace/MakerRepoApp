@@ -62,11 +62,13 @@ const TrainingSessions = ({
     <Box>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
-        {!isMobile && (
-          <Typography variant="h5" sx={{ fontWeight: 600 }} gutterBottom>
-            My Training Sessions
-          </Typography>
-        )}
+        <Typography
+          variant={isMobile ? "h6" : "h5"}
+          sx={{ fontWeight: 600 }}
+          gutterBottom
+        >
+          My Training Sessions
+        </Typography>
 
         <SessionStats stats={stats} isMobile={isMobile} />
 
