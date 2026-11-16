@@ -5,12 +5,13 @@ import {
   getTrainingSessionOptions,
 } from "../../../../api/endpoints";
 import { errorMessage } from "../../../../api/client";
+import { createSubmissionKeys } from "../../../../api/submissionKeys";
 import { getStoredUser } from "../../../../api/tokens";
 import type { NewTrainingSessionData, FormErrors } from "../types";
 
 export function useTrainingSessionForm(
   spaceId: number | string | null,
-  reloadTrainingSessions: () => void
+  reloadTrainingSessions: () => void,
 ) {
   const currentUser = getStoredUser();
   const isAdmin = currentUser?.role === "admin";
@@ -29,6 +30,8 @@ export function useTrainingSessionForm(
   const [searchQuery, setSearchQuery] = useState("");
   const [confirmDialog, setConfirmDialog] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
+  // One Idempotency-Key per submission, reused when the same form is submitted again after a failure.
+  const [submissionKeys] = useState(() => createSubmissionKeys());
 
   const resolveDefaultInstructor = useCallback(
     (admins: [string | number, string][]) => {
@@ -36,30 +39,25 @@ export function useTrainingSessionForm(
 
       if (currentUser?.id) {
         const currentUserId = String(currentUser.id);
-        const isInAdminsList = admins.some(
-          (admin) => String(admin[0]) === currentUserId
-        );
+        const isInAdminsList = admins.some((admin) => String(admin[0]) === currentUserId);
         if (isInAdminsList) return currentUserId;
       }
 
       return String(admins[0][0]);
     },
-    [currentUser?.id]
+    [currentUser?.id],
   );
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       // Trainings on offer depend on the space, so ask for the one on screen.
-      const response: NewTrainingSessionData =
-        await getTrainingSessionOptions(spaceId);
+      const response: NewTrainingSessionData = await getTrainingSessionOptions(spaceId);
       setData(response);
 
-      if (response.trainings?.length > 0)
-        setTrainingId(String(response.trainings[0][0]));
+      if (response.trainings?.length > 0) setTrainingId(String(response.trainings[0][0]));
       if (response.levels?.length > 0) setTrainingLevel(response.levels[0]);
-      if (response.course_names?.length > 0)
-        setTrainingCourse(response.course_names[0]);
+      if (response.course_names?.length > 0) setTrainingCourse(response.course_names[0]);
 
       setTrainingInstructor(resolveDefaultInstructor(response.instructors));
     } catch (error) {
@@ -87,9 +85,7 @@ export function useTrainingSessionForm(
 
   const handleUserToggle = useCallback((userId: string) => {
     setTrainingUsers((prev) =>
-      prev.includes(userId)
-        ? prev.filter((id) => id !== userId)
-        : [...prev, userId]
+      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId],
     );
     setErrors((prev) => {
       if (!prev.users) return prev;
@@ -118,10 +114,8 @@ export function useTrainingSessionForm(
     if (!trainingId) newErrors.training = "Please select a training";
     if (!trainingLevel) newErrors.level = "Please select a level";
     if (!trainingCourse) newErrors.course = "Please select a course";
-    if (!trainingInstructor)
-      newErrors.instructor = "Please select an instructor";
-    if (trainingUsers.length === 0)
-      newErrors.users = "Please select at least one user";
+    if (!trainingInstructor) newErrors.instructor = "Please select an instructor";
+    if (trainingUsers.length === 0) newErrors.users = "Please select at least one user";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -132,9 +126,7 @@ export function useTrainingSessionForm(
     setSearchQuery("");
     setErrors({});
     if (data) {
-      setTrainingId(
-        data.trainings[0]?.[0] ? String(data.trainings[0][0]) : ""
-      );
+      setTrainingId(data.trainings[0]?.[0] ? String(data.trainings[0][0]) : "");
       setTrainingLevel(data.levels[0] || "");
       setTrainingCourse(data.course_names[0] || "");
       setTrainingInstructor(resolveDefaultInstructor(data.instructors));
@@ -160,32 +152,38 @@ export function useTrainingSessionForm(
     setSubmitting(true);
     setConfirmDialog(false);
 
+    const body = {
+      space_id: Number(spaceId),
+      training_id: Number(trainingId),
+      level: trainingLevel,
+      course: trainingCourse,
+      // Staff are always the instructor of their own sessions; only admins may name someone else.
+      ...(isAdmin && trainingInstructor
+        ? { instructor_id: Number(trainingInstructor) }
+        : {}),
+      user_ids: trainingUsers.map(Number),
+    };
+
     try {
-      await createTrainingSession({
-        space_id: Number(spaceId),
-        training_id: Number(trainingId),
-        level: trainingLevel,
-        course: trainingCourse,
-        // Staff are always the instructor of their own sessions; only admins may name someone else.
-        ...(isAdmin && trainingInstructor
-          ? { instructor_id: Number(trainingInstructor) }
-          : {}),
-        user_ids: trainingUsers.map(Number),
-      });
+      await createTrainingSession(body, submissionKeys.keyFor(body));
+      submissionKeys.done();
 
       toast.success(
         `Training session created with ${trainingUsers.length} trainee${
           trainingUsers.length !== 1 ? "s" : ""
         }!`,
-        { position: "bottom-center", icon: "🎓", duration: 4000 }
+        { position: "bottom-center", icon: "🎓", duration: 4000 },
       );
       reloadTrainingSessions();
       resetForm();
     } catch (error) {
       console.error(error);
-      toast.error(errorMessage(error, "Failed to create training session. Please try again."), {
-        position: "bottom-center",
-      });
+      toast.error(
+        errorMessage(error, "Failed to create training session. Please try again."),
+        {
+          position: "bottom-center",
+        },
+      );
     } finally {
       setSubmitting(false);
     }
@@ -197,6 +195,7 @@ export function useTrainingSessionForm(
     trainingInstructor,
     trainingUsers,
     isAdmin,
+    submissionKeys,
     reloadTrainingSessions,
     resetForm,
   ]);
@@ -217,13 +216,12 @@ export function useTrainingSessionForm(
 
   const trainingName = useMemo(
     () => data?.trainings.find((t) => String(t[0]) === trainingId)?.[1] ?? "",
-    [data?.trainings, trainingId]
+    [data?.trainings, trainingId],
   );
 
   const instructorName = useMemo(
-    () =>
-      data?.instructors.find((a) => String(a[0]) === trainingInstructor)?.[1] ?? "",
-    [data?.instructors, trainingInstructor]
+    () => data?.instructors.find((a) => String(a[0]) === trainingInstructor)?.[1] ?? "",
+    [data?.instructors, trainingInstructor],
   );
 
   return {

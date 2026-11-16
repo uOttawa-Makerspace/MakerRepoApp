@@ -143,8 +143,15 @@ export const getTrainingSessionOptions = (spaceId?: number | string | null) =>
     params: spaceId != null ? { space_id: spaceId } : undefined,
   });
 
-export const createTrainingSession = (body: CreateTrainingSessionRequest) =>
-  request<{ id: number }>("post", "training_sessions", { data: body });
+/** `idempotencyKey`: one per submission, the same on a retry of it (see submissionKeys.ts). */
+export const createTrainingSession = (
+  body: CreateTrainingSessionRequest,
+  idempotencyKey: string,
+) =>
+  request<{ id: number }>("post", "training_sessions", {
+    data: body,
+    headers: { "Idempotency-Key": idempotencyKey },
+  });
 
 export const certifyTrainingSession = (sessionId: number | string) =>
   request<{ certified: boolean }>(
