@@ -8,6 +8,7 @@ import DesktopHeader from "./components/DesktopHeader";
 import TabContent from "./components/TabContent";
 import SpaceDrawer from "./components/SpaceDrawer";
 import DashboardToaster from "./components/DashboardToaster";
+import NoAssignedSpace from "./components/NoAssignedSpace";
 
 const SpaceDashboard: React.FC = () => {
   const theme = useTheme();
@@ -37,6 +38,17 @@ const SpaceDashboard: React.FC = () => {
     getTrainingSessions,
     getPrinterData,
   } = useSpaceDashboard();
+
+  const hasNoAssignedSpace =
+    !isInitialLoading && !errors.users && inSpaceUsers?.space === null;
+
+  if (hasNoAssignedSpace) {
+    return (
+      <Box sx={{ width: "100%", bgcolor: "background.default", minHeight: "100vh" }}>
+        <NoAssignedSpace />
+      </Box>
+    );
+  }
 
   return (
     <Box
